@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     # Host header allow-list: blocks DNS-rebinding access to local health data.
     allowed_hosts: list[str] = ["localhost", "127.0.0.1", "[::1]"]
     run_migrations_on_startup: bool = True
+    # Built console served by the API when present (None disables). See am.main.mount_frontend.
+    frontend_dist: Path | None = REPO_ROOT / "frontend" / "dist"
 
     @property
     def resolved_database_url(self) -> str:

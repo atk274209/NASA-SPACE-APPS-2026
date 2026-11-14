@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from am.api.deps import AppContext
 from am.ai.ollama import OllamaClient
@@ -50,6 +53,29 @@ def build_context(settings: Settings) -> AppContext:
     )
 
 
+def mount_frontend(app: FastAPI, dist: Path | None) -> None:
+    """Serve the built console (frontend/dist) from the API server, if it has been built.
+
+    One process and one origin for demos and for crew devices: hashed assets are served from
+    /assets, and every other non-API path falls back to index.html (client-side routing).
+    """
+    if dist is None or not (dist / "index.html").is_file():
+        return
+    root = dist.resolve()
+    if (root / "assets").is_dir():
+        app.mount("/assets", StaticFiles(directory=root / "assets"), name="assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def spa(path: str):
+        if path == "api" or path.startswith("api/"):
+            raise HTTPException(404, "not found")
+        candidate = (root / path).resolve()
+        # only plain files directly inside dist (favicon etc.); never traverse outside it
+        if path and candidate.is_file() and candidate.parent == root:
+            return FileResponse(candidate)
+        return FileResponse(root / "index.html")
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
 
@@ -80,6 +106,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(research.router, prefix="/api/v1")
     for module in (crew, symptoms, streaks, journal_ext, admin, guidance, network):
         app.include_router(module.router, prefix="/api/v1")
+    mount_frontend(app, settings.frontend_dist)
     return app
 
 
