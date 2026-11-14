@@ -45,6 +45,8 @@ class Mission(Base):
     astronaut_id: Mapped[int] = mapped_column(ForeignKey("astronaut.id"))
     start_date: Mapped[date] = mapped_column(Date)
     planned_days: Mapped[int | None] = mapped_column(Integer)
+    # leo_station | lunar_surface | deep_space_transit | mars_surface | ground_analog | unspecified
+    environment: Mapped[str] = mapped_column(String(32), default="unspecified", server_default="unspecified")
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
@@ -97,6 +99,9 @@ class Measurement(Base):
 
     quality: Mapped[str] = mapped_column(String(16))
     confidence: Mapped[float | None] = mapped_column(Float)
+    # value/unit as entered before conversion to the canonical unit (None if no conversion)
+    original_value: Mapped[float | None] = mapped_column(Float)
+    original_unit: Mapped[str | None] = mapped_column(String(32))
     validation_notes: Mapped[list[str]] = mapped_column(JSON, default=list)
 
     # Deterministic assessment result (filled by the anomaly engine)
@@ -233,3 +238,4 @@ class AuditLog(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 from am.db import models_ai  # noqa: E402,F401  (register companion tables)
 from am.db import models_research  # noqa: E402,F401  (register M4 tables)
+from am.db import models_m5  # noqa: E402,F401  (register M5 tables)

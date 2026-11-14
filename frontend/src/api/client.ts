@@ -60,7 +60,7 @@ function qs(query?: Query): string {
   return s ? `?${s}` : ''
 }
 
-async function request<T>(method: string, path: string, body?: unknown, query?: Query): Promise<T> {
+export async function request<T>(method: string, path: string, body?: unknown, query?: Query): Promise<T> {
   let res: Response
   try {
     res = await fetch(`/api/v1${path}${qs(query)}`, {

@@ -8,7 +8,10 @@ import { HealthPage } from './pages/Health'
 import { JournalPage } from './pages/Journal'
 import { MissionsPage } from './pages/Missions'
 import { OverviewPage } from './pages/Overview'
+import { RecordPage } from './pages/Record'
 import { SciencePage } from './pages/Science'
+import { SettingsPage } from './pages/Settings'
+import { StreaksPage } from './pages/Streaks'
 import { SystemPage } from './pages/System'
 import { SessionProvider } from './state/session'
 
@@ -31,6 +34,9 @@ export default function App() {
               <Route path="/missions" element={<MissionsPage />} />
               <Route path="/science" element={<SciencePage />} />
               <Route path="/journal" element={<JournalPage />} />
+              <Route path="/record" element={<RecordPage />} />
+              <Route path="/streaks" element={<StreaksPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
               <Route path="/system" element={<SystemPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

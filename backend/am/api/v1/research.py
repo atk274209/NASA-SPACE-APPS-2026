@@ -131,6 +131,13 @@ class JournalOut(ORM):
     is_simulated: bool
     generator_version: str
     generated_at: datetime
+    day_level: str = "none"
+    day_level_reasons: list[dict[str, Any]] = []
+    narrative: str = ""
+    narrative_generated_by: str | None = None
+    narrative_model: str | None = None
+    narrative_grounding: dict[str, Any] = {}
+    narrative_generated_at: datetime | None = None
 
 
 class JournalGenerateIn(BaseModel):

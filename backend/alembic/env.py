@@ -8,6 +8,7 @@ from sqlalchemy import engine_from_config, pool
 import am.db.models  # noqa: F401  (register models)
 import am.db.models_ai  # noqa: F401
 import am.db.models_research  # noqa: F401
+import am.db.models_m5  # noqa: F401
 from am.config import get_settings
 from am.db.base import Base
 

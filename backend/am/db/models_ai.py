@@ -44,6 +44,10 @@ class Message(Base):
     model: Mapped[str | None] = mapped_column(String(64))
     generated_by: Mapped[str] = mapped_column(String(16), default="human")  # human | llm | deterministic
     latency_ms: Mapped[int | None] = mapped_column(Integer)
+    # provenance for crew-network use: which signed-in device/session sent a user message
+    device_name: Mapped[str | None] = mapped_column(String(80))
+    device_session_id: Mapped[int | None] = mapped_column(Integer)
+    client_host: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     conversation: Mapped[Conversation] = relationship(back_populates="messages")

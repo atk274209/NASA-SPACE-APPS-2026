@@ -99,6 +99,15 @@ class JournalEntry(Base):
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
     generator_version: Mapped[str] = mapped_column(String(16))
     generated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    # Day marking (deterministic, DEMO rules): none | green | yellow | red
+    day_level: Mapped[str] = mapped_column(String(8), default="none", server_default="none")
+    day_level_reasons: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list, server_default="[]")
+    # Narrative: written by the local LLM from this entry's facts (or a deterministic template)
+    narrative: Mapped[str] = mapped_column(Text, default="", server_default="")
+    narrative_generated_by: Mapped[str | None] = mapped_column(String(16))  # llm | deterministic
+    narrative_model: Mapped[str | None] = mapped_column(String(64))
+    narrative_grounding: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, server_default="{}")
+    narrative_generated_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 class DailyTask(Base):

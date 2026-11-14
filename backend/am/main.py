@@ -10,7 +10,19 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from am.api.deps import AppContext
 from am.ai.ollama import OllamaClient
-from am.api.v1 import companion, core, monitoring, research
+from am.api.v1 import (
+    admin,
+    companion,
+    core,
+    crew,
+    guidance,
+    journal_ext,
+    monitoring,
+    network,
+    research,
+    streaks,
+    symptoms,
+)
 from am.config import Settings, get_settings
 from am.db.base import make_engine, make_session_factory
 from am.db.migrate import upgrade_to_head
@@ -66,6 +78,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(monitoring.router, prefix="/api/v1")
     app.include_router(companion.router, prefix="/api/v1")
     app.include_router(research.router, prefix="/api/v1")
+    for module in (crew, symptoms, streaks, journal_ext, admin, guidance, network):
+        app.include_router(module.router, prefix="/api/v1")
     return app
 
 

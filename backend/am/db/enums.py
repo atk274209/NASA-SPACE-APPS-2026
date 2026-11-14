@@ -9,6 +9,8 @@ class MeasurementContext(StrEnum):
     SLEEP = "sleep"
     OTHER = "other"
     DAILY = "daily"  # daily aggregates (sleep duration, intake totals...)
+    FASTING = "fasting"  # e.g. blood glucose before a meal
+    POSTPRANDIAL = "postprandial"  # e.g. blood glucose after a meal
 
 
 class SourceKind(StrEnum):

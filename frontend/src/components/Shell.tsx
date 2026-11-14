@@ -7,13 +7,16 @@ import { SimulatedMark } from './ui'
 
 const NAV = [
   { to: '/', label: 'Overview', icon: 'M3 12h4l3-8 4 16 3-8h4' },
+  { to: '/record', label: 'Record', icon: 'M12 5v14M5 12h14' },
   { to: '/companion', label: 'Companion', icon: 'M4 5h16v11H9l-5 4V5zm4 5h8m-8 3h5' },
   { to: '/health', label: 'Health', icon: 'M4 19V9m6 10V5m6 14v-7m4 7H2' },
   { to: '/baselines', label: 'Baselines', icon: 'M3 12h18M3 7h18M3 17h18' },
   { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
   { to: '/missions', label: 'Missions', icon: 'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2' },
+  { to: '/streaks', label: 'Streaks', icon: 'M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-3 2-4 2-7 1 1 2 2 3 4 0-3 0-5 0-7z' },
   { to: '/science', label: 'Science', icon: 'M9 3v6L4 19a1 1 0 001 2h14a1 1 0 001-2l-5-10V3M8 3h8M7 14h10' },
   { to: '/journal', label: 'Journal', icon: 'M6 3h11a2 2 0 012 2v16H8a2 2 0 01-2-2V3zm0 16a2 2 0 012-2h11M10 7h6M10 11h6' },
+  { to: '/settings', label: 'Settings', icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4' },
   { to: '/system', label: 'System', icon: 'M12 8a4 4 0 100 8 4 4 0 000-8zm0-5v3m0 12v3M3 12h3m12 0h3' },
 ]
 
