@@ -1,0 +1,28 @@
+# AM personal baseline policy (engineering parameters, prototype values).
+#
+# Safety principle: a baseline must never silently absorb a persistent deterioration.
+# Adaptation uses only NORMAL-classified, good-quality data, is rate-limited, freezes on
+# drift or active WARNING/CRITICAL alerts, and every change is written to baseline_audit.
+
+version: "policy-0.1"
+
+provisional:
+  min_samples: 20
+  min_span_hours: 1.0        # e.g. a ~3 h observation window qualifies as PROVISIONAL only
+
+established:
+  min_samples: 200
+  min_span_hours: 72.0
+
+adaptation:
+  update_every_n_new_normal: 50   # attempt an update after this many new NORMAL good samples
+  window_days: 14                 # rolling window used to recompute stats
+  # Max shift of the median per update, in units of the current robust scale.
+  max_median_shift_scale: 0.5
+  # If the new candidate data's median sits beyond this many robust-scale units from
+  # the current median, treat it as drift: FREEZE instead of adapting.
+  drift_freeze_scale: 1.0
+  # Total movement allowed away from the anchor profile (initial or operator-rebuilt
+  # baseline) before AM freezes and requires manual review. Prevents slow creep.
+  max_cumulative_shift_scale: 2.0
+  freeze_on_active_alert_severity: WARNING  # freeze while an alert >= this is active

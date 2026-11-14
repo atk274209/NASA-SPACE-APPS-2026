@@ -1,0 +1,53 @@
+# AM anomaly classification thresholds
+#
+# !!! DEMONSTRATION VALUES — NOT CLINICALLY VALIDATED !!!
+# These bands are statistical deviation thresholds relative to the astronaut's OWN
+# personal baseline (robust z-score: (x - median) / (1.4826 * MAD)). They are chosen
+# for prototype demonstration only and must be reviewed and replaced by qualified
+# medical professionals before any operational use. They are NOT clinical emergency
+# thresholds and must not be presented as such.
+
+version: "demo-0.1"
+label: "DEMO — NOT CLINICALLY VALIDATED"
+
+defaults:
+  direction: both            # both | high | low
+  bands:                     # |robust z| lower bounds per severity
+    WATCH: 2.0
+    WARNING: 3.0
+    CRITICAL: 4.5
+  persistence:
+    lookback: 6              # last N assessed measurements (incl. current) in same metric/context
+    max_age_hours: 6         # ignore older measurements when counting persistence
+    # A level is only granted when at least this many lookback readings deviate in
+    # the same direction at >= WATCH band. Otherwise the result is capped one level
+    # below. Single outliers (often artifacts) therefore cannot reach CRITICAL alone.
+    # Floor: a single reading at/above the WARNING band is never reported below WATCH,
+    # so an extreme value is always surfaced for review.
+    required:
+      WATCH: 2
+      WARNING: 2
+      CRITICAL: 3
+  degraded_quality_cap: WATCH
+  min_scale_fraction: 0.02   # scale floor = |median| * fraction, avoids div-by-~0
+  # Deviation scale = max(1.4826*MAD, (p95-p05)/3.29, floor). PROVISIONAL baselines use a
+  # small-sample predictive scale instead (95% upper bound of SD + standard error of the
+  # median). See backend/am/baseline/stats.py::profile_scale.
+
+metrics:
+  heart_rate:
+    rule_id: hr_personal_deviation
+  hrv_rmssd:
+    rule_id: hrv_personal_deviation
+    direction: low
+  spo2:
+    rule_id: spo2_personal_deviation
+    direction: low
+  systolic_bp:
+    rule_id: sbp_personal_deviation
+  diastolic_bp:
+    rule_id: dbp_personal_deviation
+  body_temperature:
+    rule_id: temp_personal_deviation
+  respiratory_rate:
+    rule_id: rr_personal_deviation
