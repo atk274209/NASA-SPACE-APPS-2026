@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'motion/react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type DailyTask } from '../api/client'
+import { symptomsApi, type SymptomReport } from '../api/symptoms'
 import { ErrorNote, Loading, Section, SimulatedMark } from '../components/ui'
 import { fmtTime, titleCase } from '../lib/format'
 import { useSession } from '../state/session'
@@ -9,7 +11,27 @@ import { NoCrew } from './Overview'
 
 const PRIORITY = { 1: 'Priority', 2: 'Routine', 3: 'Optional' } as Record<number, string>
 
-function TaskRow({ t }: { t: DailyTask }) {
+function LinkedSymptoms({ ids, symptoms }: { ids: number[]; symptoms: Map<number, SymptomReport> }) {
+  return (
+    <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-xs">
+      <span className="text-ink-dim">{ids.length === 1 ? 'For symptom' : 'For symptoms'}</span>
+      {ids.map((id, i) => {
+        const r = symptoms.get(id)
+        return (
+          <span key={id}>
+            <Link to="/companion" className="text-signal hover:underline">
+              {r ? `${r.label}, ${r.severity}` : `report #${id}`}
+            </Link>
+            {r?.status === 'resolved' && <span className="text-ink-faint"> (resolved)</span>}
+            {i < ids.length - 1 && <span className="text-ink-faint">;</span>}
+          </span>
+        )
+      })}
+    </p>
+  )
+}
+
+function TaskRow({ t, symptoms }: { t: DailyTask; symptoms: Map<number, SymptomReport> }) {
   const qc = useQueryClient()
   const { astronaut } = useSession()
   const m = useMutation({
@@ -18,7 +40,9 @@ function TaskRow({ t }: { t: DailyTask }) {
   })
   const done = t.status === 'done'
   const verified = t.completed_by === 'data'
-  const alertRef = (t.reason_refs as { type: string; id?: number }[]).find((r) => r.type === 'alert')
+  const refs = t.reason_refs as { type: string; id?: number }[]
+  const alertRef = refs.find((r) => r.type === 'alert')
+  const symptomIds = [...new Set(refs.filter((r) => r.type === 'symptom_report' && r.id != null).map((r) => r.id!))]
   return (
     <motion.li layout transition={{ duration: 0.2 }} className="grid grid-cols-[auto_1fr] gap-x-4 border-b border-seam/60 py-3 last:border-0">
       <input
@@ -37,6 +61,7 @@ function TaskRow({ t }: { t: DailyTask }) {
           </span>
         </div>
         <p className="text-sm text-ink-dim">{t.detail}</p>
+        {symptomIds.length > 0 && <LinkedSymptoms ids={symptomIds} symptoms={symptoms} />}
         <p className="mt-1 text-xs text-ink-faint">
           Why today: {t.reason}
           {alertRef && <> <Link to={`/alerts?id=${alertRef.id}&filter=all`} className="text-signal hover:underline">Open alert</Link></>}
@@ -61,6 +86,12 @@ export function MissionsPage() {
     enabled: !!astronaut,
     refetchInterval: 30_000,
   })
+  const reports = useQuery({
+    queryKey: ['symptoms', astronaut?.id],
+    queryFn: () => symptomsApi.reports(astronaut!.id),
+    enabled: !!astronaut,
+  })
+  const symptoms = useMemo(() => new Map((reports.data ?? []).map((r) => [r.id, r])), [reports.data])
   if (!astronaut) return <NoCrew />
   if (today.isError) return <ErrorNote error={today.error} />
   if (!today.data) return <Loading />
@@ -90,12 +121,12 @@ export function MissionsPage() {
       </div>
       {['Priority today', 'Routine', 'Completed'].filter((g) => groups.has(g)).map((g) => (
         <Section key={g} title={g} aside={`${groups.get(g)!.length}`}>
-          <ul>{groups.get(g)!.map((t) => <TaskRow key={t.id} t={t} />)}</ul>
+          <ul>{groups.get(g)!.map((t) => <TaskRow key={t.id} t={t} symptoms={symptoms} />)}</ul>
         </Section>
       ))}
       <p className="text-xs text-ink-faint">
-        Tasks adapt to your recent data and check-ins. AM does not prescribe medication or change exercise or
-        nutrition targets. {titleCase(d.protocol_note)}.
+        Tasks adapt to your recent data, check-ins and the symptoms you report; resolving a symptom removes its open
+        tasks. AM does not prescribe medication or change exercise or nutrition targets. {titleCase(d.protocol_note)}.
       </p>
     </div>
   )
