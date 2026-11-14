@@ -49,7 +49,7 @@ function ServiceLights() {
   const llm = data?.ollama as { reachable?: boolean; models?: string[] } | undefined
   const llmState = !llm?.reachable ? 'offline' : llm.models?.length ? 'ready' : 'no model'
   return (
-    <div className="flex items-center gap-4 text-sm text-ink-dim">
+    <div className="flex shrink-0 items-center gap-4 text-sm text-ink-dim">
       <span className="inline-flex items-center gap-1.5" title="Local AM service and database">
         <span className="size-2 rounded-full" style={{ background: backendOk ? 'var(--color-sev-normal)' : 'var(--color-sev-critical)' }} />
         <span className="hidden sm:inline">Core {backendOk ? 'online' : 'unreachable'}</span>
@@ -66,13 +66,13 @@ function AstronautPicker() {
   const { astronauts, astronaut, selectAstronaut } = useSession()
   if (!astronauts.length) return <span className="text-sm text-ink-faint">No crew records</span>
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       <label htmlFor="crew" className="sr-only">Crew member</label>
       <select
         id="crew"
         value={astronaut?.id ?? ''}
         onChange={(e) => selectAstronaut(Number(e.target.value))}
-        className="rounded-md border border-seam-strong bg-deck px-2 py-1 text-sm text-ink focus:border-signal focus:outline-none"
+        className="min-w-0 max-w-full truncate rounded-md border border-seam-strong bg-deck px-2 py-1 text-sm text-ink focus:border-signal focus:outline-none"
       >
         {astronauts.map((a) => (
           <option key={a.id} value={a.id}>

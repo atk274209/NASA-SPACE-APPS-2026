@@ -22,7 +22,7 @@ function ReadingRow({ r, rule }: { r: LatestReading; rule: ThresholdRule | undef
   const assessed = m.assessment_status === 'assessed'
   return (
     <tr className="border-b border-seam/60 last:border-0">
-      <td className="py-2.5 pr-4">
+      <td className="py-2.5 pr-2 sm:pr-4">
         <Link
           to={`/health?metric=${r.metric_code}&context=${r.context}`}
           className="font-medium text-ink hover:text-signal"
@@ -31,14 +31,14 @@ function ReadingRow({ r, rule }: { r: LatestReading; rule: ThresholdRule | undef
         </Link>
         <div className="text-xs text-ink-dim">{contextLabel(r.context)}</div>
       </td>
-      <td className="num py-2.5 pr-4 text-right text-lg">
+      <td className="num whitespace-nowrap py-2.5 pr-2 text-right text-base sm:pr-4 sm:text-lg">
         {fmtNum(m.value)}
         <span className="ml-1 text-xs text-ink-dim">{unitLabel(m.unit)}</span>
       </td>
       <td className="num hidden py-2.5 pr-4 text-right text-sm text-ink-dim sm:table-cell">
         {r.baseline ? fmtNum(r.baseline.median) : '–'}
       </td>
-      <td className="w-[34%] min-w-32 py-2.5 pr-4">
+      <td className="w-[34%] min-w-14 py-2.5 pr-2 sm:min-w-32 sm:pr-4">
         {assessed ? (
           <DeviationStrip z={m.deviation_score} severity={m.severity} rule={rule} />
         ) : (
@@ -47,7 +47,7 @@ function ReadingRow({ r, rule }: { r: LatestReading; rule: ThresholdRule | undef
           </span>
         )}
       </td>
-      <td className="num py-2.5 pr-4 text-right text-sm" style={{ color: assessed ? severityColor(m.severity) : undefined }}>
+      <td className="num whitespace-nowrap py-2.5 pr-1 text-right text-sm sm:pr-4" style={{ color: assessed ? severityColor(m.severity) : undefined }}>
         {assessed ? fmtZ(m.deviation_score) : ''}
       </td>
       <td className="hidden py-2.5 text-right text-xs text-ink-faint md:table-cell">{fmtAgo(m.recorded_at)}</td>
@@ -133,16 +133,19 @@ export function OverviewPage() {
               {[...byCategory.entries()].map(([cat, rows]) => (
                 <div key={cat}>
                   <h3 className="mb-1 text-sm font-medium text-ink-dim">{titleCase(cat)}</h3>
-                  <table className="w-full text-left">
-                    <thead className="sr-only">
-                      <tr><th>Indicator</th><th>Latest</th><th>Median</th><th>Deviation</th><th>Score</th><th>When</th></tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((r) => (
-                        <ReadingRow key={`${r.metric_code}-${r.context}`} r={r} rule={rules.get(r.metric_code)} />
-                      ))}
-                    </tbody>
-                  </table>
+                  {/* on very narrow screens the table scrolls inside this box, never the page */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="sr-only">
+                        <tr><th>Indicator</th><th>Latest</th><th>Median</th><th>Deviation</th><th>Score</th><th>When</th></tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((r) => (
+                          <ReadingRow key={`${r.metric_code}-${r.context}`} r={r} rule={rules.get(r.metric_code)} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               ))}
               <p className="text-xs text-ink-faint">

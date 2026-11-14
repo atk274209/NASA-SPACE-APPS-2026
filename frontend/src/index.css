@@ -42,6 +42,15 @@ body {
   min-height: 100vh;
 }
 
+@layer base {
+  /* A grid without an explicit template gets one shrinkable column. Otherwise its implicit
+     `auto` track grows to the widest child (a table with a min-width, a long file path) and
+     the whole page scrolls sideways on a phone. Any grid-cols-* utility overrides this. */
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
