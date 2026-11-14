@@ -9,7 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from am.api.deps import AppContext
-from am.api.v1 import core, monitoring
+from am.ai.ollama import OllamaClient
+from am.api.v1 import companion, core, monitoring
 from am.config import Settings, get_settings
 from am.db.base import make_engine, make_session_factory
 from am.db.migrate import upgrade_to_head
@@ -33,6 +34,7 @@ def build_context(settings: Settings) -> AppContext:
         session_factory=factory,
         thresholds=load_thresholds(settings.thresholds_path),
         policy=load_baseline_policy(settings.baseline_policy_path),
+        llm=OllamaClient(settings.ollama_url, timeout=settings.llm_timeout_s),
     )
 
 
@@ -43,6 +45,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         app.state.ctx = build_context(settings)
         yield
+        app.state.ctx.llm.close()
         app.state.ctx.engine.dispose()
 
     app = FastAPI(
@@ -61,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.include_router(core.router, prefix="/api/v1")
     app.include_router(monitoring.router, prefix="/api/v1")
+    app.include_router(companion.router, prefix="/api/v1")
     return app
 
 

@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     ollama_url: str = "http://127.0.0.1:11434"
     chat_model: str = "qwen2.5:7b-instruct"
     embed_model: str = "nomic-embed-text"
+    llm_timeout_s: float = 180.0
 
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     # Host header allow-list: blocks DNS-rebinding access to local health data.

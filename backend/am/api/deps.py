@@ -9,6 +9,7 @@ from fastapi import Request
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from am.ai.ollama import OllamaClient
 from am.config import Settings
 from am.policy import BaselinePolicy, ThresholdConfig
 
@@ -20,6 +21,7 @@ class AppContext:
     session_factory: sessionmaker[Session]
     thresholds: ThresholdConfig
     policy: BaselinePolicy
+    llm: OllamaClient
 
 
 def get_ctx(request: Request) -> AppContext:

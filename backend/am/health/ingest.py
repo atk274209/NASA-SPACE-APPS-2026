@@ -8,6 +8,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from am.ai.memory import MemoryService
 from am.alerts.service import AlertService
 from am.anomaly.engine import AnomalyEngine, Assessment
 from am.audit import audit
@@ -49,6 +50,7 @@ class IngestService:
         self.baselines = BaselineService(session, policy, thresholds)
         self.anomaly = AnomalyEngine(session, thresholds)
         self.alerts = AlertService(session, thresholds)
+        self.memory = MemoryService(session)
         self._sources: dict[str, DataSource] = {}
 
     def _source(self, name: str, kind: SourceKind) -> DataSource:
@@ -123,4 +125,17 @@ class IngestService:
         event = None
         if spec.baseline_enabled and m.quality == DataQuality.GOOD.value:
             event = self.baselines.maybe_update(m.astronaut_id, m.metric_code, m.context)
+        self._record_memory(m, event)
         return IngestResult(m, assessment, alert.id if alert else None, event, vr.notes)
+
+    def _record_memory(self, m: Measurement, event: BaselineEvent | None) -> None:
+        """Deterministic mission-memory entries for significant events (never LLM-written)."""
+        for kind, alert, mid in self.alerts.events:
+            self.memory.record_alert_event(alert, kind, mid)
+        self.alerts.events.clear()
+        if event is not None and event.action == "frozen" and event.profile_id is not None:
+            from am.db.models import BaselineProfile
+
+            prof = self.s.get(BaselineProfile, event.profile_id)
+            if prof is not None:
+                self.memory.record_baseline_freeze(prof, event.reason, m.is_simulated)

@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Shell } from './components/Shell'
 import { AlertsPage } from './pages/Alerts'
 import { BaselinesPage } from './pages/Baselines'
+import { CompanionPage } from './pages/Companion'
 import { HealthPage } from './pages/Health'
 import { OverviewPage } from './pages/Overview'
 import { SystemPage } from './pages/System'
@@ -20,6 +21,7 @@ export default function App() {
           <Shell>
             <Routes>
               <Route path="/" element={<OverviewPage />} />
+              <Route path="/companion" element={<CompanionPage />} />
               <Route path="/health" element={<HealthPage />} />
               <Route path="/baselines" element={<BaselinesPage />} />
               <Route path="/alerts" element={<AlertsPage />} />

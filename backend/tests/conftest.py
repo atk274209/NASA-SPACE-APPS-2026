@@ -32,6 +32,7 @@ def settings(tmp_path) -> Settings:
 def ctx(settings) -> Iterator[AppContext]:
     c = build_context(settings)
     yield c
+    c.llm.close()
     c.engine.dispose()
 
 

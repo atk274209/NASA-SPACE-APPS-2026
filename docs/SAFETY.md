@@ -79,11 +79,22 @@ Generator output (`am/simulation/generator.py`) is written with:
 The distributions are arbitrary demonstration parameters. They are not physiological
 norms.
 
-## 6. The LLM's role (later milestones)
+## 6. The LLM's role
 
-The LLM explains, summarizes and drafts hypotheses only from tool-provided, stored data.
-It cannot:
+The implementation is `am/ai/`.
 
-- change alert status
-- change baselines
-- create references that are not stored documents
+- **Read-only access:** the model reads stored data only through read-only tools
+  (`am/ai/tools.py`). It has no write access: it cannot change alerts, baselines or memory.
+- **No arithmetic:** comparisons such as the difference from the median, its direction
+  and the percentage are computed deterministically and passed to the model.
+- **No guessing:** tools reject ambiguous calls (missing context, invalid mission day)
+  instead of guessing. Point-in-time questions use a deterministic nearest-reading lookup.
+- **Traceability:** each answer stores the tool calls and the record IDs it used.
+- **Grounding check:** numbers in an answer that do not appear in the retrieved data are
+  flagged in the UI. Limitation: this cannot detect a real number attributed to the wrong
+  time or indicator.
+- **Prompt rules:** the system prompt forbids diagnosis, prescriptions, reassurance,
+  unprompted mechanisms and treating correlation as causation. Compliance by a 7B model is
+  imperfect, which is why the deterministic layers above exist.
+- **Fallback:** if the model is unavailable, a rule-based summary is shown instead.
+- **Memory writes:** mission memory is written only by deterministic code.

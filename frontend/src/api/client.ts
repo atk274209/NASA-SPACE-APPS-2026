@@ -18,6 +18,14 @@ export type Scenario = S['ScenarioOut']
 export type SimulationRun = S['SimulationRunOut']
 export type SimulationRunIn = S['SimulationRunIn']
 export type AuditEntry = S['AuditOut']
+export type AIStatus = S['AIStatusOut']
+export type Conversation = S['ConversationOut']
+export type ChatMessage = S['MessageOut']
+export type Turn = S['TurnOut']
+export type Suggestion = S['SuggestionOut']
+export type MemoryItem = S['MemoryOut']
+export type CheckinItem = S['CheckinItemOut']
+export type SelfReport = S['SelfReportOut']
 
 export class ApiError extends Error {
   readonly status: number
@@ -86,5 +94,20 @@ export const api = {
     request<AlertDetail>('POST', `/alerts/${id}/resolve`, { actor, note }),
   scenarios: () => request<Scenario[]>('GET', '/simulation/scenarios'),
   runSimulation: (body: SimulationRunIn) => request<SimulationRun>('POST', '/simulation/run', body),
+  aiStatus: () => request<AIStatus>('GET', '/ai/status'),
+  conversations: (astronaut_id: number) =>
+    request<Conversation[]>('GET', '/companion/conversations', undefined, { astronaut_id }),
+  createConversation: (astronaut_id: number) =>
+    request<Conversation>('POST', '/companion/conversations', { astronaut_id }),
+  messages: (conversationId: number) => request<ChatMessage[]>('GET', `/companion/conversations/${conversationId}/messages`),
+  send: (conversationId: number, content: string) =>
+    request<Turn>('POST', `/companion/conversations/${conversationId}/messages`, { content }),
+  suggestions: (astronaut_id: number) =>
+    request<Suggestion[]>('GET', '/companion/suggestions', undefined, { astronaut_id }),
+  memory: (astronaut_id: number, layer?: string) => request<MemoryItem[]>('GET', '/memory', undefined, { astronaut_id, layer }),
+  checkinItems: () => request<CheckinItem[]>('GET', '/checkins/items'),
+  submitCheckin: (astronaut_id: number, ratings: Record<string, number>, note: string) =>
+    request<SelfReport[]>('POST', '/checkins', { astronaut_id, ratings, note }),
+  checkins: (astronaut_id: number) => request<SelfReport[]>('GET', '/checkins', undefined, { astronaut_id }),
   audit: (limit = 100) => request<AuditEntry[]>('GET', '/audit', undefined, { limit }),
 }

@@ -24,6 +24,8 @@ class AlertService:
     def __init__(self, session: Session, thresholds: ThresholdConfig):
         self.s = session
         self.thresholds = thresholds
+        # (event, alert, measurement_id) for 'opened' / 'escalated'; consumed by the memory recorder
+        self.events: list[tuple[str, Alert, int | None]] = []
 
     def open_alert(self, astronaut_id: int, metric: str, context: str, direction: str) -> Alert | None:
         return self.s.scalars(
@@ -68,6 +70,7 @@ class AlertService:
             )
             self.s.add(alert)
             self.s.flush()
+            self.events.append(("opened", alert, m.id))
             audit(self.s, actor=SYSTEM_ACTOR, action="alert.opened", entity="alert", entity_id=alert.id,
                   payload={"severity": alert.severity, "measurement_id": m.id, "z": a.z})
         else:
@@ -83,6 +86,7 @@ class AlertService:
                 alert.peak_severity = a.severity.value
                 if alert.status == AlertStatus.ACKNOWLEDGED.value:
                     alert.status = AlertStatus.ACTIVE.value
+                self.events.append(("escalated", alert, m.id))
                 audit(self.s, actor=SYSTEM_ACTOR, action="alert.escalated", entity="alert", entity_id=alert.id,
                       payload={"from": prev_peak.value, "to": a.severity.value, "measurement_id": m.id})
         self.s.add(

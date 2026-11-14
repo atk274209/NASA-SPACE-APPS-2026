@@ -231,3 +231,4 @@ class AuditLog(Base):
     entity_id: Mapped[str | None] = mapped_column(String(64))
     payload: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+from am.db import models_ai  # noqa: E402,F401  (register companion tables)

@@ -7,6 +7,7 @@ import { SimulatedMark } from './ui'
 
 const NAV = [
   { to: '/', label: 'Overview', icon: 'M3 12h4l3-8 4 16 3-8h4' },
+  { to: '/companion', label: 'Companion', icon: 'M4 5h16v11H9l-5 4V5zm4 5h8m-8 3h5' },
   { to: '/health', label: 'Health', icon: 'M4 19V9m6 10V5m6 14v-7m4 7H2' },
   { to: '/baselines', label: 'Baselines', icon: 'M3 12h18M3 7h18M3 17h18' },
   { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
