@@ -27,6 +27,7 @@ from am.research.ari import build_observation
 from am.research.reference import reference_for
 from am.research.series import build_daily_series, current_mission_day
 from am.research.service import run_correlation
+from am.settings_store import effective_chat_model, effective_embed_model
 
 router = APIRouter()
 DB = Annotated[Session, Depends(get_db)]
@@ -238,7 +239,8 @@ def daily_series(db: DB, astronaut_id: int):
 def create_observation(body: ObservationIn, db: DB, ctx: CTX):
     try:
         obs = build_observation(db, body.finding_id, llm=ctx.llm if body.use_llm else None,
-                                chat_model=ctx.settings.chat_model, embed_model=ctx.settings.embed_model)
+                                chat_model=effective_chat_model(db, ctx.settings),
+                                embed_model=effective_embed_model(db, ctx.settings))
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     db.commit()
@@ -334,7 +336,7 @@ def missions_history(db: DB, astronaut_id: int):
 # ------------------------------------------------------------------ knowledge
 @router.post("/knowledge/ingest", response_model=KnowledgeIngestOut, tags=["knowledge"])
 def knowledge_ingest(db: DB, ctx: CTX):
-    rep = ingest_directory(db, KNOWLEDGE_DIR, ctx.llm, ctx.settings.embed_model)
+    rep = ingest_directory(db, KNOWLEDGE_DIR, ctx.llm, effective_embed_model(db, ctx.settings))
     db.commit()
     total = len(db.scalars(select(KnowledgeDocument.id)).all())
     return KnowledgeIngestOut(**rep.__dict__, documents_total=total)
@@ -347,4 +349,5 @@ def knowledge_documents(db: DB):
 
 @router.get("/knowledge/search", response_model=list[dict[str, Any]], tags=["knowledge"])
 def knowledge_search(db: DB, ctx: CTX, q: str, k: int = 5):
-    return [h.as_dict() for h in search(db, q, llm=ctx.llm, embed_model=ctx.settings.embed_model, k=min(k, 20))]
+    return [h.as_dict() for h in search(db, q, llm=ctx.llm, embed_model=effective_embed_model(db, ctx.settings),
+                                        k=min(k, 20))]
