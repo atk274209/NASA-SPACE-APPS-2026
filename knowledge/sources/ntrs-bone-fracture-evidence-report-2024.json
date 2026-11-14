@@ -1,0 +1,49 @@
+{
+  "id": "ntrs-bone-fracture-evidence-report-2024",
+  "title": "Risk of Bone Fracture due to Spaceflight-induced Changes to Bone",
+  "authors": [
+    "Jean D. Sibonga",
+    "Elisabeth R. Spector",
+    "Greg Yardley",
+    "Joshua S. Alwood",
+    "Jerry Myers",
+    "Harlan J. Evans",
+    "Scott A. Smith",
+    "Lisa King"
+  ],
+  "organization": "NASA Human Research Program / NASA Johnson Space Center (NTRS record)",
+  "published_date": "2024-06-03",
+  "url": "https://ntrs.nasa.gov/citations/20240005190",
+  "doi": null,
+  "source_type": "nasa_evidence_report",
+  "topics": [
+    "bone",
+    "exercise"
+  ],
+  "license_basis": "NASA Technical Reports Server record of a NASA Human Research Program evidence report authored by NASA civil servants and NASA contractors (KBR). Treated as a US government work; only the NTRS abstract text was quoted. Contractor authorship means public-domain status is likely but not certain.",
+  "passages": [
+    {
+      "text": "The Human Research Program (HRP) is taking a biomechanical approach to assessing subsequent fracture risk in active astronauts as a consequence of spaceflight exposure. Triennial testing of active and retired astronauts continues as Space Medicine monitors for a premature diagnosis of primary osteoporosis, which is associated with age-related bone loss and skeletal fragility.",
+      "url": "https://ntrs.nasa.gov/citations/20240005190"
+    },
+    {
+      "text": "The risk for fracture necessitates understanding the relationship between applied loads to bone and the biomechanical competence of bone. The Risk for Early Onset Osteoporosis focuses on the weakened condition of bone (including development of new technologies, measurements of novel skeletal attributes, translation of multiple measures to an index of bone fragility, and interpretations of data used to reflect a weakened bone), while the Risk for Fracture assesses factors that influence the probability an astronaut would encounter applied loads exceeding the biomechanical competence of bones, resulting in fracture. This Evidence Report combines the research gaps and tasks associated with both risks.",
+      "url": "https://ntrs.nasa.gov/citations/20240005190"
+    }
+  ],
+  "key_findings": [
+    "HRP assesses later fracture risk in active astronauts with a biomechanical approach; active and retired astronauts are tested triennially for premature primary osteoporosis.",
+    "Analysis of fractures in health records of the full astronaut cohort suggests a higher incidence of hip and spine fractures after longer-duration flights than after shorter ones.",
+    "Routine pre-to-postflight DXA does not fully detect bone loss and recovery in long-duration astronauts, nor full recovery of hip trabecular bone; hip QCT delineates effects of spaceflight, countermeasures and recovery on cortical and trabecular bone.",
+    "QCT distinguishes the effects of alendronate and of ARED resistive exercise on specific bone sub-regions during spaceflight.",
+    "Accelerated hip trabecular vBMD loss during spaceflight may be analogous to menopause-related accelerated loss in females.",
+    "The IMPACT probabilistic risk assessment tool is in development and was not included in the 2024 update."
+  ],
+  "limitations": [
+    "Only the NTRS metadata and abstract were read; the full evidence report PDF was not read.",
+    "The abstract refers both to an 'updated 2023 Fracture Evidence Report' and to 'this 2024 update' (as written in the source).",
+    "Several abstract bullet points contain garbled bullet characters in the NTRS API text, so they were paraphrased rather than quoted."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Metadata (title, 8 authors, center, publication date 2024-06-03, document type 'Contribution to a larger work', publication name 'Human Research Program') verified from the NTRS citation page (https://ntrs.nasa.gov/citations/20240005190) and the NTRS API JSON (https://ntrs.nasa.gov/api/citations/20240005190), both fetched 2026-11-14. Passages taken from the API abstract field. No DOI listed. The same report is linked from humanresearchroadmap.nasa.gov as 'Bone Fracture Evidence Report_07-18-2024.pdf' (seen in search results only, not fetched)."
+}

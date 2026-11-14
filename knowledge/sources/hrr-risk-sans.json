@@ -1,0 +1,47 @@
+{
+  "id": "hrr-risk-sans",
+  "title": "Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=105",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "sans",
+    "fluid_shift"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that ocular and brain structural changes develop during spaceflight, there is a possibility that these changes could lead to short-term or long-term vision alterations, cognitive effects, or other deleterious health effects.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=105"
+    },
+    {
+      "text": "Spaceflight Associated Neuro-ocular Syndrome (SANS) is a syndrome unique to humans that fly in space, and there is no terrestrial disease equivalent. Data collected pre-, in-, and post-flight indicate that 70% of crewmembers experience one or more of the hallmark signs of SANS: optic disc edema, chorioretinal folds, globe flattening, or hyperopic shifts in refractive error.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=105"
+    },
+    {
+      "text": "Major SANS knowledge gaps include: underlying mechanism(s), including role of intracranial pressure (ICP) and factors contributing to individual variability of presentation; threshold where physiological adaptations transition to pathology; proven countermeasures; and long-term health consequences. The effect of spaceflight on brain structure is being investigated, but an association between SANS and brain structure or function (cognition) has not been established.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=105"
+    },
+    {
+      "text": "Recently, research findings have provided evidence that the earliest signs of optic disc edema can be detected based on an increase in total retinal thickness measured from optical coherence tomography images. These data suggest ~70% of crew flying 4-6 month long missions to the International Space Station develop early signs of optic disc edema.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=105"
+    }
+  ],
+  "key_findings": [
+    "SANS is unique to spaceflight with no terrestrial disease equivalent.",
+    "About 70% of crewmembers show one or more hallmark signs: optic disc edema, chorioretinal folds, globe flattening or hyperopic refractive shifts.",
+    "Mechanisms (including the role of intracranial pressure), the threshold from adaptation to pathology, proven countermeasures and long-term consequences are open gaps.",
+    "Increased total retinal thickness on OCT can detect the earliest signs of optic disc edema.",
+    "Research includes the role of the cephalad fluid shift; strict head-down tilt bed rest has been used as a ground analog since 2017."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Some forward-looking statements on the page refer to studies 'expected to be completed in 2023'; their outcomes are not reported on the page (own observation).",
+    "Page states an association between SANS and brain structure or cognition has not been established."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=105 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Steve Laurie), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 7/2022. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

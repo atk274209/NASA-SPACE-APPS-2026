@@ -1,0 +1,47 @@
+{
+  "id": "hrr-risk-inadequate-food-nutrition",
+  "title": "Risk of Performance Decrement and Crew Illness Due to Inadequate Food and Nutrition",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=176",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "nutrition",
+    "fluid_shift"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that there is a constrained ability to supply adequate food in spaceflight missions, there is a possibility that inadequate nutrition will result in performance decrement, crew illness, and long-term health effects.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=176"
+    },
+    {
+      "text": "Much is known about the basic nutrition required to maintain performance and health during spaceflight. Standards/controls exist to maintain food safety during spaceflight. Ground data indicates that dehydration and \"quicker than usual\" weight loss in physically fit individuals will impact cognition and performance. Adequate nutrition and safe food have been demonstrated for 6-month missions and limited 1-year missions that have resupply.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=176"
+    },
+    {
+      "text": "There is an uncharacterized risk during LO and LOS missions due to resource restrictions and increased EVAs resulting in reduced food provisioning and preparation capability compared to ISS. The capability to provide safe pre-packaged food with a 5-year shelf life that provides adequate nutrition content, acceptability, safety and variety is a gap.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=176"
+    },
+    {
+      "text": "To develop requirements for a nutritious, acceptable/palatable, and safe food system that in addition to providing sustenance can act as a physiological and psychological countermeasure while being balanced with resource constraints.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=176"
+    }
+  ],
+  "key_findings": [
+    "Constrained food supply in spaceflight may lead to inadequate nutrition, performance decrement, crew illness and long-term health effects.",
+    "Adequate nutrition and safe food have been demonstrated for 6-month and limited 1-year missions with resupply.",
+    "Ground data indicate dehydration and faster-than-usual weight loss in physically fit people impair cognition and performance.",
+    "Providing safe pre-packaged food with a 5-year shelf life and adequate nutrition, acceptability and variety is an open gap.",
+    "Potential health impacts listed include reduced endurance and cognition, loss of bone and muscle mass, altered immune and cardiovascular function, severe dehydration and long-term effects."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states the impact of current and proposed exploration food systems on cognition, performance, behavior and health is not adequately understood.",
+    "Hydration is covered only briefly (dehydration effects from ground data); tagged fluid_shift for hydration relevance (own judgment)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=176 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Grace Douglas, Scott M. Smith), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 7/2022. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

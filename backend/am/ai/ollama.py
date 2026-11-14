@@ -65,6 +65,9 @@ class OllamaClient:
             "reason": None if installed else "model_not_installed",
         }
 
+    def embed(self, model: str, texts: list[str]) -> list[list[float]]:
+        return _embed_impl(self._client, model, texts)
+
     def chat(
         self,
         model: str,
@@ -73,6 +76,7 @@ class OllamaClient:
         tools: list[dict[str, Any]] | None = None,
         temperature: float = 0.1,
         num_ctx: int = 8192,
+        format: dict[str, Any] | str | None = None,
     ) -> ChatReply:
         payload: dict[str, Any] = {
             "model": model,
@@ -82,6 +86,8 @@ class OllamaClient:
         }
         if tools:
             payload["tools"] = tools
+        if format is not None:
+            payload["format"] = format
         try:
             r = self._client.post("/api/chat", json=payload)
         except httpx.HTTPError as exc:
@@ -114,6 +120,24 @@ class OllamaClient:
             model=body.get("model", model),
             eval_ms=int(eval_ns / 1e6) if isinstance(eval_ns, (int, float)) else None,
         )
+
+
+def _embed_impl(client: httpx.Client, model: str, texts: list[str]) -> list[list[float]]:
+    try:
+        r = client.post("/api/embed", json={"model": model, "input": texts})
+    except httpx.HTTPError as exc:
+        raise LLMUnavailable("service_unreachable", type(exc).__name__) from exc
+    if r.status_code == 404:
+        raise LLMUnavailable("model_not_installed", model)
+    if r.status_code >= 400:
+        raise LLMUnavailable("model_error", r.text[:300])
+    try:
+        vecs = r.json()["embeddings"]
+    except (ValueError, KeyError) as exc:
+        raise LLMUnavailable("malformed_reply", str(exc)) from exc
+    if len(vecs) != len(texts):
+        raise LLMUnavailable("malformed_reply", "embedding count mismatch")
+    return vecs
 
 
 def _model_installed(model: str, installed: list[str]) -> bool:

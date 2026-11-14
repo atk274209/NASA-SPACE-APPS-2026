@@ -1,0 +1,47 @@
+{
+  "id": "hrr-risk-cardiovascular-adaptations",
+  "title": "Risk of Cardiovascular Adaptations Contributing to Adverse Mission Performance and Health Outcomes",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=179",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "cardiovascular",
+    "fluid_shift",
+    "radiation"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given exposure to the spaceflight environment can contribute to cardiovascular deconditioning, dysfunction, and remodeling, there is a possibility that crews will experience impaired performance and adverse cardiovascular health outcomes that necessitate intervention during and after spaceflight and planetary operations.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=179"
+    },
+    {
+      "text": "Exposure to weightlessness and the resulting headward fluid shift alters blood volume, flow, and pressure, manifesting in changes in vascular and cardiac structure and function (e.g., cardiovascular deconditioning, orthostatic intolerance, decreased exercise capacity). In-mission countermeasures and monitoring have been implemented, and available evidence from current missions in Low Earth Orbit (LEO) suggest that functional impairments recover in the weeks/months after landing with a reconditioning program. Less is known following missions >1 year, and there is minimal experience with missions beyond LEO (>14 days) or in partial gravity (>3 days).",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=179"
+    },
+    {
+      "text": "Epidemiological evidence does not support an increased lifetime risk of cardiovascular disease death in astronauts, but mission durations have been limited largely to 4-6 months and there has been limited follow-up.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=179"
+    },
+    {
+      "text": "An emerging medical concern is thrombosis during spaceflight, particularly in the internal jugular vein. Though only one case has been documented, it does not preclude that there have been previous cases that were undetected.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=179"
+    }
+  ],
+  "key_findings": [
+    "Weightlessness and the headward fluid shift alter blood volume, flow and pressure, producing changes in cardiac and vascular structure and function, including deconditioning, orthostatic intolerance and decreased exercise capacity.",
+    "Evidence from LEO missions suggests functional impairments recover over weeks to months after landing with a reconditioning program; less is known for missions over 1 year or beyond LEO.",
+    "Epidemiological evidence does not support increased lifetime cardiovascular death risk in astronauts, but missions have mostly lasted 4-6 months with limited follow-up.",
+    "Thrombosis, particularly in the internal jugular vein, is described as an emerging concern; one case has been documented."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states minimal experience exists beyond LEO (>14 days) or in partial gravity (>3 days).",
+    "The page also discusses radiation-related cardiovascular risk; terrestrial radiation evidence may not transfer directly to space radiation (own observation, consistent with the page's statement that mechanisms are unclear)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=179 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Jason Lytle), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 5/2024. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

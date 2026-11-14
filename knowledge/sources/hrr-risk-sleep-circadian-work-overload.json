@@ -1,0 +1,42 @@
+{
+  "id": "hrr-risk-sleep-circadian-work-overload",
+  "title": "Risk of Performance Decrements and Adverse Health Outcomes Resulting from Sleep Loss, Circadian Desynchronization, and Work Overload",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=100",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "sleep",
+    "circadian",
+    "behavioral_health"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that astronauts experience sleep loss, circadian desynchronization, and work overload, there is a possibility that performance decrements and adverse health outcomes will occur.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=100"
+    },
+    {
+      "text": "There is evidence of sleep deficiency inflight as crews sleep 6 h/night and increase their sleep and circadian misalignment. There is also evidence of work overload and scheduling issues. Ground studies demonstrate that despite perception that one can adapt, these risk factors cause short-term performance, mood, psychosocial, and metabolic decrements and are associated with long term poor health outcomes including increased risk of Alzheimer's Disease, cardiovascular disease, hormone-dependent cancer, and diabetes. A flexible lighting system* on the International Space Station (ISS) expected to aid; Human Factors, Behavioral Health and Performance (HFBP) research and operational surveillance to evaluate effectiveness.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=100"
+    },
+    {
+      "text": "Current research on this risk involves multi-disciplinary studies to characterize how sleep loss, circadian misalignment, and work overload interact with other risks, and to develop appropriate monitoring and mitigation approaches.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=100"
+    }
+  ],
+  "key_findings": [
+    "There is evidence of inflight sleep deficiency, with crews sleeping about 6 h per night, along with sleep and circadian misalignment.",
+    "There is also evidence of work overload and scheduling issues.",
+    "Ground studies show these factors cause short-term performance, mood, psychosocial and metabolic decrements despite a perception of adaptation, and are associated with long-term poor health outcomes.",
+    "A flexible lighting system on the ISS is expected to help; the page marks it as a promising countermeasure not yet in use."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Long-term health associations cited come from ground studies, not spaceflight data (as stated on the page)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=100 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Erin Flynn-Evans), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 3/2022. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

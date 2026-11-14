@@ -451,6 +451,245 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research/correlation/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Correlation Run */
+        post: operations["correlation_run_api_v1_research_correlation_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/correlation/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Correlation Latest */
+        get: operations["correlation_latest_api_v1_research_correlation_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily Series */
+        get: operations["daily_series_api_v1_research_series_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Observations */
+        get: operations["list_observations_api_v1_research_observations_get"];
+        put?: never;
+        /** Create Observation */
+        post: operations["create_observation_api_v1_research_observations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/observations/{obs_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review Observation */
+        post: operations["review_observation_api_v1_research_observations__obs_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/findings/{finding_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Finding */
+        get: operations["get_finding_api_v1_research_findings__finding_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Journal Generate */
+        post: operations["journal_generate_api_v1_journal_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Journal List */
+        get: operations["journal_list_api_v1_journal_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/missions/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Missions Today */
+        get: operations["missions_today_api_v1_missions_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/missions/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set Task Status */
+        post: operations["set_task_status_api_v1_missions_tasks__task_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/missions/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Missions History */
+        get: operations["missions_history_api_v1_missions_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/knowledge/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Knowledge Ingest */
+        post: operations["knowledge_ingest_api_v1_knowledge_ingest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/knowledge/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knowledge Documents */
+        get: operations["knowledge_documents_api_v1_knowledge_documents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/knowledge/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knowledge Search */
+        get: operations["knowledge_search_api_v1_knowledge_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -634,6 +873,11 @@ export interface components {
             code: string;
             /** Display Name */
             display_name: string;
+        };
+        /** AstronautIn */
+        AstronautIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
         };
         /** AstronautOut */
         AstronautOut: {
@@ -840,6 +1084,82 @@ export interface components {
              */
             updated_at: string;
         };
+        /** DocumentOut */
+        DocumentOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Authors */
+            authors: string[];
+            /** Organization */
+            organization: string;
+            /** Published Date */
+            published_date: string | null;
+            /** Url */
+            url: string;
+            /** Doi */
+            doi: string | null;
+            /** Source Type */
+            source_type: string;
+            /** Topics */
+            topics: string[];
+            /** License Basis */
+            license_basis: string;
+            /** Key Findings */
+            key_findings: string[];
+            /** Limitations */
+            limitations: string[];
+            /** Retrieved At */
+            retrieved_at: string | null;
+            /** Verification Notes */
+            verification_notes: string;
+        };
+        /** FindingOut */
+        FindingOut: {
+            /** Id */
+            id: number;
+            /** Run Id */
+            run_id: number;
+            /** Finding Type */
+            finding_type: string;
+            /** X Key */
+            x_key: string | null;
+            /** Y Key */
+            y_key: string;
+            /** X Label */
+            x_label: string | null;
+            /** Y Label */
+            y_label: string;
+            /** Lag Days */
+            lag_days: number;
+            /** N Days */
+            n_days: number;
+            /** Rho */
+            rho: number;
+            /** P Value */
+            p_value: number;
+            /** Q Value */
+            q_value: number;
+            /** Rho Detrended */
+            rho_detrended: number | null;
+            /** P Detrended */
+            p_detrended: number | null;
+            /** Detrended Supported */
+            detrended_supported: boolean | null;
+            /** Slope Per Day */
+            slope_per_day: number | null;
+            /** Unit */
+            unit: string;
+            /** Days */
+            days: number[];
+            /** Summary */
+            summary: string;
+            /** Caveat */
+            caveat: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -852,6 +1172,75 @@ export interface components {
             /** Alert Id */
             alert_id: number | null;
             baseline_event: components["schemas"]["BaselineEventOut"] | null;
+        };
+        /** JournalGenerateIn */
+        JournalGenerateIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** First Day */
+            first_day?: number | null;
+            /** Last Day */
+            last_day?: number | null;
+        };
+        /** JournalOut */
+        JournalOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Mission Day */
+            mission_day: number;
+            /**
+             * Day Date
+             * Format: date
+             */
+            day_date: string;
+            /** Sections */
+            sections: {
+                [key: string]: unknown;
+            };
+            /** Flags */
+            flags: {
+                [key: string]: unknown;
+            }[];
+            /** Observations */
+            observations: {
+                [key: string]: unknown;
+            }[];
+            /** Refs */
+            refs: {
+                [key: string]: unknown;
+            }[];
+            /** Complete Day */
+            complete_day: boolean;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Generator Version */
+            generator_version: string;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+        };
+        /** KnowledgeIngestOut */
+        KnowledgeIngestOut: {
+            /** Loaded */
+            loaded: number;
+            /** Updated */
+            updated: number;
+            /** Unchanged */
+            unchanged: number;
+            /** Skipped */
+            skipped: string[];
+            /** Embedded */
+            embedded: number;
+            /** Embed Model */
+            embed_model: string | null;
+            /** Embed Error */
+            embed_error: string | null;
+            /** Documents Total */
+            documents_total: number;
         };
         /** LatestReadingOut */
         LatestReadingOut: {
@@ -1032,6 +1421,58 @@ export interface components {
             /** Is Simulated */
             is_simulated: boolean;
         };
+        /** ObservationIn */
+        ObservationIn: {
+            /** Finding Id */
+            finding_id: number;
+            /**
+             * Use Llm
+             * @default true
+             */
+            use_llm: boolean;
+        };
+        /** ObservationOut */
+        ObservationOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Finding Ids */
+            finding_ids: number[];
+            /** Title */
+            title: string;
+            /** Observation */
+            observation: string;
+            /** Scientific Context */
+            scientific_context: string;
+            /** Hypothesis */
+            hypothesis: string;
+            /** Evidence Level */
+            evidence_level: string;
+            /** Confidence Note */
+            confidence_note: string;
+            /** Doc Refs */
+            doc_refs: {
+                [key: string]: unknown;
+            }[];
+            /** Generated By */
+            generated_by: string;
+            /** Model */
+            model: string | null;
+            /** Grounding */
+            grounding: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** OperatorAction */
         OperatorAction: {
             /** Actor */
@@ -1086,6 +1527,41 @@ export interface components {
             /** Note */
             note: string;
         };
+        /** ReviewIn */
+        ReviewIn: {
+            /** Status */
+            status: string;
+            /** Actor */
+            actor: string;
+        };
+        /** RunOut */
+        RunOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Kind */
+            kind: string;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /** N Tests */
+            n_tests: number;
+            /** N Series */
+            n_series: number;
+            /** Through Day */
+            through_day: number | null;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Findings */
+            findings: components["schemas"]["FindingOut"][];
+        };
         /** ScenarioOut */
         ScenarioOut: {
             /** Name */
@@ -1119,6 +1595,27 @@ export interface components {
         SendIn: {
             /** Content */
             content: string;
+        };
+        /** SeriesOut */
+        SeriesOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Unit */
+            unit: string;
+            /** Kind */
+            kind: string;
+            /** Aggregation */
+            aggregation: string;
+            /** Points */
+            points: {
+                [key: string]: number;
+            }[];
+            /** Reference */
+            reference: {
+                [key: string]: unknown;
+            } | null;
         };
         /** SimulationRunIn */
         SimulationRunIn: {
@@ -1193,6 +1690,44 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** TaskOut */
+        TaskOut: {
+            /** Id */
+            id: number;
+            /** Mission Day */
+            mission_day: number;
+            /** Template Code */
+            template_code: string;
+            /** Category */
+            category: string;
+            /** Title */
+            title: string;
+            /** Detail */
+            detail: string;
+            /** Priority */
+            priority: number;
+            /** Reason */
+            reason: string;
+            /** Reason Refs */
+            reason_refs: {
+                [key: string]: unknown;
+            }[];
+            /** Protocol Ref */
+            protocol_ref: string;
+            /** Completion Rule */
+            completion_rule: string;
+            /** Status */
+            status: string;
+            /** Completed By */
+            completed_by: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /** TaskStatusIn */
+        TaskStatusIn: {
+            /** Status */
+            status: string;
+        };
         /** ThresholdRuleOut */
         ThresholdRuleOut: {
             /** Metric Code */
@@ -1220,6 +1755,19 @@ export interface components {
             label: string;
             /** Rules */
             rules: components["schemas"]["ThresholdRuleOut"][];
+        };
+        /** TodayOut */
+        TodayOut: {
+            /** Mission Day */
+            mission_day: number;
+            /** Protocol Note */
+            protocol_note: string;
+            /** Tasks */
+            tasks: components["schemas"]["TaskOut"][];
+            /** Done */
+            done: number;
+            /** Total */
+            total: number;
         };
         /** TraceOut */
         TraceOut: {
@@ -2183,6 +2731,468 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SelfReportOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    correlation_run_api_v1_research_correlation_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AstronautIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    correlation_latest_api_v1_research_correlation_latest_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    daily_series_api_v1_research_series_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_observations_api_v1_research_observations_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_observation_api_v1_research_observations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObservationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_observation_api_v1_research_observations__obs_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                obs_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_finding_api_v1_research_findings__finding_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FindingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journal_generate_api_v1_journal_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JournalGenerateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journal_list_api_v1_journal_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    missions_today_api_v1_missions_today_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_task_status_api_v1_missions_tasks__task_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskStatusIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    missions_history_api_v1_missions_history_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    knowledge_ingest_api_v1_knowledge_ingest_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KnowledgeIngestOut"];
+                };
+            };
+        };
+    };
+    knowledge_documents_api_v1_knowledge_documents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+        };
+    };
+    knowledge_search_api_v1_knowledge_search_get: {
+        parameters: {
+            query: {
+                q: string;
+                k?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
             /** @description Validation Error */

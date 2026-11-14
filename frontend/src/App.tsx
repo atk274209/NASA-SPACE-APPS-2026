@@ -5,7 +5,10 @@ import { AlertsPage } from './pages/Alerts'
 import { BaselinesPage } from './pages/Baselines'
 import { CompanionPage } from './pages/Companion'
 import { HealthPage } from './pages/Health'
+import { JournalPage } from './pages/Journal'
+import { MissionsPage } from './pages/Missions'
 import { OverviewPage } from './pages/Overview'
+import { SciencePage } from './pages/Science'
 import { SystemPage } from './pages/System'
 import { SessionProvider } from './state/session'
 
@@ -25,6 +28,9 @@ export default function App() {
               <Route path="/health" element={<HealthPage />} />
               <Route path="/baselines" element={<BaselinesPage />} />
               <Route path="/alerts" element={<AlertsPage />} />
+              <Route path="/missions" element={<MissionsPage />} />
+              <Route path="/science" element={<SciencePage />} />
+              <Route path="/journal" element={<JournalPage />} />
               <Route path="/system" element={<SystemPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

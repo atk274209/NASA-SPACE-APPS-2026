@@ -1,0 +1,47 @@
+{
+  "id": "hrr-risk-bone-fracture",
+  "title": "Risk of Bone Fracture due to Spaceflight-induced Changes to Bone",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=77",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "bone",
+    "exercise"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given the skeletal changes that occur during spaceflight, there is a possibility that the bones of crewmembers during and after spaceflight are not as strong as they were before spaceflight and a fracture may occur postflight for activities otherwise unlikely to induce fracture prior to space flight.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=77"
+    },
+    {
+      "text": "Fracture risk (Ops) increases with likelihood of applied loads to bone > bone strength. Fracture risk (Long-Term Health (LTH)) is focused on detection of skeletal fragility. Low areal Bone Mineral Density (aBMD) has been widely used to assess skeletal fragility due to age-related bone loss. Diagnosis by aBMD is recognized by terrestrial medicine to be insufficient (requires monitoring index of Bone Quality), especially for males <50 years and pre-menopausal females.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=77"
+    },
+    {
+      "text": "Extensive pre/post flight aBMD measurements exist for International Space Station (ISS) astronauts; exercise regimens using ARED/T2 (Advanced Resistive Exercise Device/Treadmill 2) six days/week have minimized deficits in postflight aBMDs. Notably, the minimum aBMD Permissible Outcome Limit (POL) for bone health was met before ARED/T2 were implemented on the ISS suggesting that postflight aBMD alone is not useful as a POL.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=77"
+    },
+    {
+      "text": "ARED on the ISS is the preferred exercise countermeasure to mitigate the adaptive changes in musculoskeletal physiology during spaceflight. However, an in-flight study assessing the sole effects of resistive exercise using ARED in conjunction with QCT imaging found that ARED exercise alone failed to protect the hip trabecular bone from spaceflight induced bone loss or to suppress the increased breakdown bone during spaceflight as evidenced by increased excretion of bone resorption biomarkers. Furthermore, ARED will be unavailable on exploration class missions in a constrained vehicle environment.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=77"
+    }
+  ],
+  "key_findings": [
+    "HRP frames postflight fracture risk as the possibility that bones are weaker after spaceflight, so activities that would not have caused a fracture before flight might do so afterwards.",
+    "Operational fracture risk rises as the likelihood that loads applied to bone exceed bone strength increases; areal BMD by DXA alone is described as insufficient to assess skeletal fragility, especially in men under 50 and premenopausal women.",
+    "Exercise on ARED/T2 six days per week on the ISS is credited with minimising postflight areal BMD deficits.",
+    "Per the Bone-401 gap text on the same page, ARED alone did not protect hip trabecular bone or suppress increased bone resorption in an in-flight QCT study, and ARED will not be available on exploration-class vehicles.",
+    "DXA is performed triennially in active and retired astronauts to surveil for premature skeletal fragility."
+  ],
+  "limitations": [
+    "Summary/roadmap web page, not primary data; the full PDF evidence report was not read for this record.",
+    "The ARED passage comes from the Bone-401 gap description embedded in the same page, not from the risk summary section.",
+    "Risk ratings date from HSRB approval in 5/2022 (per page)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=77 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Jean Sibonga), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 5/2022. The page links a full PDF Evidence Report, which was NOT read for this record. The ARED passage appears in the gap 'Bone-401: Identify and test preventative and mitigating countermeasures for changes induced by spaceflight.' on the same page."
+}

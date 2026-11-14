@@ -138,4 +138,5 @@ class IngestService:
 
             prof = self.s.get(BaselineProfile, event.profile_id)
             if prof is not None:
-                self.memory.record_baseline_freeze(prof, event.reason, m.is_simulated)
+                self.memory.record_baseline_freeze(prof, event.reason, m.is_simulated,
+                                                   self.baselines.last_freeze_data_time or m.recorded_at)

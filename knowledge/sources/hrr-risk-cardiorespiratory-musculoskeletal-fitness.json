@@ -1,0 +1,43 @@
+{
+  "id": "hrr-risk-cardiorespiratory-musculoskeletal-fitness",
+  "title": "Risk of Mission Performance Decrements and Adverse Health Outcomes Resulting from Reduced Cardiorespiratory and Musculoskeletal Fitness",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=180",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "muscle",
+    "exercise",
+    "cardiovascular"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that exposure to a reduced gravity environment causes cardio-respiratory (e.g., maximal oxygen consumption and ventilatory threshold) and musculoskeletal fitness (e.g., strength, power, and endurance) to decline, there is a risk of impaired mission task performance and adverse health outcomes.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=180"
+    },
+    {
+      "text": "Despite the use of inflight exercise countermeasures on the International Space Station (ISS), current evidence suggests that cardio-respiratory and musculoskeletal fitness decrease during spaceflight and after spaceflight, though individual variability is evident that cannot be fully explained by countermeasure adherence. During ISS missions, some astronauts do not meet the current fitness standards for operations in weightlessness, and many astronauts would not meet current fitness standards for extravehicular operations on celestial surfaces. Further, many have not returned to preflight fitness levels by the end of the standard reconditioning program (30 days after landing).",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=180"
+    },
+    {
+      "text": "In long-duration missions on ISS, astronauts have access for a robust suite of exercise countermeasures (cycle ergometer, treadmill, resistive exercise) but countermeasure capabilities likely will be reduced for exploration missions due to mass, volume, and power limitations.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=180"
+    }
+  ],
+  "key_findings": [
+    "Reduced gravity causes declines in cardio-respiratory fitness (e.g. maximal oxygen consumption, ventilatory threshold) and musculoskeletal fitness (strength, power, endurance).",
+    "Despite inflight exercise countermeasures on the ISS, fitness decreases during and after flight, with individual variability not fully explained by countermeasure adherence.",
+    "Some astronauts do not meet fitness standards for weightless operations during ISS missions, many would not meet standards for surface EVA, and many have not regained preflight fitness by the end of the 30-day reconditioning program.",
+    "Exploration missions will likely have reduced exercise capability compared with the ISS (cycle ergometer, treadmill, resistive exercise) because of mass, volume and power limits."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states limited data exist for missions longer than 4-6 months, for women astronauts, and for partial-gravity exposure.",
+    "Page notes the risk is carried as two separate risks at the HSRB and the content was developed by HRP."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=180 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Brian Prejean), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: not found in the extracted text. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

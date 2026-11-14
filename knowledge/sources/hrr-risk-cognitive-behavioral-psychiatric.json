@@ -1,0 +1,48 @@
+{
+  "id": "hrr-risk-cognitive-behavioral-psychiatric",
+  "title": "Risk of Adverse Cognitive or Behavioral Changes and Psychiatric Disorders Leading to In-mission Health and Performance and Long-term Health Effects",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=99",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "behavioral_health",
+    "radiation"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that crews of future exploration missions will be exposed to extended duration of isolation and confinement, greater distances from Earth, as well as increased exposures to radiation and altered gravity, there is a possibility that these singular or combined hazards could lead to (a) adverse cognitive or behavioral changes affecting crew health and performance during the mission; (b) development of psychiatric disorders if adverse behavioral health changes are undetected or inadequately mitigated; and (c) long term health consequences, including late-emerging cognitive and behavioral changes.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=99"
+    },
+    {
+      "text": "Sub-diagnostic behavioral health conditions were anecdotally reported on several long-duration missions. Inflight symptoms have never reached diagnostic threshold despite related instances of lost mission objectives or early return. Estimated ISS incidence of behavioral health symptoms is 0.62 person-year, but is likely an underestimate. Incidence of psychiatric disorders in Antarctic ground analogs is ≥4.5%; increase in behavioral health symptoms over time with a preliminary non-linear increased incidence past 5-6 months has been found in experimental analogs.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=99"
+    },
+    {
+      "text": "There is minimal-to-no evidence of excess neurodegenerative diseases in short-duration LEO astronauts; likelihood for long-duration and DRMs beyond LEO is unknown. Most current countermeasures have limited feasibility beyond LEO, increasing risk.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=99"
+    },
+    {
+      "text": "Early detection of stress, cognitive or behavioral changes from baseline, or other risk factors during spaceflight is imperative to deter development of cognitive or behavioral conditions or psychiatric disorders which could seriously harm and negatively impact the individual or the crew, and pose serious consequences for accomplishing mission objectives or jeopardizing the mission altogether.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=99"
+    }
+  ],
+  "key_findings": [
+    "Isolation, confinement, distance from Earth, radiation and altered gravity, alone or combined, may lead to adverse cognitive or behavioral changes, psychiatric disorders if undetected or inadequately mitigated, and long-term effects.",
+    "Sub-diagnostic behavioral health conditions were anecdotally reported on several long-duration missions; inflight symptoms have never reached diagnostic threshold.",
+    "Estimated ISS incidence of behavioral health symptoms is 0.62 per person-year (stated on the page as likely an underestimate); psychiatric disorder incidence in Antarctic ground analogs is at least 4.5%.",
+    "Experimental analogs show increasing behavioral health symptoms over time, with a preliminary non-linear increase beyond 5-6 months.",
+    "Most current countermeasures have limited feasibility beyond LEO.",
+    "HFBP is developing methods to monitor cognitive and behavioral health during long-duration missions for early detection of stress and behavioral change."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states much of the evidence is anecdotal, from case reports, ground analogs or animal studies, with uncertain translation to humans in space.",
+    "The page text reads '0.62 person-year'; it is paraphrased here as 'per person-year' (own interpretation of the unit)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=99 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Sheena Dev), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 7/2024. The page links a full PDF Evidence Report, which was NOT read for this record. The page's short-title field reads 'Behavioral Health'."
+}

@@ -1,0 +1,46 @@
+{
+  "id": "nasa-hrp-five-hazards",
+  "title": "5 Hazards of Human Spaceflight",
+  "authors": [],
+  "organization": "NASA Human Research Program",
+  "published_date": "2023-10-26",
+  "url": "https://www.nasa.gov/hrp/hazards/",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "radiation",
+    "behavioral_health",
+    "bone",
+    "muscle"
+  ],
+  "license_basis": "NASA web page, US government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "A human journey to Mars, at first glance, offers an inexhaustible amount of complexities. To bring such a mission to the Red Planet from fiction to fact, NASA’s Human Research Program has pinpointed five hazards that astronauts will encounter on their journeys. These include space radiation, isolation and confinement, distance from Earth, gravity (and the lack of it), and closed or hostile environments. Scroll down to learn details involving each hazard.",
+      "url": "https://www.nasa.gov/hrp/hazards/"
+    },
+    {
+      "text": "Pooling the challenges of human spaceflight into categories allows for an organized effort to overcome the obstacles that lay before such a mission. However, these hazards do not stand alone. They can feed off one another and exacerbate effects on the human body, which are being studied using ground-based analogs, laboratories, and the International Space Station. These locations all serve as test beds to evaluate human performance, as well as the effectiveness of strategies that could keep astronauts safe and healthy in space.",
+      "url": "https://www.nasa.gov/hrp/hazards/"
+    },
+    {
+      "text": "Behavioral responses occur among groups of people isolated and confined in a small space over a long period of time. Crews must be carefully chosen, trained, and supported to ensure they can work effectively as a team for months or years in space.",
+      "url": "https://www.nasa.gov/hrp/hazards/"
+    },
+    {
+      "text": "On Mars, astronauts would need to live and work in three-eighths of Earth’s gravitational pull for up to two years. Throughout this time, their bodies – muscles, bones, inner ear, and organs – will be adjusting to new gravitational loads.",
+      "url": "https://www.nasa.gov/hrp/hazards/"
+    }
+  ],
+  "key_findings": [
+    "HRP groups spaceflight challenges into five hazards: space radiation, isolation and confinement, distance from Earth, gravity (and the lack of it), and closed or hostile environments.",
+    "The hazards interact and can exacerbate effects on the body; they are studied with ground analogs, laboratories and the ISS.",
+    "Space radiation is described as one of the most hazardous aspects of spaceflight.",
+    "Mars is on average 140 million miles from Earth and a mission would last roughly three years, making self-sufficiency key."
+  ],
+  "limitations": [
+    "General public-outreach overview; no quantitative health data."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched with an HTTP client on 2026-11-14; passages extracted programmatically from fetched text. Title from page <title> ('5 Hazards of Human Spaceflight - NASA'). No author shown. published_date from embedded JSON-LD datePublished (2023-10-26; dateModified 2026-06-12), not a visible byline."
+}

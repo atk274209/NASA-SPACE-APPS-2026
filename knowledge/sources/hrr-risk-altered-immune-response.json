@@ -1,0 +1,40 @@
+{
+  "id": "hrr-risk-altered-immune-response",
+  "title": "Risk of In Mission Impacts, Adverse Health Events or Long-Term Health Impacts due to Altered Immune Response",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2025-05-13",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=85",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "immune"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given that exposure to orbital spaceflight results in persistent dysregulation of the immune system, which leads to reactivation of latent herpesviruses and likely to an increased clinical incidence, including rashes and hypersensitivity reactions, there is a possibility that crewmembers will be susceptible to certain diseases during exploration class missions or long term health impacts.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=85"
+    },
+    {
+      "text": "Subclinical altered human immune function has been documented in crewmembers post-flight & in-flight (cytokine shifts, cell distribution shifts, specific changes in viral immunity or reactivation of latent viruses). These immune changes persist for the duration of a 6 month orbital flight. On-orbit clinical issues believed related to persistent immune dysregulation include increased incidence of skin rashes, various infectious processes and continued shedding of latent herpesviruses. Alterations to the immune function due to long duration missions is unknown. Future countermeasures may include: Operational procedures, functional foods, nutritional supplements, nutraceuticals, probiotics, pharmaceuticals, exercise, vaccination, behavioral countermeasures, bone countermeasures, personalized/precision medicine.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=85"
+    },
+    {
+      "text": "Prevent, monitor, and mitigate spaceflight-induced impaired immunity to protect in-mission health and performance (e.g., new infection, reactivation of dormant infection, autoimmune conditions, inflammation, hypersensitivity/rash) and long-term health (e.g., malignancies).",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=85"
+    }
+  ],
+  "key_findings": [
+    "Orbital spaceflight causes persistent immune dysregulation, leading to reactivation of latent herpesviruses and likely increased clinical incidence such as rashes and hypersensitivity reactions.",
+    "Subclinical immune changes (cytokine shifts, cell distribution shifts, altered viral immunity, latent virus reactivation) persist for the duration of a 6-month orbital flight.",
+    "On-orbit clinical issues believed related to immune dysregulation include skin rashes, various infections and continued shedding of latent herpesviruses.",
+    "Potential future countermeasures listed include operational procedures, nutrition and supplements, probiotics, pharmaceuticals, exercise, vaccination and behavioral measures."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states effects of longer-duration (exploration) missions on immune function are unknown."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=85 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Brian Crucian), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: 11/2023. The page links a full PDF Evidence Report, which was NOT read for this record."
+}

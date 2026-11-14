@@ -1,0 +1,46 @@
+{
+  "id": "hrr-risk-radiation-carcinogenesis",
+  "title": "Risk of Radiation Carcinogenesis",
+  "authors": [],
+  "organization": "NASA Human Research Program (Human Research Roadmap)",
+  "published_date": "2026-08-17",
+  "url": "https://humanresearchroadmap.nasa.gov/risks/?i=96",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "radiation"
+  ],
+  "license_basis": "NASA Human Research Roadmap web page (humanresearchroadmap.nasa.gov), US federal government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Given crew is exposed to radiation from the space environment, there is the possibility for increased cancer morbidity or mortality.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=96"
+    },
+    {
+      "text": "While epidemiological studies of terrestrial radiation-exposed cohorts demonstrate dose-related increases in cancer incidence and mortality at space relevant doses, no epidemiological data exists for exposures to space radiation. The space radiation environment differs from that present on Earth (e.g. x- and gamma-rays) due to the presence of high-energy particles including protons, heavy ions, and neutrons. Particles produce densely ionizing tracks and impart clustered damage difficult for cells to repair and current animal and cellular research suggests damage induced by particle radiation could increase cancer-related effects compared to x- or gamma-rays (i.e. reduced latency, increased malignancy).",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=96"
+    },
+    {
+      "text": "Overall REID uncertainty is large with upper 95% confidence levels 3-4 times larger than estimated central values. The effects of other sources of uncertainty that may modify radiation risk (e.g. secondary spaceflight hazards) are being characterized but cannot be estimated or integrated currently.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=96"
+    },
+    {
+      "text": "Due to lack of resource availability and constraints in spacecraft design, shielding crew from the high energy particles that comprise the space radiation environment (87% protons, 12% helium, 1% higher charge and energy [HZE] ions) remains imperfect, leaving crew members exposed to the space radiation field, particularly during deep space and interplanetary missions.",
+      "url": "https://humanresearchroadmap.nasa.gov/risks/?i=96"
+    }
+  ],
+  "key_findings": [
+    "Space radiation exposure creates a possibility of increased cancer morbidity or mortality.",
+    "No epidemiological data exist for space radiation exposure; risk estimates rely on terrestrial cohorts plus animal and cellular data.",
+    "Space radiation includes high-energy protons, heavy ions and neutrons that produce clustered damage difficult for cells to repair; animal and cell research suggests particle radiation could increase cancer-related effects compared with x- or gamma-rays.",
+    "NASA's Space Cancer Risk (NSCR) model estimates lifetime risk as risk of exposure-induced death (REID); upper 95% confidence levels are 3-4 times the central estimates.",
+    "Shielding remains imperfect due to resource and design constraints, especially for deep space missions; the page gives the radiation field composition as 87% protons, 12% helium, 1% HZE ions."
+  ],
+  "limitations": [
+    "Summary web page, not primary data.",
+    "Page states there are no validated medical countermeasures and that effects of other spaceflight hazards on radiation risk cannot yet be estimated.",
+    "Covers carcinogenesis only; other radiation risks (CNS, cardiovascular/degenerative) are folded into other HRP risks."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://humanresearchroadmap.nasa.gov/risks/?i=96 with an HTTP client on 2026-11-14 and extracted text locally; passages were extracted programmatically from the fetched text and checked for exact (whitespace-normalised) match. Page lists no authors; it names a Point of Contact (Janice Zawaski), recorded here only in these notes. published_date is the page's 'Last Published' timestamp. HSRB approval of risk ratings per the page: no date given; the page says ratings were approved under the previous 3x4 LxC matrix and the risk was scheduled to be updated at the 2025 HSRB. The page links a full PDF Evidence Report, which was NOT read for this record. This page showed a newer 'Last Published' date (08/17/26) than the other HRR pages."
+}

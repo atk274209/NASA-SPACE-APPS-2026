@@ -41,6 +41,7 @@ class BaselineService:
         self.s = session
         self.policy = policy
         self.thresholds = thresholds
+        self.last_freeze_data_time: datetime | None = None
 
     # ------------------------------------------------------------------ queries
     def active_profile(self, astronaut_id: int, metric: str, context: str) -> BaselineProfile | None:
@@ -150,10 +151,14 @@ class BaselineService:
         self.s.flush()
         return prof
 
-    def _freeze(self, p: BaselineProfile, reason: str, actor: str = SYSTEM_ACTOR, **details) -> BaselineEvent:
+    def _freeze(self, p: BaselineProfile, reason: str, data_time: datetime, actor: str = SYSTEM_ACTOR,
+                **details) -> BaselineEvent:
+        """Freeze; `data_time` is the timestamp of the data that triggered it (not wall-clock)."""
         p.is_frozen = True
         p.frozen_reason = reason
-        self._log(p.astronaut_id, p.metric_code, p.context, p.id, "frozen", reason, actor, **details)
+        self.last_freeze_data_time = data_time
+        self._log(p.astronaut_id, p.metric_code, p.context, p.id, "frozen", reason, actor,
+                  data_time=data_time.isoformat(), **details)
         return BaselineEvent("frozen", p.id, reason)
 
     # ------------------------------------------------------------------ lifecycle
@@ -199,8 +204,9 @@ class BaselineService:
             )
         ).all()
         blocking = [a for a in open_alerts if Severity(a.peak_severity).rank >= freeze_rank]
+        trigger_time = max(r.recorded_at for r in new_rows)
         if blocking:
-            return self._freeze(current, "open alert at or above freeze severity",
+            return self._freeze(current, "open alert at or above freeze severity", trigger_time,
                                 alert_ids=[a.id for a in blocking])
 
         scale = self.scale_of(current)
@@ -208,6 +214,7 @@ class BaselineService:
         drift = (new_st.median - current.median) / scale
         if abs(drift) > ad.drift_freeze_scale:
             return self._freeze(current, f"drift detected: new-data median {drift:+.2f} scale units from baseline",
+                                trigger_time,
                                 drift_scale=drift, n_new=new_st.n)
 
         latest = max(r.recorded_at for r in new_rows)
@@ -234,6 +241,7 @@ class BaselineService:
             if abs(cumulative) > ad.max_cumulative_shift_scale:
                 return self._freeze(current, f"cumulative shift {cumulative:+.2f} scale units from anchor "
                                              f"v{anchor.version} exceeds limit; manual review required",
+                                    trigger_time,
                                     cumulative_scale=cumulative)
 
         prof = self._new_version(astronaut_id, metric, context, st, stage, current, median_override=target)

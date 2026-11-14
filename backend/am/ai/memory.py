@@ -111,7 +111,8 @@ class MemoryService:
                         source="deterministic", importance=3 if sev == Severity.CRITICAL else 2,
                         refs=refs, occurred_at=alert.last_seen_at, is_simulated=alert.is_simulated)
 
-    def record_baseline_freeze(self, profile: BaselineProfile, reason: str, is_simulated: bool) -> MemoryItem:
+    def record_baseline_freeze(self, profile: BaselineProfile, reason: str, is_simulated: bool,
+                               occurred_at: datetime) -> MemoryItem:
         content = (
             f"Baseline for {profile.metric_code.replace('_', ' ')} ({profile.context}) v{profile.version} "
             f"frozen: {reason}."
@@ -119,4 +120,4 @@ class MemoryService:
         return self.add(profile.astronaut_id, layer="mission", kind="baseline", content=content,
                         source="deterministic", importance=2,
                         refs=[{"type": "baseline", "id": profile.id}],
-                        occurred_at=profile.window_end, is_simulated=is_simulated)
+                        occurred_at=occurred_at, is_simulated=is_simulated)

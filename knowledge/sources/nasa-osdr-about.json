@@ -1,0 +1,43 @@
+{
+  "id": "nasa-osdr-about",
+  "title": "About OSDR",
+  "authors": [],
+  "organization": "NASA Science Mission Directorate, Biological and Physical Sciences (Open Science Data Repository)",
+  "published_date": "2025-09-04",
+  "url": "https://science.nasa.gov/biological-physical/data/osdr/",
+  "doi": null,
+  "source_type": "dataset_overview",
+  "topics": [
+    "bone",
+    "muscle",
+    "immune",
+    "radiation"
+  ],
+  "license_basis": "NASA web page, US government work; generally public domain in the US. Verbatim passages limited to short excerpts. Data terms are governed separately (page links https://science.nasa.gov/reference/osdr-help-terms-and-conditions/, not read).",
+  "passages": [
+    {
+      "text": "NASA’s Open Science Data Repository (OSDR) enables the reuse of comprehensive, multi-modal space life science data—including omics, physiological, phenotypic, behavioral, and environmental telemetry—to advance basic and applied research as well as operational outcomes for human space exploration.",
+      "url": "https://science.nasa.gov/biological-physical/data/osdr/"
+    },
+    {
+      "text": "NASA OSDR expanded from GeneLab in 2021, integrating the Ames Life Sciences Data Archive (ALSDA).",
+      "url": "https://science.nasa.gov/biological-physical/data/osdr/"
+    },
+    {
+      "text": "GeneLab is NASA’s first comprehensive open-access platform for storing, sharing, and analyzing omics data from spaceflight and related experiments. It enables scientists worldwide to explore how microgravity, radiation, and the space environment affect DNA, RNA, proteins, and metabolites by providing rigorously curated and standardized multi-omics datasets along with essential metadata.",
+      "url": "https://science.nasa.gov/biological-physical/data/osdr/"
+    }
+  ],
+  "key_findings": [
+    "OSDR holds multi-modal space life science data (omics, physiological, phenotypic, behavioral, bioimaging, environmental telemetry) from humans, animals, model organisms, tissue chips, plants and microbes.",
+    "OSDR expanded from GeneLab in 2021 by integrating the Ames Life Sciences Data Archive (ALSDA).",
+    "GeneLab provides curated, standardized omics datasets to study how microgravity, radiation and the space environment affect DNA, RNA, proteins and metabolites, including mechanisms behind bone loss and immune dysregulation.",
+    "ALSDA is the official repository for non-human life sciences data from NASA Space Biology and HRP, with phenotypic datasets relevant to muscle atrophy and bone loss."
+  ],
+  "limitations": [
+    "Dataset overview page; describes data resources, contains no health findings itself.",
+    "Mostly non-human / model-organism data; not astronaut medical records (own observation)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://science.nasa.gov/biological-physical/data/osdr/ on 2026-11-14 (page title 'About OSDR - NASA Science'). No author found in page metadata; published_date from JSON-LD datePublished 2025-09-04 (dateModified 2026-10-23). Note https://www.nasa.gov/osdr/ redirected to a different page ('BPS Data') and https://osdr.nasa.gov/bio/about/ returned 404; neither was used."
+}

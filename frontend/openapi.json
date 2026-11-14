@@ -1471,6 +1471,657 @@
           }
         }
       }
+    },
+    "/api/v1/research/correlation/run": {
+      "post": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Correlation Run",
+        "operationId": "correlation_run_api_v1_research_correlation_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AstronautIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/research/correlation/latest": {
+      "get": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Correlation Latest",
+        "operationId": "correlation_latest_api_v1_research_correlation_latest_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RunOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Correlation Latest Api V1 Research Correlation Latest Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/research/series": {
+      "get": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Daily Series",
+        "operationId": "daily_series_api_v1_research_series_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeriesOut"
+                  },
+                  "title": "Response Daily Series Api V1 Research Series Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/research/observations": {
+      "post": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Create Observation",
+        "operationId": "create_observation_api_v1_research_observations_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "research"
+        ],
+        "summary": "List Observations",
+        "operationId": "list_observations_api_v1_research_observations_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ObservationOut"
+                  },
+                  "title": "Response List Observations Api V1 Research Observations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/research/observations/{obs_id}/review": {
+      "post": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Review Observation",
+        "operationId": "review_observation_api_v1_research_observations__obs_id__review_post",
+        "parameters": [
+          {
+            "name": "obs_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Obs Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/research/findings/{finding_id}": {
+      "get": {
+        "tags": [
+          "research"
+        ],
+        "summary": "Get Finding",
+        "operationId": "get_finding_api_v1_research_findings__finding_id__get",
+        "parameters": [
+          {
+            "name": "finding_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Finding Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal/generate": {
+      "post": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "Journal Generate",
+        "operationId": "journal_generate_api_v1_journal_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JournalGenerateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JournalOut"
+                  },
+                  "type": "array",
+                  "title": "Response Journal Generate Api V1 Journal Generate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal": {
+      "get": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "Journal List",
+        "operationId": "journal_list_api_v1_journal_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JournalOut"
+                  },
+                  "title": "Response Journal List Api V1 Journal Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/missions/today": {
+      "get": {
+        "tags": [
+          "missions"
+        ],
+        "summary": "Missions Today",
+        "operationId": "missions_today_api_v1_missions_today_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/missions/tasks/{task_id}": {
+      "post": {
+        "tags": [
+          "missions"
+        ],
+        "summary": "Set Task Status",
+        "operationId": "set_task_status_api_v1_missions_tasks__task_id__post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskStatusIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/missions/history": {
+      "get": {
+        "tags": [
+          "missions"
+        ],
+        "summary": "Missions History",
+        "operationId": "missions_history_api_v1_missions_history_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Missions History Api V1 Missions History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/ingest": {
+      "post": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Ingest",
+        "operationId": "knowledge_ingest_api_v1_knowledge_ingest_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeIngestOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/documents": {
+      "get": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Documents",
+        "operationId": "knowledge_documents_api_v1_knowledge_documents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentOut"
+                  },
+                  "type": "array",
+                  "title": "Response Knowledge Documents Api V1 Knowledge Documents Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/search": {
+      "get": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Search",
+        "operationId": "knowledge_search_api_v1_knowledge_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Q"
+            }
+          },
+          {
+            "name": "k",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "title": "K"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Knowledge Search Api V1 Knowledge Search Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1979,6 +2630,19 @@
         ],
         "title": "AstronautCreate"
       },
+      "AstronautIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id"
+        ],
+        "title": "AstronautIn"
+      },
       "AstronautOut": {
         "properties": {
           "id": {
@@ -2480,6 +3144,275 @@
         ],
         "title": "ConversationOut"
       },
+      "DocumentOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authors"
+          },
+          "organization": {
+            "type": "string",
+            "title": "Organization"
+          },
+          "published_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Date"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "doi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doi"
+          },
+          "source_type": {
+            "type": "string",
+            "title": "Source Type"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Topics"
+          },
+          "license_basis": {
+            "type": "string",
+            "title": "License Basis"
+          },
+          "key_findings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Key Findings"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          },
+          "retrieved_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieved At"
+          },
+          "verification_notes": {
+            "type": "string",
+            "title": "Verification Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "authors",
+          "organization",
+          "published_date",
+          "url",
+          "doi",
+          "source_type",
+          "topics",
+          "license_basis",
+          "key_findings",
+          "limitations",
+          "retrieved_at",
+          "verification_notes"
+        ],
+        "title": "DocumentOut"
+      },
+      "FindingOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "run_id": {
+            "type": "integer",
+            "title": "Run Id"
+          },
+          "finding_type": {
+            "type": "string",
+            "title": "Finding Type"
+          },
+          "x_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Key"
+          },
+          "y_key": {
+            "type": "string",
+            "title": "Y Key"
+          },
+          "x_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Label"
+          },
+          "y_label": {
+            "type": "string",
+            "title": "Y Label"
+          },
+          "lag_days": {
+            "type": "integer",
+            "title": "Lag Days"
+          },
+          "n_days": {
+            "type": "integer",
+            "title": "N Days"
+          },
+          "rho": {
+            "type": "number",
+            "title": "Rho"
+          },
+          "p_value": {
+            "type": "number",
+            "title": "P Value"
+          },
+          "q_value": {
+            "type": "number",
+            "title": "Q Value"
+          },
+          "rho_detrended": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rho Detrended"
+          },
+          "p_detrended": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Detrended"
+          },
+          "detrended_supported": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detrended Supported"
+          },
+          "slope_per_day": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slope Per Day"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "days": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "caveat": {
+            "type": "string",
+            "title": "Caveat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "run_id",
+          "finding_type",
+          "x_key",
+          "y_key",
+          "x_label",
+          "y_label",
+          "lag_days",
+          "n_days",
+          "rho",
+          "p_value",
+          "q_value",
+          "rho_detrended",
+          "p_detrended",
+          "detrended_supported",
+          "slope_per_day",
+          "unit",
+          "days",
+          "summary",
+          "caveat"
+        ],
+        "title": "FindingOut"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2531,6 +3464,189 @@
           "baseline_event"
         ],
         "title": "IngestOut"
+      },
+      "JournalGenerateIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "first_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Day"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id"
+        ],
+        "title": "JournalGenerateIn"
+      },
+      "JournalOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "mission_day": {
+            "type": "integer",
+            "title": "Mission Day"
+          },
+          "day_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Day Date"
+          },
+          "sections": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Sections"
+          },
+          "flags": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "observations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Observations"
+          },
+          "refs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Refs"
+          },
+          "complete_day": {
+            "type": "boolean",
+            "title": "Complete Day"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "generator_version": {
+            "type": "string",
+            "title": "Generator Version"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "mission_day",
+          "day_date",
+          "sections",
+          "flags",
+          "observations",
+          "refs",
+          "complete_day",
+          "is_simulated",
+          "generator_version",
+          "generated_at"
+        ],
+        "title": "JournalOut"
+      },
+      "KnowledgeIngestOut": {
+        "properties": {
+          "loaded": {
+            "type": "integer",
+            "title": "Loaded"
+          },
+          "updated": {
+            "type": "integer",
+            "title": "Updated"
+          },
+          "unchanged": {
+            "type": "integer",
+            "title": "Unchanged"
+          },
+          "skipped": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skipped"
+          },
+          "embedded": {
+            "type": "integer",
+            "title": "Embedded"
+          },
+          "embed_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embed Model"
+          },
+          "embed_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embed Error"
+          },
+          "documents_total": {
+            "type": "integer",
+            "title": "Documents Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loaded",
+          "updated",
+          "unchanged",
+          "skipped",
+          "embedded",
+          "embed_model",
+          "embed_error",
+          "documents_total"
+        ],
+        "title": "KnowledgeIngestOut"
       },
       "LatestReadingOut": {
         "properties": {
@@ -3048,6 +4164,128 @@
         ],
         "title": "MissionOut"
       },
+      "ObservationIn": {
+        "properties": {
+          "finding_id": {
+            "type": "integer",
+            "title": "Finding Id"
+          },
+          "use_llm": {
+            "type": "boolean",
+            "title": "Use Llm",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "finding_id"
+        ],
+        "title": "ObservationIn"
+      },
+      "ObservationOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Finding Ids"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "observation": {
+            "type": "string",
+            "title": "Observation"
+          },
+          "scientific_context": {
+            "type": "string",
+            "title": "Scientific Context"
+          },
+          "hypothesis": {
+            "type": "string",
+            "title": "Hypothesis"
+          },
+          "evidence_level": {
+            "type": "string",
+            "title": "Evidence Level"
+          },
+          "confidence_note": {
+            "type": "string",
+            "title": "Confidence Note"
+          },
+          "doc_refs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Doc Refs"
+          },
+          "generated_by": {
+            "type": "string",
+            "title": "Generated By"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "grounding": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Grounding"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "finding_ids",
+          "title",
+          "observation",
+          "scientific_context",
+          "hypothesis",
+          "evidence_level",
+          "confidence_note",
+          "doc_refs",
+          "generated_by",
+          "model",
+          "grounding",
+          "status",
+          "is_simulated",
+          "created_at"
+        ],
+        "title": "ObservationOut"
+      },
       "OperatorAction": {
         "properties": {
           "actor": {
@@ -3204,6 +4442,97 @@
         ],
         "title": "ResolveIn"
       },
+      "ReviewIn": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^(reviewed|rejected|draft)$",
+            "title": "Status"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "actor"
+        ],
+        "title": "ReviewIn"
+      },
+      "RunOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "n_tests": {
+            "type": "integer",
+            "title": "N Tests"
+          },
+          "n_series": {
+            "type": "integer",
+            "title": "N Series"
+          },
+          "through_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Through Day"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingOut"
+            },
+            "type": "array",
+            "title": "Findings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "kind",
+          "params",
+          "n_tests",
+          "n_series",
+          "through_day",
+          "is_simulated",
+          "created_at",
+          "findings"
+        ],
+        "title": "RunOut"
+      },
       "ScenarioOut": {
         "properties": {
           "name": {
@@ -3285,6 +4614,63 @@
           "content"
         ],
         "title": "SendIn"
+      },
+      "SeriesOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "aggregation": {
+            "type": "string",
+            "title": "Aggregation"
+          },
+          "points": {
+            "items": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "kind",
+          "aggregation",
+          "points",
+          "reference"
+        ],
+        "title": "SeriesOut"
       },
       "SimulationRunIn": {
         "properties": {
@@ -3437,6 +4823,116 @@
         ],
         "title": "SystemStatusOut"
       },
+      "TaskOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "mission_day": {
+            "type": "integer",
+            "title": "Mission Day"
+          },
+          "template_code": {
+            "type": "string",
+            "title": "Template Code"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "priority": {
+            "type": "integer",
+            "title": "Priority"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "reason_refs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Reason Refs"
+          },
+          "protocol_ref": {
+            "type": "string",
+            "title": "Protocol Ref"
+          },
+          "completion_rule": {
+            "type": "string",
+            "title": "Completion Rule"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "completed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed By"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "mission_day",
+          "template_code",
+          "category",
+          "title",
+          "detail",
+          "priority",
+          "reason",
+          "reason_refs",
+          "protocol_ref",
+          "completion_rule",
+          "status",
+          "completed_by",
+          "completed_at"
+        ],
+        "title": "TaskOut"
+      },
+      "TaskStatusIn": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "TaskStatusIn"
+      },
       "ThresholdRuleOut": {
         "properties": {
           "metric_code": {
@@ -3506,6 +5002,42 @@
           "rules"
         ],
         "title": "ThresholdsOut"
+      },
+      "TodayOut": {
+        "properties": {
+          "mission_day": {
+            "type": "integer",
+            "title": "Mission Day"
+          },
+          "protocol_note": {
+            "type": "string",
+            "title": "Protocol Note"
+          },
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/TaskOut"
+            },
+            "type": "array",
+            "title": "Tasks"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mission_day",
+          "protocol_note",
+          "tasks",
+          "done",
+          "total"
+        ],
+        "title": "TodayOut"
       },
       "TraceOut": {
         "properties": {

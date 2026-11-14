@@ -51,10 +51,29 @@ Fonts are bundled locally, so the UI works offline.
 Known limitation: a 7B local model sometimes omits tool arguments or misreads instructions.
 The tools reject ambiguous calls (for example, a missing context) instead of guessing.
 
-The backend has 51 pytest tests in total.
+**M4 is done: scientific intelligence, missions and journal.**
 
-Next milestones: RAG over public space-medicine literature, historical correlation,
-research observations, adaptive daily missions and the mission journal.
+- **Knowledge base (`knowledge/sources/`):** 15 curated public sources, mostly NASA Human
+  Research Program risk pages.
+  - Verbatim passages are stored only for US government works.
+  - Each source records its license basis and verification notes.
+  - Retrieval uses `nomic-embed-text` embeddings, with an offline keyword (TF-IDF)
+    fallback when the embedding model is unavailable.
+- **Correlation engine:** trends (Spearman, Theil-Sen) and lagged associations
+  (0–3 days) with Benjamini-Hochberg FDR control. Each association is re-tested on
+  first differences, so two unrelated trends are labelled "shared trend only".
+- **Research observations (ARI):** each observation combines the statistical finding,
+  retrieved literature (quotes and AM's own summaries are labelled differently) and a
+  hypothesis drafted by the LLM with validated citations. The hypothesis states its own
+  confidence and goes through a review workflow.
+- **Mission journal:** deterministic daily summaries compared with a fixed reference
+  period (mission days 1–7). Patterns that persist for 5 or more days are written to
+  long-term memory.
+- **Adaptive daily missions:** rule-based tasks with a stated reason for each.
+  - Completion is verified from recorded data where possible.
+  - Protocol IDs are DEMO placeholders.
+
+The backend has 64 pytest tests in total.
 
 ## Layout
 
@@ -63,7 +82,7 @@ backend/   FastAPI + SQLAlchemy + Alembic (Python, managed with uv)
 config/    thresholds.demo.yaml, baseline_policy.yaml (safety configuration)
 docs/      SAFETY.md, architecture notes
 frontend/  React + TS + Vite operations console
-knowledge/ (M4) source-traceable scientific documents
+knowledge/ source-traceable scientific documents (knowledge/sources/*.json + _index.md)
 ```
 
 ## Local model

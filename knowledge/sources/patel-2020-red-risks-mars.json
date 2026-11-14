@@ -1,0 +1,40 @@
+{
+  "id": "patel-2020-red-risks-mars",
+  "title": "Red risks for a journey to the red planet: The highest priority human health risks for a mission to Mars.",
+  "authors": [
+    "Patel ZS",
+    "Brunstetter TJ",
+    "Tarver WJ",
+    "Whitmire AM",
+    "Zwart SR",
+    "Smith SM",
+    "Huff JL"
+  ],
+  "organization": "npj Microgravity (Nature Portfolio); authors affiliated with NASA JSC, NASA LaRC, KBR, U.S. Navy, UTMB",
+  "published_date": "2020-11-05",
+  "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=33298950&rettype=abstract&retmode=text",
+  "doi": "10.1038/s41526-020-00124-6",
+  "source_type": "peer_reviewed_article",
+  "topics": [
+    "radiation",
+    "sans",
+    "behavioral_health",
+    "nutrition",
+    "cardiovascular"
+  ],
+  "license_basis": "Peer-reviewed journal article; copyright/licence not verified in this session - metadata and own paraphrase only, no verbatim text.",
+  "passages": [],
+  "key_findings": [
+    "Review (paraphrased): HRP links five spaceflight hazards to more than 30 human health risks; the authors summarise the risks ranked 'red' (highest priority by likelihood and severity) for a Mars mission.",
+    "The red risks named are space radiation effects (cancer, cardiovascular disease, cognitive decrements), SANS, behavioral health and performance decrements, and inadequate food and nutrition.",
+    "The authors propose evaluating risk through the 'space exposome' - combined spaceflight and lifetime exposures in relation to genetics - to build individual risk profiles."
+  ],
+  "limitations": [
+    "Narrative review, not primary data.",
+    "Only the PubMed abstract and metadata were read; the full text was not read.",
+    "Authors' conflict-of-interest statement says views are their own and not necessarily NASA's.",
+    "Risk rankings reflect 2020 status and may have changed (own observation)."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Metadata (title, 7 authors, journal 'NPJ Microgravity', 2020 Nov 5, vol 6(1):33, DOI, PMID 33298950, PMCID PMC7645687) verified via NCBI E-utilities esummary (db=pmc, id=7645687) and efetch (db=pubmed, id=33298950) on 2026-11-14. The PubMed web page itself returned a cookie/bot wall and could not be read, so the E-utilities URL is recorded as the fetched URL. Journal licence not checked."
+}

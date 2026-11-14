@@ -26,6 +26,19 @@ export type Suggestion = S['SuggestionOut']
 export type MemoryItem = S['MemoryOut']
 export type CheckinItem = S['CheckinItemOut']
 export type SelfReport = S['SelfReportOut']
+export type Finding = S['FindingOut']
+export type AnalysisRun = S['RunOut']
+export type DailySeriesOut = S['SeriesOut']
+export type Observation = S['ObservationOut']
+export type JournalEntry = S['JournalOut']
+export type DailyTask = S['TaskOut']
+export type Today = S['TodayOut']
+export type KnowledgeDoc = S['DocumentOut']
+export type IngestReport = S['KnowledgeIngestOut']
+export type SearchHit = {
+  chunk_id: number; doc_slug: string; title: string; organization: string; published_date: string | null
+  url: string; kind: string; text: string; score: number; method: string
+}
 
 export class ApiError extends Error {
   readonly status: number
@@ -109,5 +122,24 @@ export const api = {
   submitCheckin: (astronaut_id: number, ratings: Record<string, number>, note: string) =>
     request<SelfReport[]>('POST', '/checkins', { astronaut_id, ratings, note }),
   checkins: (astronaut_id: number) => request<SelfReport[]>('GET', '/checkins', undefined, { astronaut_id }),
+  runCorrelation: (astronaut_id: number) => request<AnalysisRun>('POST', '/research/correlation/run', { astronaut_id }),
+  latestRun: (astronaut_id: number) =>
+    request<AnalysisRun | null>('GET', '/research/correlation/latest', undefined, { astronaut_id }),
+  series: (astronaut_id: number) => request<DailySeriesOut[]>('GET', '/research/series', undefined, { astronaut_id }),
+  observations: (astronaut_id: number) =>
+    request<Observation[]>('GET', '/research/observations', undefined, { astronaut_id }),
+  createObservation: (finding_id: number, use_llm = true) =>
+    request<Observation>('POST', '/research/observations', { finding_id, use_llm }),
+  reviewObservation: (id: number, status: string, actor: string) =>
+    request<Observation>('POST', `/research/observations/${id}/review`, { status, actor }),
+  generateJournal: (astronaut_id: number) => request<JournalEntry[]>('POST', '/journal/generate', { astronaut_id }),
+  journal: (astronaut_id: number) => request<JournalEntry[]>('GET', '/journal', undefined, { astronaut_id }),
+  today: (astronaut_id: number) => request<Today>('GET', '/missions/today', undefined, { astronaut_id }),
+  setTask: (id: number, status: string) => request<DailyTask>('POST', `/missions/tasks/${id}`, { status }),
+  missionHistory: (astronaut_id: number) =>
+    request<{ mission_day: number; done: number; total: number }[]>('GET', '/missions/history', undefined, { astronaut_id }),
+  ingestKnowledge: () => request<IngestReport>('POST', '/knowledge/ingest'),
+  documents: () => request<KnowledgeDoc[]>('GET', '/knowledge/documents'),
+  searchKnowledge: (q: string) => request<SearchHit[]>('GET', '/knowledge/search', undefined, { q, k: 6 }),
   audit: (limit = 100) => request<AuditEntry[]>('GET', '/audit', undefined, { limit }),
 }

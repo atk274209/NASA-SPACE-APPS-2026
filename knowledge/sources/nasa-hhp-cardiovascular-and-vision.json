@@ -1,0 +1,49 @@
+{
+  "id": "nasa-hhp-cardiovascular-and-vision",
+  "title": "Cardiovascular and Vision",
+  "authors": [
+    "Robert E. Lewis"
+  ],
+  "organization": "NASA Human Health and Performance Directorate (Johnson Space Center), Cardiovascular and Vision Laboratory",
+  "published_date": "2023-03-16",
+  "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/",
+  "doi": null,
+  "source_type": "nasa_web_page",
+  "topics": [
+    "cardiovascular",
+    "fluid_shift",
+    "sans"
+  ],
+  "license_basis": "NASA web page, US government work; generally public domain in the US. Verbatim passages limited to short excerpts.",
+  "passages": [
+    {
+      "text": "Upon entering weightlessness, approximately 2 liters of fluid move from the lower to the upper body. The anatomical and physiological changes associated with this headward fluid shift affect the cardiovascular system, eye, and brain.",
+      "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/"
+    },
+    {
+      "text": "The body senses this relative increase of fluid in the upper body and the physiological response is to reduce total blood volume. However, when astronauts return to Earth and gravity once again “pulls” blood to the lower body, many crewmembers experience signs of fainting (orthostatic intolerance). The changes in fluid distributions during spaceflight and the potential for associated negative health and performance consequences are an important area of research for the team, as more than 60% of astronauts can be affected by orthostatic intolerance if no countermeasures are used.",
+      "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/"
+    },
+    {
+      "text": "During the Fluid Shifts Study, the team also identified slow and stagnant blood flow in veins that drain the head. Stagnant blood flow is known to be a risk factor for blood clot development (thrombosis), and during this study, a blood clot was identified in one crewmember and suspected in a second crewmember.",
+      "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/"
+    },
+    {
+      "text": "Approximately 70% of crewmembers participating in long-duration missions (~6-months) on the ISS develop SANS findings, such as swelling of the nerve in the back of the eye and flattening of the back of the eye, which can result in the need for a new prescription of their glasses or contact lenses. Though no astronauts to date have had permanent vision loss, swelling in the back of the eye has the potential to impact vision on longer-duration missions to the moon and Mars.",
+      "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/"
+    }
+  ],
+  "key_findings": [
+    "About 2 liters of fluid shift from the lower to the upper body on entering weightlessness, affecting the cardiovascular system, eye and brain.",
+    "The body responds by reducing total blood volume; on return to Earth many crewmembers show signs of orthostatic intolerance, which can affect more than 60% of astronauts without countermeasures; female crewmembers are more susceptible.",
+    "Countermeasures developed include gradient compression garments and fluid-loading protocols; lower body negative pressure and veno-occlusive thigh cuffs are being tested to reverse the headward shift.",
+    "The ISS Fluid Shifts Study found the inflight shift resembles the supine posture on Earth but is unrelenting; slow/stagnant flow in head-draining veins was found, with a clot identified in one crewmember and suspected in another.",
+    "About 70% of long-duration (~6-month) ISS crewmembers develop SANS findings; no astronaut to date has had permanent vision loss."
+  ],
+  "limitations": [
+    "Laboratory overview page, not primary data or a peer-reviewed report.",
+    "Page states it is unknown whether similar effects occur with varying gravity levels during planetary descent/ascent."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched with an HTTP client on 2026-11-14; passages extracted programmatically from fetched text. Title from page <h1>. Author 'Robert E. Lewis' and datePublished 2023-03-16 (dateModified 2025-03-11) taken from the page's embedded structured metadata (JSON-LD), not from a visible byline; the author is likely the page editor/publisher rather than a scientific author. The first passage is preceded on the page by the label 'Fun Fact:', which was omitted from the excerpt."
+}

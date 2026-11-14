@@ -1,0 +1,35 @@
+{
+  "id": "ntrs-fluid-shifts-icp-visual-impairment",
+  "title": "Fluid Shifts Before, During and After Prolonged Space Flight and Their Association with Intracranial Pressure and Visual Impairment",
+  "authors": [
+    "Stenger, Michael",
+    "Hargens, Alan",
+    "Dulchavsky, Scott"
+  ],
+  "organization": "NASA Johnson Space Center (NTRS record)",
+  "published_date": "2014-01-01",
+  "url": "https://ntrs.nasa.gov/citations/20150001888",
+  "doi": null,
+  "source_type": "nasa_technical_report",
+  "topics": [
+    "fluid_shift",
+    "sans"
+  ],
+  "license_basis": "NASA Technical Reports Server record (presentation, Johnson Space Center). Public-domain status not stated on the record, and author affiliations were not verified. Only the short NTRS abstract is quoted; treat cautiously.",
+  "passages": [
+    {
+      "text": "Future human space travel will primarily consist of long duration missions onboard the International Space Station or exploration class missions to Mars, its moons, or nearby asteroids. Current evidence suggests that long duration missions might increase risk of permanent ocular structural and functional changes, possibly due to increased intracranial pressure resulting from a spaceflight-induced cephalad (headward) fluid shift.",
+      "url": "https://ntrs.nasa.gov/citations/20150001888"
+    }
+  ],
+  "key_findings": [
+    "The presentation states that long-duration missions might increase the risk of permanent ocular structural and functional changes, possibly due to increased intracranial pressure from a spaceflight-induced headward fluid shift."
+  ],
+  "limitations": [
+    "Presentation abstract only; very short, no results reported in the abstract.",
+    "Dated 2014; uses the older VIIP framing, later renamed SANS (own observation).",
+    "Hypothesis statement, not a finding."
+  ],
+  "retrieved_at": "2026-11-14",
+  "verification_notes": "Fetched https://ntrs.nasa.gov/citations/20150001888 (title confirmed in page <title>) and the NTRS API JSON https://ntrs.nasa.gov/api/citations/20150001888 on 2026-11-14. Authors, date (2014-01-01, which may be a year-only placeholder), STI type PRESENTATION, center JSC and meeting 'ISS International Partner Representative Telecon' (2014-01-20) are from the API JSON. Author affiliations were not checked, so the license basis is uncertain. No DOI."
+}

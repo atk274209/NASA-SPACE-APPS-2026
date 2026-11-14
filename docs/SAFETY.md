@@ -98,3 +98,33 @@ The implementation is `am/ai/`.
   imperfect, which is why the deterministic layers above exist.
 - **Fallback:** if the model is unavailable, a rule-based summary is shown instead.
 - **Memory writes:** mission memory is written only by deterministic code.
+
+## 7. Scientific intelligence (M4)
+
+- **Statistics are deterministic** (`am/research/correlation.py`). Findings carry a caveat
+  that they do not establish causation, along with the n, rho, p and FDR q values.
+  - Associations are re-tested after removing shared trends. In a simulation check
+    (200 seeds), two unrelated trends were falsely confirmed in about 5% of runs, and a
+    real 2-day lagged relationship was confirmed in all 200 runs.
+- **Knowledge sources are curated** in `knowledge/sources/`. Ingestion rejects a source if:
+  - its URL is not http(s), or
+  - required metadata is missing, or
+  - it has verbatim passages but is marked as copyrighted.
+  Passages were checked as exact substrings of the downloaded pages.
+- **LLM hypotheses:**
+  - They are generated only from the finding and the retrieved excerpts.
+  - Citations to excerpts that were not provided are removed and logged.
+  - Numbers are grounding-checked.
+  - Without a model, a clearly labelled template is used.
+  - Observations start as `draft` and need human review.
+- **The journal and missions compare against a fixed reference period** (mission days
+  1–7), so later deterioration cannot shift the reference.
+  - These comparisons are descriptive only.
+  - Historical journal days use alert severity *as of that day* (no hindsight).
+  - Baseline freezes are attributed to the time of the data that triggered them.
+- **Missions are monitoring and protocol-adherence prompts.** They are never
+  prescriptions. Protocol IDs are DEMO placeholders until real protocols are configured.
+
+Known limitation: an open WATCH alert that no one resolves absorbs later escalations on the
+same stream, so its "first seen" time can be much earlier than the significant episode.
+Operators should resolve WATCH alerts once reviewed.
