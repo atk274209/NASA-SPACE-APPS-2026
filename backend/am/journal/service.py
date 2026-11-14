@@ -48,7 +48,7 @@ MAX_SYMPTOM_NOTE_CHARS = 300
 
 PHYSICAL = ["exercise_duration:daily", "step_count:daily", "sleep_duration:daily", "heart_rate:rest",
             "heart_rate:sleep", "hrv_rmssd:rest", "spo2:rest", "body_temperature:rest", "water_intake:daily",
-            "energy_intake:daily"]
+            "energy_intake:daily", "blood_glucose:fasting"]
 MENTAL = ["selfreport:mood", "selfreport:stress", "selfreport:fatigue", "selfreport:sleep_quality",
           "selfreport:motivation"]
 

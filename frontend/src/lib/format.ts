@@ -57,6 +57,8 @@ const CONTEXT_LABEL: Record<string, string> = {
   sleep: 'Sleep',
   other: 'Other',
   daily: 'Daily total',
+  fasting: 'Fasting',
+  postprandial: 'After a meal',
 }
 export const contextLabel = (c: string) => CONTEXT_LABEL[c] ?? c
 

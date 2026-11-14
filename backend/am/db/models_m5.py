@@ -106,7 +106,7 @@ class SyncPackage(Base):
     """Outbox entry: an explicitly authorized export prepared for transmission to ground.
 
     AM never transmits by itself; it prepares a file and records who authorized what.
-    status: prepared | exported | cancelled
+    status: prepared | exported | cancelled (ground reports); stored | pruned (backups)
     """
 
     __tablename__ = "sync_package"

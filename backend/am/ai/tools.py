@@ -131,7 +131,7 @@ def health_overview(env: ToolEnv, _args: dict[str, Any]) -> ToolResult:
     return data, refs
 
 
-CONTEXTS = ("rest", "exercise", "sleep", "other", "daily")
+CONTEXTS = ("rest", "exercise", "sleep", "other", "daily", "fasting", "postprandial")
 
 
 def _stream_args(env: ToolEnv, args: dict[str, Any]) -> tuple[str, str] | dict[str, Any]:
@@ -365,7 +365,7 @@ _STREAM = {
                                                          "respiratory_rate, systolic_bp, diastolic_bp (contexts rest/"
                                                          "exercise/sleep); sleep_duration, exercise_duration, "
                                                          "water_intake, energy_intake, step_count (context daily)"},
-        "context": {"type": "string", "enum": ["rest", "exercise", "sleep", "other", "daily"]},
+        "context": {"type": "string", "enum": ["rest", "exercise", "sleep", "other", "daily", "fasting", "postprandial"]},
     },
     "required": ["metric_code", "context"],
 }

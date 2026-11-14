@@ -11,7 +11,7 @@ import { useSession } from '../state/session'
 export function NoCrew() {
   return (
     <Empty title="No crew records yet">
-      Add an astronaut through the API, or generate a labelled simulated mission in{' '}
+      Add a crew member and a mission, or generate a labelled simulated mission, in{' '}
       <Link to="/system" className="text-signal underline underline-offset-2">System</Link>.
     </Empty>
   )
@@ -43,7 +43,7 @@ function ReadingRow({ r, rule }: { r: LatestReading; rule: ThresholdRule | undef
           <DeviationStrip z={m.deviation_score} severity={m.severity} rule={rule} />
         ) : (
           <span className="text-xs text-ink-faint">
-            {r.baseline ? 'Trend only, no alert rule' : 'Collecting baseline data'}
+            {!r.baseline_enabled ? 'Logged only, not compared' : r.baseline ? 'Trend only, no alert rule' : 'Collecting baseline data'}
           </span>
         )}
       </td>

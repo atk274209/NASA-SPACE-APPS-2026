@@ -122,7 +122,20 @@ class AlertService:
         self.s.add(AlertAck(alert_id=alert.id, action="resolve", actor=actor, note=note))
         audit(self.s, actor=actor, action="alert.resolved", entity="alert", entity_id=alert.id,
               payload={"note": note})
+        self._close_escalations(alert, actor)
         return alert
+
+    def _close_escalations(self, alert: Alert, actor: str) -> None:
+        """A resolved alert needs no further escalation: close its still-open events."""
+        from am.db.models_m5 import EscalationEvent
+
+        for e in self.s.scalars(select(EscalationEvent).where(EscalationEvent.alert_id == alert.id,
+                                                              EscalationEvent.status != "closed")):
+            e.status = "closed"
+            e.actions = [*(e.actions or []), {"kind": "closed", "by": actor, "at": utcnow().isoformat(),
+                                              "reason": "alert resolved"}]
+            audit(self.s, actor=actor, action="escalation.closed", entity="escalation_event", entity_id=e.id,
+                  payload={"alert_id": alert.id, "reason": "alert resolved"})
 
     def _get(self, alert_id: int) -> Alert:
         alert = self.s.get(Alert, alert_id)

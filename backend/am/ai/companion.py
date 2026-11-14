@@ -321,6 +321,7 @@ class CompanionService:
         """Deterministic status summary used when the language model is unavailable."""
         data, refs = run_tool(env, "get_health_overview", {})
         why = {"service_unreachable": "the local language model service is not running",
+               "model_timeout": "the local language model took too long to answer",
                "model_not_installed": f"the model '{self.model}' is not installed"}.get(reason, reason)
         lines = [f"AI conversation is unavailable because {why}. Monitoring and alerts are unaffected.",
                  "", "Current status from stored records:"]

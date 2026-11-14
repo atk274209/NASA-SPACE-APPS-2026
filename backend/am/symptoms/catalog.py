@@ -63,9 +63,9 @@ _CONTACT_NOW = TaskTemplate(
     "Use the mission's medical contact procedure today. Do not wait for the end of the day.",
     "manual", "AM-DEMO-SYM-02")
 _LOG_SYMPTOM = TaskTemplate(
-    "symptom_daily_log", "Record how the symptom is today",
-    "Update the symptom in the companion (better, same, worse) so the trend is visible to the medical team.",
-    "manual", "AM-DEMO-SYM-03")
+    "symptom_daily_log", "Note how the symptom is today",
+    "In today's check-in note, say whether it is better, the same or worse, so the medical team can see the trend.",
+    "checkin", "AM-DEMO-SYM-03")
 _HYDRATION = TaskTemplate("hydration_log", "Log water intake", "Record today's total water intake.",
                           "measurement:water_intake:daily", "AM-DEMO-NUT-01")
 _EXERCISE = TaskTemplate("exercise_session", "Complete today's scheduled exercise session",

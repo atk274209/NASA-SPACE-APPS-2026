@@ -66,6 +66,12 @@ def _validate(doc: dict[str, Any]) -> str | None:
     return None
 
 
+def _same_model(a: str | None, b: str | None) -> bool:
+    """Ollama treats an untagged model name as ':latest'."""
+    norm = (lambda m: m if m is None or ":" in m else f"{m}:latest")
+    return norm(a) == norm(b)
+
+
 def ingest_directory(session: Session, directory: Path, llm: OllamaClient | None, embed_model: str) -> IngestReport:
     loaded = updated = unchanged = embedded = 0
     skipped: list[str] = []
@@ -121,8 +127,8 @@ def ingest_directory(session: Session, directory: Path, llm: OllamaClient | None
 
     embed_error = None
     if llm is not None:
-        todo = session.scalars(select(DocumentChunk).where(
-            (DocumentChunk.embedding.is_(None)) | (DocumentChunk.embed_model != embed_model))).all()
+        todo = [c for c in session.scalars(select(DocumentChunk))
+                if c.embedding is None or not _same_model(c.embed_model, embed_model)]
         try:
             for i in range(0, len(todo), 16):
                 batch = todo[i:i + 16]
@@ -160,7 +166,7 @@ def search(session: Session, query: str, *, llm: OllamaClient | None, embed_mode
     chunks = session.scalars(select(DocumentChunk)).all()
     if not chunks or not query.strip():
         return []
-    embedded = [c for c in chunks if c.embedding is not None and c.embed_model == embed_model]
+    embedded = [c for c in chunks if c.embedding is not None and _same_model(c.embed_model, embed_model)]
     if llm is not None and len(embedded) == len(chunks):
         try:
             q = np.asarray(llm.embed(embed_model, [query])[0], dtype=np.float32)

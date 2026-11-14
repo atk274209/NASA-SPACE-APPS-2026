@@ -943,7 +943,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResolveIn"
+                "$ref": "#/components/schemas/am__schemas__ResolveIn"
               }
             }
           }
@@ -2122,6 +2122,1654 @@
           }
         }
       }
+    },
+    "/api/v1/entry-spec": {
+      "get": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "Entry Spec",
+        "description": "Everything a manual-entry form needs, taken from the registry the ingest pipeline uses.",
+        "operationId": "entry_spec_api_v1_entry_spec_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntrySpecOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/manual-entries": {
+      "post": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "Create Manual Entry",
+        "description": "Record one reading typed in by a person (source kind `manual`).\n\nA reading that fails validation is still stored, marked rejected with its reasons and\naudited, exactly as for sensor data: the response then says why.",
+        "operationId": "create_manual_entry_api_v1_manual_entries_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualEntryIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualEntryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "List Manual Entries",
+        "description": "Most recently entered manual readings first, rejected ones included (with reasons).",
+        "operationId": "list_manual_entries_api_v1_manual_entries_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ManualEntryRowOut"
+                  },
+                  "title": "Response List Manual Entries Api V1 Manual Entries Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/radiation/cumulative": {
+      "get": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "Radiation Cumulative",
+        "description": "Daily and running sums of logged dosimeter doses.\n\nArithmetic only: AM records what the dosimeter reported and adds it up. It does not\ncompare doses with any exposure limit.",
+        "operationId": "radiation_cumulative_api_v1_radiation_cumulative_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RadiationCumulativeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/missions/environments": {
+      "get": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "Mission Environments",
+        "operationId": "mission_environments_api_v1_missions_environments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MissionEnvironmentOut"
+                  },
+                  "type": "array",
+                  "title": "Response Mission Environments Api V1 Missions Environments Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/missions": {
+      "get": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "List Missions",
+        "description": "An astronaut's missions, newest (current) first, with their environment.",
+        "operationId": "list_missions_api_v1_missions_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MissionDetailOut"
+                  },
+                  "title": "Response List Missions Api V1 Missions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "crew"
+        ],
+        "summary": "Create Mission",
+        "description": "Create a mission; it becomes the astronaut's current mission (day 1 = start date, UTC).\n\nA mission on a simulated crew record is marked simulated too, so generated and real\nrecords never mix.",
+        "operationId": "create_mission_api_v1_missions_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissionCreateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionDetailOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms/catalog": {
+      "get": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Symptom Catalog",
+        "operationId": "symptom_catalog_api_v1_symptoms_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms": {
+      "get": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "List Reports",
+        "operationId": "list_reports_api_v1_symptoms_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SymptomReportOut"
+                  },
+                  "title": "Response List Reports Api V1 Symptoms Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Create Report",
+        "operationId": "create_report_api_v1_symptoms_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SymptomReportIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms/{report_id}/resolve": {
+      "post": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Resolve Report",
+        "operationId": "resolve_report_api_v1_symptoms__report_id__resolve_post",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/am__api__v1__symptoms__ResolveIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms/proposals": {
+      "get": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "List Proposals",
+        "operationId": "list_proposals_api_v1_symptoms_proposals_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "pending",
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProposalOut"
+                  },
+                  "title": "Response List Proposals Api V1 Symptoms Proposals Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms/proposals/{proposal_id}/confirm": {
+      "post": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Confirm Proposal",
+        "operationId": "confirm_proposal_api_v1_symptoms_proposals__proposal_id__confirm_post",
+        "parameters": [
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/symptoms/proposals/{proposal_id}/dismiss": {
+      "post": {
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Dismiss Proposal",
+        "operationId": "dismiss_proposal_api_v1_symptoms_proposals__proposal_id__dismiss_post",
+        "parameters": [
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/streaks": {
+      "get": {
+        "tags": [
+          "streaks"
+        ],
+        "summary": "Get Streaks",
+        "operationId": "get_streaks_api_v1_streaks_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreaksOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal/day-level-rules": {
+      "get": {
+        "tags": [
+          "journal_ext"
+        ],
+        "summary": "Day Level Rules",
+        "operationId": "day_level_rules_api_v1_journal_day_level_rules_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayLevelRulesOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal/{astronaut_id}/days/{day}/narrative": {
+      "post": {
+        "tags": [
+          "journal_ext"
+        ],
+        "summary": "Write Day Narrative",
+        "operationId": "write_day_narrative_api_v1_journal__astronaut_id__days__day__narrative_post",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Day"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/NarrativeIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal/{astronaut_id}/narratives": {
+      "post": {
+        "tags": [
+          "journal_ext"
+        ],
+        "summary": "Write Narratives",
+        "description": "Regenerate the days, then write their narratives one after another (a local model runs one at a time).",
+        "operationId": "write_narratives_api_v1_journal__astronaut_id__narratives_post",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NarrativeRangeIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JournalOut"
+                  },
+                  "title": "Response Write Narratives Api V1 Journal  Astronaut Id  Narratives Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/journal/{astronaut_id}/days/{day}/conversations": {
+      "get": {
+        "tags": [
+          "journal_ext"
+        ],
+        "summary": "Day Conversations",
+        "description": "That day's user and assistant messages from all of the astronaut's conversations, oldest first.",
+        "operationId": "day_conversations_api_v1_journal__astronaut_id__days__day__conversations_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DayMessageOut"
+                  },
+                  "title": "Response Day Conversations Api V1 Journal  Astronaut Id  Days  Day  Conversations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Settings",
+        "operationId": "list_settings_api_v1_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SettingOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Settings Api V1 Settings Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/{key}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update Setting",
+        "operationId": "update_setting_api_v1_settings__key__put",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/diagnostics": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Diagnostics",
+        "operationId": "get_diagnostics_api_v1_admin_diagnostics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/privacy": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Privacy",
+        "operationId": "get_privacy_api_v1_admin_privacy_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Audit",
+        "description": "Audit entries for settings, backups and ground-report packages (the data-handling trail).",
+        "operationId": "admin_audit_api_v1_admin_audit_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditOut"
+                  },
+                  "title": "Response Admin Audit Api V1 Admin Audit Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/backups": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Backups",
+        "operationId": "list_backups_api_v1_admin_backups_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackupOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Backups Api V1 Admin Backups Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Backup",
+        "operationId": "create_backup_api_v1_admin_backups_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/backups/{backup_id}/verify": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Verify Backup",
+        "operationId": "verify_backup_api_v1_admin_backups__backup_id__verify_post",
+        "parameters": [
+          {
+            "name": "backup_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Backup Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/outbox/ground-report": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Ground Report",
+        "operationId": "create_ground_report_api_v1_admin_outbox_ground_report_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroundReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/outbox": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Outbox",
+        "operationId": "list_outbox_api_v1_admin_outbox_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PackageOut"
+                  },
+                  "title": "Response List Outbox Api V1 Admin Outbox Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/outbox/{package_id}/download": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Download Package",
+        "description": "Return a package file (the JSON by default; `file` selects another file of the package).\n\nThe download is audited. The person's name comes from the X-AM-Actor header,\npercent-encoded UTF-8, so it stays out of URLs and server access logs.",
+        "operationId": "download_package_api_v1_admin_outbox__package_id__download_get",
+        "parameters": [
+          {
+            "name": "package_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Package Id"
+            }
+          },
+          {
+            "name": "file",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "File"
+            }
+          },
+          {
+            "name": "x-am-actor",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Am-Actor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/outbox/{package_id}/mark-exported": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Mark Exported",
+        "operationId": "mark_exported_api_v1_admin_outbox__package_id__mark_exported_post",
+        "parameters": [
+          {
+            "name": "package_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Package Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkExportedIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guidance/levels": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Guidance Levels",
+        "operationId": "guidance_levels_api_v1_guidance_levels_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidanceLevelsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guidance/current": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Guidance Current",
+        "description": "The most serious open item (alert or active symptom) and the guidance for its level.",
+        "operationId": "guidance_current_api_v1_guidance_current_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentGuidanceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guidance/alerts/{alert_id}": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Guidance For Alert",
+        "operationId": "guidance_for_alert_api_v1_guidance_alerts__alert_id__get",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidanceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guidance/symptoms/{symptom_report_id}": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Guidance For Symptom",
+        "operationId": "guidance_for_symptom_api_v1_guidance_symptoms__symptom_report_id__get",
+        "parameters": [
+          {
+            "name": "symptom_report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Symptom Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidanceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/escalations": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "List Escalations",
+        "operationId": "list_escalations_api_v1_escalations_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EscalationOut"
+                  },
+                  "title": "Response List Escalations Api V1 Escalations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/escalations/{event_id}/acknowledge": {
+      "post": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Acknowledge Escalation",
+        "operationId": "acknowledge_escalation_api_v1_escalations__event_id__acknowledge_post",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcknowledgeIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bodymap": {
+      "get": {
+        "tags": [
+          "guidance"
+        ],
+        "summary": "Body Map",
+        "operationId": "body_map_api_v1_bodymap_get",
+        "parameters": [
+          {
+            "name": "astronaut_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Astronaut Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodyMapOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2187,6 +3835,27 @@
           "actor"
         ],
         "title": "AckIn"
+      },
+      "AcknowledgeIn": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor"
+        ],
+        "title": "AcknowledgeIn"
       },
       "AlertAckOut": {
         "properties": {
@@ -2729,6 +4398,221 @@
         ],
         "title": "AuditOut"
       },
+      "BackupDiag": {
+        "properties": {
+          "last_backup_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Backup At"
+          },
+          "last_backup_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Backup Id"
+          },
+          "stored": {
+            "type": "integer",
+            "title": "Stored"
+          },
+          "retention": {
+            "type": "integer",
+            "title": "Retention"
+          }
+        },
+        "type": "object",
+        "required": [
+          "last_backup_at",
+          "last_backup_id",
+          "stored",
+          "retention"
+        ],
+        "title": "BackupDiag"
+      },
+      "BackupIn": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 1024,
+            "format": "password",
+            "title": "Passphrase",
+            "writeOnly": true
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "passphrase",
+          "actor",
+          "reason"
+        ],
+        "title": "BackupIn"
+      },
+      "BackupOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "authorized_by": {
+            "type": "string",
+            "title": "Authorized By"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "file_present": {
+            "type": "boolean",
+            "title": "File Present"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "plaintext_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plaintext Bytes"
+          },
+          "encrypted": {
+            "type": "boolean",
+            "title": "Encrypted"
+          },
+          "cipher": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cipher"
+          },
+          "kdf": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Kdf"
+          },
+          "alembic_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alembic Revision"
+          },
+          "pruned_backup_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Pruned Backup Ids",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "authorized_by",
+          "reason",
+          "status",
+          "file_name",
+          "location",
+          "file_present",
+          "sha256",
+          "size_bytes",
+          "plaintext_bytes",
+          "encrypted",
+          "cipher",
+          "kdf",
+          "alembic_revision"
+        ],
+        "title": "BackupOut"
+      },
       "BaselineAuditOut": {
         "properties": {
           "id": {
@@ -3041,6 +4925,233 @@
         ],
         "title": "BatchOut"
       },
+      "BodyMapOut": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/StatusRuleOut"
+            },
+            "type": "array",
+            "title": "Rules"
+          },
+          "rules_note": {
+            "type": "string",
+            "title": "Rules Note"
+          },
+          "knowledge_indexed": {
+            "type": "boolean",
+            "title": "Knowledge Indexed"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/BodySystemOut"
+            },
+            "type": "array",
+            "title": "Systems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "generated_at",
+          "simulated",
+          "label",
+          "rules",
+          "rules_note",
+          "knowledge_indexed",
+          "systems"
+        ],
+        "title": "BodyMapOut"
+      },
+      "BodySystemOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "red",
+              "yellow",
+              "watch",
+              "green",
+              "no_data"
+            ],
+            "title": "Status"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "WATCH",
+                  "WARNING",
+                  "CRITICAL"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "coverage": {
+            "type": "string",
+            "title": "Coverage"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonOut"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/SystemReadingOut"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "active_symptoms": {
+            "items": {
+              "$ref": "#/components/schemas/SystemSymptomOut"
+            },
+            "type": "array",
+            "title": "Active Symptoms"
+          },
+          "open_alerts": {
+            "items": {
+              "$ref": "#/components/schemas/SystemAlertOut"
+            },
+            "type": "array",
+            "title": "Open Alerts"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/SystemDocumentOut"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "last_data_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Data At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "label",
+          "status",
+          "level",
+          "coverage",
+          "reasons",
+          "metrics",
+          "active_symptoms",
+          "open_alerts",
+          "documents",
+          "last_data_at"
+        ],
+        "title": "BodySystemOut"
+      },
+      "CatalogItemOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "body_system": {
+            "type": "string",
+            "title": "Body System"
+          },
+          "body_system_label": {
+            "type": "string",
+            "title": "Body System Label"
+          },
+          "report_promptly": {
+            "type": "boolean",
+            "title": "Report Promptly"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "label",
+          "category",
+          "body_system",
+          "body_system_label",
+          "report_promptly"
+        ],
+        "title": "CatalogItemOut"
+      },
+      "CatalogOut": {
+        "properties": {
+          "report_promptly_label": {
+            "type": "string",
+            "title": "Report Promptly Label"
+          },
+          "severities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Severities"
+          },
+          "symptoms": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogItemOut"
+            },
+            "type": "array",
+            "title": "Symptoms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_promptly_label",
+          "severities",
+          "symptoms"
+        ],
+        "title": "CatalogOut"
+      },
       "CheckinIn": {
         "properties": {
           "astronaut_id": {
@@ -3096,6 +5207,46 @@
         ],
         "title": "CheckinItemOut"
       },
+      "ConfirmIn": {
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "mild",
+              "moderate",
+              "severe"
+            ],
+            "title": "Severity"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "severity"
+        ],
+        "title": "ConfirmIn"
+      },
+      "ConfirmOut": {
+        "properties": {
+          "proposal": {
+            "$ref": "#/components/schemas/ProposalOut"
+          },
+          "report": {
+            "$ref": "#/components/schemas/SymptomReportOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proposal",
+          "report"
+        ],
+        "title": "ConfirmOut"
+      },
       "ConversationIn": {
         "properties": {
           "astronaut_id": {
@@ -3143,6 +5294,404 @@
           "updated_at"
         ],
         "title": "ConversationOut"
+      },
+      "CurrentGuidanceOut": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "WATCH",
+                  "WARNING",
+                  "CRITICAL"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "guidance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LevelGuidanceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CurrentItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "open_escalations": {
+            "type": "integer",
+            "title": "Open Escalations"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "matrix_version": {
+            "type": "string",
+            "title": "Matrix Version"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "level",
+          "guidance",
+          "items",
+          "open_escalations",
+          "label",
+          "matrix_version",
+          "note"
+        ],
+        "title": "CurrentGuidanceOut"
+      },
+      "CurrentItemOut": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "alert",
+              "symptom_report"
+            ],
+            "title": "Type"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "title",
+          "level",
+          "reason"
+        ],
+        "title": "CurrentItemOut"
+      },
+      "DatabaseDiag": {
+        "properties": {
+          "engine": {
+            "type": "string",
+            "title": "Engine"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "wal_bytes": {
+            "type": "integer",
+            "title": "Wal Bytes"
+          },
+          "alembic_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alembic Revision"
+          },
+          "alembic_head": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alembic Head"
+          },
+          "at_head": {
+            "type": "boolean",
+            "title": "At Head"
+          },
+          "row_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Row Counts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "engine",
+          "path",
+          "size_bytes",
+          "wal_bytes",
+          "alembic_revision",
+          "alembic_head",
+          "at_head",
+          "row_counts"
+        ],
+        "title": "DatabaseDiag"
+      },
+      "DayLevelInfoOut": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "label",
+          "description"
+        ],
+        "title": "DayLevelInfoOut"
+      },
+      "DayLevelRuleOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "level",
+          "text",
+          "detail"
+        ],
+        "title": "DayLevelRuleOut"
+      },
+      "DayLevelRulesOut": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "levels": {
+            "items": {
+              "$ref": "#/components/schemas/DayLevelInfoOut"
+            },
+            "type": "array",
+            "title": "Levels"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/DayLevelRuleOut"
+            },
+            "type": "array",
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "label",
+          "note",
+          "levels",
+          "rules"
+        ],
+        "title": "DayLevelRulesOut"
+      },
+      "DayMessageOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "conversation_id": {
+            "type": "integer",
+            "title": "Conversation Id"
+          },
+          "conversation_title": {
+            "type": "string",
+            "title": "Conversation Title"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "client_host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Host"
+          },
+          "generated_by": {
+            "type": "string",
+            "title": "Generated By"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "conversation_id",
+          "conversation_title",
+          "role",
+          "content",
+          "created_at",
+          "device_name",
+          "client_host",
+          "generated_by",
+          "model"
+        ],
+        "title": "DayMessageOut"
+      },
+      "DiagnosticsOut": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseDiag"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/StorageDiag"
+          },
+          "ollama": {
+            "$ref": "#/components/schemas/OllamaDiag"
+          },
+          "embeddings": {
+            "$ref": "#/components/schemas/EmbeddingDiag"
+          },
+          "backups": {
+            "$ref": "#/components/schemas/BackupDiag"
+          },
+          "versions": {
+            "$ref": "#/components/schemas/VersionsDiag"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "database",
+          "storage",
+          "ollama",
+          "embeddings",
+          "backups",
+          "versions"
+        ],
+        "title": "DiagnosticsOut"
       },
       "DocumentOut": {
         "properties": {
@@ -3259,6 +5808,670 @@
           "verification_notes"
         ],
         "title": "DocumentOut"
+      },
+      "EmbeddingDiag": {
+        "properties": {
+          "embed_model": {
+            "type": "string",
+            "title": "Embed Model"
+          },
+          "chunks_total": {
+            "type": "integer",
+            "title": "Chunks Total"
+          },
+          "chunks_current_model": {
+            "type": "integer",
+            "title": "Chunks Current Model"
+          },
+          "chunks_other_model": {
+            "type": "integer",
+            "title": "Chunks Other Model"
+          },
+          "chunks_without_embedding": {
+            "type": "integer",
+            "title": "Chunks Without Embedding"
+          },
+          "coverage_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage Percent"
+          },
+          "search_method": {
+            "type": "string",
+            "title": "Search Method"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embed_model",
+          "chunks_total",
+          "chunks_current_model",
+          "chunks_other_model",
+          "chunks_without_embedding",
+          "coverage_percent",
+          "search_method"
+        ],
+        "title": "EmbeddingDiag"
+      },
+      "EntryAlertOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "peak_severity": {
+            "type": "string",
+            "title": "Peak Severity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "threshold_label": {
+            "type": "string",
+            "title": "Threshold Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "peak_severity",
+          "status",
+          "threshold_label"
+        ],
+        "title": "EntryAlertOut"
+      },
+      "EntryAssessmentOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "instant_severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instant Severity"
+          },
+          "z": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Z"
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "persistence_count": {
+            "type": "integer",
+            "title": "Persistence Count"
+          },
+          "baseline_profile_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Profile Id"
+          },
+          "rule_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Id"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "severity",
+          "instant_severity",
+          "z",
+          "direction",
+          "persistence_count",
+          "baseline_profile_id",
+          "rule_id",
+          "reasons"
+        ],
+        "title": "EntryAssessmentOut"
+      },
+      "EntryChoiceOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "label"
+        ],
+        "title": "EntryChoiceOut"
+      },
+      "EntryConversionOut": {
+        "properties": {
+          "entered_value": {
+            "type": "number",
+            "title": "Entered Value"
+          },
+          "entered_unit": {
+            "type": "string",
+            "title": "Entered Unit"
+          },
+          "entered_label": {
+            "type": "string",
+            "title": "Entered Label"
+          },
+          "canonical_value": {
+            "type": "number",
+            "title": "Canonical Value"
+          },
+          "canonical_unit": {
+            "type": "string",
+            "title": "Canonical Unit"
+          },
+          "canonical_label": {
+            "type": "string",
+            "title": "Canonical Label"
+          },
+          "formula": {
+            "type": "string",
+            "title": "Formula"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entered_value",
+          "entered_unit",
+          "entered_label",
+          "canonical_value",
+          "canonical_unit",
+          "canonical_label",
+          "formula",
+          "source"
+        ],
+        "title": "EntryConversionOut"
+      },
+      "EntryMetricOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "category_label": {
+            "type": "string",
+            "title": "Category Label"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "unit_label": {
+            "type": "string",
+            "title": "Unit Label"
+          },
+          "accepted_units": {
+            "items": {
+              "$ref": "#/components/schemas/EntryUnitOut"
+            },
+            "type": "array",
+            "title": "Accepted Units"
+          },
+          "contexts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Contexts"
+          },
+          "plausible_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plausible Min"
+          },
+          "plausible_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plausible Max"
+          },
+          "sanity_note": {
+            "type": "string",
+            "title": "Sanity Note"
+          },
+          "bound_note": {
+            "type": "string",
+            "title": "Bound Note"
+          },
+          "baseline_enabled": {
+            "type": "boolean",
+            "title": "Baseline Enabled"
+          },
+          "alert_rule_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alert Rule Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "display_name",
+          "category",
+          "category_label",
+          "unit",
+          "unit_label",
+          "accepted_units",
+          "contexts",
+          "plausible_min",
+          "plausible_max",
+          "sanity_note",
+          "bound_note",
+          "baseline_enabled",
+          "alert_rule_id"
+        ],
+        "title": "EntryMetricOut"
+      },
+      "EntrySpecOut": {
+        "properties": {
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/EntryMetricOut"
+            },
+            "type": "array",
+            "title": "Metrics"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/EntryChoiceOut"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "contexts": {
+            "items": {
+              "$ref": "#/components/schemas/EntryChoiceOut"
+            },
+            "type": "array",
+            "title": "Contexts"
+          },
+          "default_source_name": {
+            "type": "string",
+            "title": "Default Source Name"
+          },
+          "max_future_minutes": {
+            "type": "number",
+            "title": "Max Future Minutes"
+          },
+          "degraded_confidence_below": {
+            "type": "number",
+            "title": "Degraded Confidence Below"
+          },
+          "degraded_signal_quality": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Degraded Signal Quality"
+          },
+          "threshold_label": {
+            "type": "string",
+            "title": "Threshold Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metrics",
+          "categories",
+          "contexts",
+          "default_source_name",
+          "max_future_minutes",
+          "degraded_confidence_below",
+          "degraded_signal_quality",
+          "threshold_label"
+        ],
+        "title": "EntrySpecOut"
+      },
+      "EntryUnitOut": {
+        "properties": {
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "canonical": {
+            "type": "boolean",
+            "title": "Canonical"
+          },
+          "factor": {
+            "type": "number",
+            "title": "Factor"
+          },
+          "offset": {
+            "type": "number",
+            "title": "Offset"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "aliases": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Aliases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unit",
+          "label",
+          "canonical",
+          "factor",
+          "offset",
+          "note",
+          "source",
+          "aliases"
+        ],
+        "title": "EntryUnitOut"
+      },
+      "EscalationAlertOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "metric_code": {
+            "type": "string",
+            "title": "Metric Code"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "direction": {
+            "type": "string",
+            "title": "Direction"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "peak_severity": {
+            "type": "string",
+            "title": "Peak Severity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "metric_code",
+          "display_name",
+          "context",
+          "direction",
+          "severity",
+          "peak_severity",
+          "status",
+          "is_simulated"
+        ],
+        "title": "EscalationAlertOut"
+      },
+      "EscalationOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "alert_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alert Id"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "procedure_id": {
+            "type": "string",
+            "title": "Procedure Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "plain_meaning": {
+            "type": "string",
+            "title": "Plain Meaning"
+          },
+          "who_to_involve": {
+            "type": "string",
+            "title": "Who To Involve"
+          },
+          "guidance": {
+            "type": "string",
+            "title": "Guidance"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "data_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Time"
+          },
+          "acknowledged_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged By"
+          },
+          "acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged At"
+          },
+          "acknowledgement_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledgement Note"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "alert": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EscalationAlertOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "alert_id",
+          "level",
+          "procedure_id",
+          "status",
+          "plain_meaning",
+          "who_to_involve",
+          "guidance",
+          "label",
+          "data_time",
+          "acknowledged_by",
+          "acknowledged_at",
+          "acknowledgement_note",
+          "created_at",
+          "updated_at",
+          "alert"
+        ],
+        "title": "EscalationOut"
       },
       "FindingOut": {
         "properties": {
@@ -3413,6 +6626,207 @@
         ],
         "title": "FindingOut"
       },
+      "GroundReportIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "first_day": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "First Day"
+          },
+          "last_day": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Last Day"
+          },
+          "sections": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "alerts",
+                "journal",
+                "observations",
+                "symptoms",
+                "checkins",
+                "missions"
+              ]
+            },
+            "type": "array",
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Sections"
+          },
+          "authorized_by": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Authorized By"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          },
+          "encrypt": {
+            "type": "boolean",
+            "title": "Encrypt",
+            "default": false
+          },
+          "passphrase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024,
+                "format": "password",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passphrase"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "first_day",
+          "last_day",
+          "sections",
+          "authorized_by",
+          "reason"
+        ],
+        "title": "GroundReportIn"
+      },
+      "GuidanceLevelsOut": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "levels": {
+            "items": {
+              "$ref": "#/components/schemas/LevelGuidanceOut"
+            },
+            "type": "array",
+            "title": "Levels"
+          },
+          "symptom_rules": {
+            "items": {
+              "$ref": "#/components/schemas/SymptomRuleOut"
+            },
+            "type": "array",
+            "title": "Symptom Rules"
+          },
+          "report_promptly_label": {
+            "type": "string",
+            "title": "Report Promptly Label"
+          },
+          "report_promptly_symptoms": {
+            "items": {
+              "$ref": "#/components/schemas/PromptSymptomOut"
+            },
+            "type": "array",
+            "title": "Report Promptly Symptoms"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "label",
+          "levels",
+          "symptom_rules",
+          "report_promptly_label",
+          "report_promptly_symptoms",
+          "disclaimer"
+        ],
+        "title": "GuidanceLevelsOut"
+      },
+      "GuidanceOut": {
+        "properties": {
+          "subject": {
+            "$ref": "#/components/schemas/SubjectOut"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "procedure_id": {
+            "type": "string",
+            "title": "Procedure Id"
+          },
+          "plain_meaning": {
+            "type": "string",
+            "title": "Plain Meaning"
+          },
+          "who_to_involve": {
+            "type": "string",
+            "title": "Who To Involve"
+          },
+          "guidance": {
+            "type": "string",
+            "title": "Guidance"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "matrix_version": {
+            "type": "string",
+            "title": "Matrix Version"
+          },
+          "applies_now": {
+            "type": "boolean",
+            "title": "Applies Now"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "escalations": {
+            "items": {
+              "$ref": "#/components/schemas/EscalationOut"
+            },
+            "type": "array",
+            "title": "Escalations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subject",
+          "level",
+          "procedure_id",
+          "plain_meaning",
+          "who_to_involve",
+          "guidance",
+          "label",
+          "matrix_version",
+          "applies_now",
+          "reasons",
+          "escalations"
+        ],
+        "title": "GuidanceOut"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3564,6 +6978,65 @@
             "type": "string",
             "format": "date-time",
             "title": "Generated At"
+          },
+          "day_level": {
+            "type": "string",
+            "title": "Day Level",
+            "default": "none"
+          },
+          "day_level_reasons": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Day Level Reasons",
+            "default": []
+          },
+          "narrative": {
+            "type": "string",
+            "title": "Narrative",
+            "default": ""
+          },
+          "narrative_generated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrative Generated By"
+          },
+          "narrative_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrative Model"
+          },
+          "narrative_grounding": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Narrative Grounding",
+            "default": {}
+          },
+          "narrative_generated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Narrative Generated At"
           }
         },
         "type": "object",
@@ -3678,6 +7151,11 @@
                 "type": "null"
               }
             ]
+          },
+          "baseline_enabled": {
+            "type": "boolean",
+            "title": "Baseline Enabled",
+            "default": true
           }
         },
         "type": "object",
@@ -3690,6 +7168,351 @@
           "baseline"
         ],
         "title": "LatestReadingOut"
+      },
+      "LevelGuidanceOut": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "procedure_id": {
+            "type": "string",
+            "title": "Procedure Id"
+          },
+          "plain_meaning": {
+            "type": "string",
+            "title": "Plain Meaning"
+          },
+          "who_to_involve": {
+            "type": "string",
+            "title": "Who To Involve"
+          },
+          "guidance": {
+            "type": "string",
+            "title": "Guidance"
+          },
+          "raises_event": {
+            "type": "boolean",
+            "title": "Raises Event"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "procedure_id",
+          "plain_meaning",
+          "who_to_involve",
+          "guidance",
+          "raises_event"
+        ],
+        "title": "LevelGuidanceOut"
+      },
+      "ManualEntryIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "metric_code": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Metric Code"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "context": {
+            "type": "string",
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Context"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          },
+          "source_name": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Source Name",
+            "default": "manual entry"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "signal_quality": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal Quality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "metric_code",
+          "value",
+          "unit",
+          "context"
+        ],
+        "title": "ManualEntryIn"
+      },
+      "ManualEntryOut": {
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "entry": {
+            "$ref": "#/components/schemas/ManualEntryRowOut"
+          },
+          "assessment": {
+            "$ref": "#/components/schemas/EntryAssessmentOut"
+          },
+          "alert": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntryAlertOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "baseline_event": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineEventOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "threshold_label": {
+            "type": "string",
+            "title": "Threshold Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accepted",
+          "entry",
+          "assessment",
+          "alert",
+          "baseline_event",
+          "threshold_label"
+        ],
+        "title": "ManualEntryOut"
+      },
+      "ManualEntryRowOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "metric_code": {
+            "type": "string",
+            "title": "Metric Code"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "unit_label": {
+            "type": "string",
+            "title": "Unit Label"
+          },
+          "conversion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntryConversionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          },
+          "ingested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ingested At"
+          },
+          "source_name": {
+            "type": "string",
+            "title": "Source Name"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "quality": {
+            "type": "string",
+            "title": "Quality"
+          },
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "validation_notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Notes"
+          },
+          "assessment_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Status"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "deviation_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deviation Score"
+          },
+          "alert_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alert Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "metric_code",
+          "display_name",
+          "value",
+          "unit",
+          "unit_label",
+          "conversion",
+          "context",
+          "recorded_at",
+          "ingested_at",
+          "source_name",
+          "is_simulated",
+          "quality",
+          "accepted",
+          "confidence",
+          "validation_notes",
+          "assessment_status",
+          "severity",
+          "deviation_score",
+          "alert_id"
+        ],
+        "title": "ManualEntryRowOut"
+      },
+      "MarkExportedIn": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor"
+        ],
+        "title": "MarkExportedIn"
       },
       "MeasurementIn": {
         "properties": {
@@ -3872,6 +7695,28 @@
               }
             ],
             "title": "Baseline Profile Id"
+          },
+          "original_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Value"
+          },
+          "original_unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Unit"
           }
         },
         "type": "object",
@@ -4118,6 +7963,189 @@
         ],
         "title": "MetricOut"
       },
+      "MilestoneOut": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "reached": {
+            "type": "boolean",
+            "title": "Reached"
+          },
+          "reached_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reached Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "label",
+          "reached",
+          "reached_day"
+        ],
+        "title": "MilestoneOut"
+      },
+      "MissionCreateIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "planned_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days"
+          },
+          "environment": {
+            "type": "string",
+            "enum": [
+              "leo_station",
+              "lunar_surface",
+              "deep_space_transit",
+              "mars_surface",
+              "ground_analog",
+              "unspecified"
+            ],
+            "title": "Environment"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor",
+            "default": "operator"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "name",
+          "start_date",
+          "environment"
+        ],
+        "title": "MissionCreateIn"
+      },
+      "MissionDetailOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "planned_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Days"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "environment_label": {
+            "type": "string",
+            "title": "Environment Label"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "is_current": {
+            "type": "boolean",
+            "title": "Is Current"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "astronaut_id",
+          "start_date",
+          "planned_days",
+          "environment",
+          "environment_label",
+          "is_simulated",
+          "created_at",
+          "is_current"
+        ],
+        "title": "MissionDetailOut"
+      },
+      "MissionEnvironmentOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "label",
+          "description"
+        ],
+        "title": "MissionEnvironmentOut"
+      },
       "MissionOut": {
         "properties": {
           "id": {
@@ -4148,6 +8176,11 @@
             ],
             "title": "Planned Days"
           },
+          "environment": {
+            "type": "string",
+            "title": "Environment",
+            "default": "unspecified"
+          },
           "is_simulated": {
             "type": "boolean",
             "title": "Is Simulated"
@@ -4163,6 +8196,68 @@
           "is_simulated"
         ],
         "title": "MissionOut"
+      },
+      "ModelServiceOut": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "is_local": {
+            "type": "boolean",
+            "title": "Is Local"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "host",
+          "is_local",
+          "note"
+        ],
+        "title": "ModelServiceOut"
+      },
+      "NarrativeIn": {
+        "properties": {
+          "use_llm": {
+            "type": "boolean",
+            "title": "Use Llm",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "NarrativeIn"
+      },
+      "NarrativeRangeIn": {
+        "properties": {
+          "first_day": {
+            "type": "integer",
+            "title": "First Day"
+          },
+          "last_day": {
+            "type": "integer",
+            "title": "Last Day"
+          },
+          "use_llm": {
+            "type": "boolean",
+            "title": "Use Llm",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_day",
+          "last_day"
+        ],
+        "title": "NarrativeRangeIn"
       },
       "ObservationIn": {
         "properties": {
@@ -4286,6 +8381,88 @@
         ],
         "title": "ObservationOut"
       },
+      "OllamaDiag": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "reachable": {
+            "type": "boolean",
+            "title": "Reachable"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "installed_models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Installed Models"
+          },
+          "chat_model": {
+            "type": "string",
+            "title": "Chat Model"
+          },
+          "chat_model_source": {
+            "type": "string",
+            "title": "Chat Model Source"
+          },
+          "chat_model_installed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chat Model Installed"
+          },
+          "embed_model": {
+            "type": "string",
+            "title": "Embed Model"
+          },
+          "embed_model_source": {
+            "type": "string",
+            "title": "Embed Model Source"
+          },
+          "embed_model_installed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embed Model Installed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "reachable",
+          "reason",
+          "installed_models",
+          "chat_model",
+          "chat_model_source",
+          "chat_model_installed",
+          "embed_model",
+          "embed_model_source",
+          "embed_model_installed"
+        ],
+        "title": "OllamaDiag"
+      },
       "OperatorAction": {
         "properties": {
           "actor": {
@@ -4373,6 +8550,515 @@
         ],
         "title": "OverviewOut"
       },
+      "PackageFileOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "media_type": {
+            "type": "string",
+            "title": "Media Type"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "media_type",
+          "sha256",
+          "size_bytes"
+        ],
+        "title": "PackageFileOut"
+      },
+      "PackageOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "astronaut_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Astronaut Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "authorized_by": {
+            "type": "string",
+            "title": "Authorized By"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "encrypted": {
+            "type": "boolean",
+            "title": "Encrypted"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "first_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Day"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          },
+          "sections": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sections"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/PackageFileOut"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "record_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Record Counts"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          },
+          "thresholds_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thresholds Label"
+          },
+          "exported_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exported By"
+          },
+          "exported_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exported At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "astronaut_id",
+          "created_at",
+          "authorized_by",
+          "reason",
+          "status",
+          "encrypted",
+          "sha256",
+          "size_bytes",
+          "location",
+          "first_day",
+          "last_day",
+          "sections",
+          "files",
+          "record_counts",
+          "simulated",
+          "thresholds_label",
+          "exported_by",
+          "exported_at"
+        ],
+        "title": "PackageOut"
+      },
+      "PrivacyOut": {
+        "properties": {
+          "stores": {
+            "items": {
+              "$ref": "#/components/schemas/StoreOut"
+            },
+            "type": "array",
+            "title": "Stores"
+          },
+          "model_service": {
+            "$ref": "#/components/schemas/ModelServiceOut"
+          },
+          "transmission": {
+            "type": "string",
+            "title": "Transmission"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Counts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stores",
+          "model_service",
+          "transmission",
+          "warnings",
+          "counts"
+        ],
+        "title": "PrivacyOut"
+      },
+      "PromptSymptomOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "label"
+        ],
+        "title": "PromptSymptomOut"
+      },
+      "ProposalOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "message_id": {
+            "type": "integer",
+            "title": "Message Id"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "symptom_code": {
+            "type": "string",
+            "title": "Symptom Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "report_promptly": {
+            "type": "boolean",
+            "title": "Report Promptly"
+          },
+          "quote": {
+            "type": "string",
+            "title": "Quote"
+          },
+          "detector": {
+            "type": "string",
+            "title": "Detector"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "message_id",
+          "conversation_id",
+          "symptom_code",
+          "label",
+          "report_promptly",
+          "quote",
+          "detector",
+          "status",
+          "decided_at",
+          "created_at"
+        ],
+        "title": "ProposalOut"
+      },
+      "RadiationCumulativeOut": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/RadiationDayOut"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "total": {
+            "type": "number",
+            "title": "Total"
+          },
+          "entries": {
+            "type": "integer",
+            "title": "Entries"
+          },
+          "mission_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mission Start"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "unit",
+          "days",
+          "total",
+          "entries",
+          "mission_start",
+          "simulated",
+          "note"
+        ],
+        "title": "RadiationCumulativeOut"
+      },
+      "RadiationDayOut": {
+        "properties": {
+          "utc_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Utc Date"
+          },
+          "mission_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mission Day"
+          },
+          "dose": {
+            "type": "number",
+            "title": "Dose"
+          },
+          "entries": {
+            "type": "integer",
+            "title": "Entries"
+          },
+          "cumulative": {
+            "type": "number",
+            "title": "Cumulative"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utc_date",
+          "mission_day",
+          "dose",
+          "entries",
+          "cumulative",
+          "simulated"
+        ],
+        "title": "RadiationDayOut"
+      },
+      "ReasonOut": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "WATCH",
+                  "WARNING",
+                  "CRITICAL"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "ref_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Type"
+          },
+          "ref_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ReasonOut"
+      },
       "RebuildIn": {
         "properties": {
           "actor": {
@@ -4420,27 +9106,6 @@
           "window_end"
         ],
         "title": "RebuildIn"
-      },
-      "ResolveIn": {
-        "properties": {
-          "actor": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "title": "Actor"
-          },
-          "note": {
-            "type": "string",
-            "minLength": 3,
-            "title": "Note"
-          }
-        },
-        "type": "object",
-        "required": [
-          "actor",
-          "note"
-        ],
-        "title": "ResolveIn"
       },
       "ReviewIn": {
         "properties": {
@@ -4672,6 +9337,126 @@
         ],
         "title": "SeriesOut"
       },
+      "SettingIn": {
+        "properties": {
+          "value": {
+            "title": "Value"
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "actor"
+        ],
+        "title": "SettingIn"
+      },
+      "SettingOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "value": {
+            "title": "Value"
+          },
+          "default": {
+            "title": "Default"
+          },
+          "effective": {
+            "title": "Effective"
+          },
+          "deployment_default": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment Default"
+          },
+          "is_default": {
+            "type": "boolean",
+            "title": "Is Default"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Value"
+          },
+          "max_value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Value"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "kind",
+          "value",
+          "default",
+          "effective",
+          "deployment_default",
+          "is_default",
+          "description",
+          "min_value",
+          "max_value",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "SettingOut"
+      },
       "SimulationRunIn": {
         "properties": {
           "scenario": {
@@ -4761,6 +9546,326 @@
         ],
         "title": "SourceKind"
       },
+      "StatusRuleOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "red",
+              "yellow",
+              "watch",
+              "green",
+              "no_data"
+            ],
+            "title": "Status"
+          },
+          "meaning": {
+            "type": "string",
+            "title": "Meaning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "meaning"
+        ],
+        "title": "StatusRuleOut"
+      },
+      "StorageDiag": {
+        "properties": {
+          "data_dir": {
+            "type": "string",
+            "title": "Data Dir"
+          },
+          "backups_dir": {
+            "type": "string",
+            "title": "Backups Dir"
+          },
+          "outbox_dir": {
+            "type": "string",
+            "title": "Outbox Dir"
+          },
+          "free_bytes": {
+            "type": "integer",
+            "title": "Free Bytes"
+          },
+          "total_bytes": {
+            "type": "integer",
+            "title": "Total Bytes"
+          },
+          "backups_bytes": {
+            "type": "integer",
+            "title": "Backups Bytes"
+          },
+          "outbox_bytes": {
+            "type": "integer",
+            "title": "Outbox Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data_dir",
+          "backups_dir",
+          "outbox_dir",
+          "free_bytes",
+          "total_bytes",
+          "backups_bytes",
+          "outbox_bytes"
+        ],
+        "title": "StorageDiag"
+      },
+      "StoreOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "what": {
+            "type": "string",
+            "title": "What"
+          },
+          "where": {
+            "type": "string",
+            "title": "Where"
+          },
+          "protection": {
+            "type": "string",
+            "title": "Protection"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "what",
+          "where",
+          "protection"
+        ],
+        "title": "StoreOut"
+      },
+      "StreakDayOut": {
+        "properties": {
+          "mission_day": {
+            "type": "integer",
+            "title": "Mission Day"
+          },
+          "day_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Day Date"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "done",
+              "missed",
+              "no_data",
+              "pending"
+            ],
+            "title": "State"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mission_day",
+          "day_date",
+          "state",
+          "simulated"
+        ],
+        "title": "StreakDayOut"
+      },
+      "StreakOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "rule": {
+            "type": "string",
+            "title": "Rule"
+          },
+          "current": {
+            "type": "integer",
+            "title": "Current"
+          },
+          "at_risk": {
+            "type": "boolean",
+            "title": "At Risk"
+          },
+          "today_done": {
+            "type": "boolean",
+            "title": "Today Done"
+          },
+          "longest": {
+            "type": "integer",
+            "title": "Longest"
+          },
+          "longest_days": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Longest Days"
+          },
+          "total_done": {
+            "type": "integer",
+            "title": "Total Done"
+          },
+          "next_milestone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Milestone"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/MilestoneOut"
+            },
+            "type": "array",
+            "title": "Milestones"
+          },
+          "calendar": {
+            "items": {
+              "$ref": "#/components/schemas/StreakDayOut"
+            },
+            "type": "array",
+            "title": "Calendar"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "rule",
+          "current",
+          "at_risk",
+          "today_done",
+          "longest",
+          "longest_days",
+          "total_done",
+          "next_milestone",
+          "milestones",
+          "calendar"
+        ],
+        "title": "StreakOut"
+      },
+      "StreaksOut": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "mission_id": {
+            "type": "integer",
+            "title": "Mission Id"
+          },
+          "mission_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Mission Start"
+          },
+          "mission_day": {
+            "type": "integer",
+            "title": "Mission Day"
+          },
+          "today": {
+            "type": "string",
+            "format": "date",
+            "title": "Today"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          },
+          "window_days": {
+            "type": "integer",
+            "title": "Window Days"
+          },
+          "rules": {
+            "type": "string",
+            "title": "Rules"
+          },
+          "milestone_note": {
+            "type": "string",
+            "title": "Milestone Note"
+          },
+          "streaks": {
+            "items": {
+              "$ref": "#/components/schemas/StreakOut"
+            },
+            "type": "array",
+            "title": "Streaks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "mission_id",
+          "mission_start",
+          "mission_day",
+          "today",
+          "simulated",
+          "window_days",
+          "rules",
+          "milestone_note",
+          "streaks"
+        ],
+        "title": "StreaksOut"
+      },
+      "SubjectOut": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "alert",
+              "symptom_report"
+            ],
+            "title": "Type"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "astronaut_id",
+          "title",
+          "status",
+          "is_simulated"
+        ],
+        "title": "SubjectOut"
+      },
       "SuggestionOut": {
         "properties": {
           "text": {
@@ -4778,6 +9883,376 @@
           "reason"
         ],
         "title": "SuggestionOut"
+      },
+      "SymptomReportIn": {
+        "properties": {
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "symptom_code": {
+            "type": "string",
+            "maxLength": 48,
+            "minLength": 1,
+            "title": "Symptom Code"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "mild",
+              "moderate",
+              "severe"
+            ],
+            "title": "Severity"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          },
+          "onset_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onset At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "astronaut_id",
+          "symptom_code",
+          "severity"
+        ],
+        "title": "SymptomReportIn"
+      },
+      "SymptomReportOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "astronaut_id": {
+            "type": "integer",
+            "title": "Astronaut Id"
+          },
+          "symptom_code": {
+            "type": "string",
+            "title": "Symptom Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "body_system": {
+            "type": "string",
+            "title": "Body System"
+          },
+          "report_promptly": {
+            "type": "boolean",
+            "title": "Report Promptly"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "onset_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onset At"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reported At"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "proposal_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposal Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "astronaut_id",
+          "symptom_code",
+          "label",
+          "category",
+          "body_system",
+          "report_promptly",
+          "severity",
+          "note",
+          "onset_at",
+          "reported_at",
+          "source",
+          "proposal_id",
+          "status",
+          "resolved_at",
+          "is_simulated"
+        ],
+        "title": "SymptomReportOut"
+      },
+      "SymptomRuleOut": {
+        "properties": {
+          "when": {
+            "type": "string",
+            "title": "When"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "when",
+          "level"
+        ],
+        "title": "SymptomRuleOut"
+      },
+      "SystemAlertOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "metric_code": {
+            "type": "string",
+            "title": "Metric Code"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "direction": {
+            "type": "string",
+            "title": "Direction"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "peak_severity": {
+            "type": "string",
+            "title": "Peak Severity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "metric_code",
+          "display_name",
+          "context",
+          "direction",
+          "severity",
+          "peak_severity",
+          "status",
+          "level",
+          "last_seen_at",
+          "is_simulated"
+        ],
+        "title": "SystemAlertOut"
+      },
+      "SystemDocumentOut": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "organization": {
+            "type": "string",
+            "title": "Organization"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "matched_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Matched Topics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "title",
+          "organization",
+          "url",
+          "matched_topics"
+        ],
+        "title": "SystemDocumentOut"
+      },
+      "SystemReadingOut": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "measurement",
+              "self_report"
+            ],
+            "title": "Source"
+          },
+          "record_id": {
+            "type": "integer",
+            "title": "Record Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "assessment_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Status"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "record_id",
+          "code",
+          "display_name",
+          "context",
+          "value",
+          "unit",
+          "recorded_at",
+          "severity",
+          "assessment_status",
+          "is_simulated"
+        ],
+        "title": "SystemReadingOut"
       },
       "SystemStatusOut": {
         "properties": {
@@ -4822,6 +10297,78 @@
           "ollama"
         ],
         "title": "SystemStatusOut"
+      },
+      "SystemSymptomOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "symptom_code": {
+            "type": "string",
+            "title": "Symptom Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "report_promptly": {
+            "type": "boolean",
+            "title": "Report Promptly"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "title": "Level"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reported At"
+          },
+          "onset_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onset At"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "symptom_code",
+          "label",
+          "severity",
+          "report_promptly",
+          "level",
+          "reported_at",
+          "onset_at",
+          "source",
+          "is_simulated"
+        ],
+        "title": "SystemSymptomOut"
       },
       "TaskOut": {
         "properties": {
@@ -5097,6 +10644,14 @@
               }
             ],
             "title": "Fallback Reason"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalOut"
+            },
+            "type": "array",
+            "title": "Proposals",
+            "default": []
           }
         },
         "type": "object",
@@ -5148,6 +10703,187 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VerifyIn": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "format": "password",
+            "title": "Passphrase",
+            "writeOnly": true
+          },
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor",
+            "default": "unnamed operator"
+          }
+        },
+        "type": "object",
+        "required": [
+          "passphrase"
+        ],
+        "title": "VerifyIn"
+      },
+      "VerifyOut": {
+        "properties": {
+          "backup_id": {
+            "type": "integer",
+            "title": "Backup Id"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "checksum_ok": {
+            "type": "boolean",
+            "title": "Checksum Ok"
+          },
+          "decrypted": {
+            "type": "boolean",
+            "title": "Decrypted"
+          },
+          "integrity": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Integrity"
+          },
+          "alembic_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alembic Revision"
+          },
+          "tables": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tables"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Verified At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "backup_id",
+          "ok",
+          "checksum_ok",
+          "decrypted",
+          "integrity",
+          "alembic_revision",
+          "tables",
+          "message",
+          "verified_at"
+        ],
+        "title": "VerifyOut"
+      },
+      "VersionsDiag": {
+        "properties": {
+          "app": {
+            "type": "string",
+            "title": "App"
+          },
+          "python": {
+            "type": "string",
+            "title": "Python"
+          },
+          "sqlite": {
+            "type": "string",
+            "title": "Sqlite"
+          },
+          "sqlalchemy": {
+            "type": "string",
+            "title": "Sqlalchemy"
+          },
+          "fastapi": {
+            "type": "string",
+            "title": "Fastapi"
+          },
+          "os": {
+            "type": "string",
+            "title": "Os"
+          },
+          "thresholds_version": {
+            "type": "string",
+            "title": "Thresholds Version"
+          },
+          "thresholds_label": {
+            "type": "string",
+            "title": "Thresholds Label"
+          },
+          "baseline_policy_version": {
+            "type": "string",
+            "title": "Baseline Policy Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "app",
+          "python",
+          "sqlite",
+          "sqlalchemy",
+          "fastapi",
+          "os",
+          "thresholds_version",
+          "thresholds_label",
+          "baseline_policy_version"
+        ],
+        "title": "VersionsDiag"
+      },
+      "am__api__v1__symptoms__ResolveIn": {
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "ResolveIn"
+      },
+      "am__schemas__ResolveIn": {
+        "properties": {
+          "actor": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Actor"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor",
+          "note"
+        ],
+        "title": "ResolveIn"
       }
     }
   }

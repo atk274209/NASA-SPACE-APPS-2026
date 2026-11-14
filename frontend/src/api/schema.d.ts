@@ -690,6 +690,633 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/entry-spec": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Entry Spec
+         * @description Everything a manual-entry form needs, taken from the registry the ingest pipeline uses.
+         */
+        get: operations["entry_spec_api_v1_entry_spec_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manual-entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Manual Entries
+         * @description Most recently entered manual readings first, rejected ones included (with reasons).
+         */
+        get: operations["list_manual_entries_api_v1_manual_entries_get"];
+        put?: never;
+        /**
+         * Create Manual Entry
+         * @description Record one reading typed in by a person (source kind `manual`).
+         *
+         *     A reading that fails validation is still stored, marked rejected with its reasons and
+         *     audited, exactly as for sensor data: the response then says why.
+         */
+        post: operations["create_manual_entry_api_v1_manual_entries_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/radiation/cumulative": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Radiation Cumulative
+         * @description Daily and running sums of logged dosimeter doses.
+         *
+         *     Arithmetic only: AM records what the dosimeter reported and adds it up. It does not
+         *     compare doses with any exposure limit.
+         */
+        get: operations["radiation_cumulative_api_v1_radiation_cumulative_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/missions/environments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mission Environments */
+        get: operations["mission_environments_api_v1_missions_environments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/missions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Missions
+         * @description An astronaut's missions, newest (current) first, with their environment.
+         */
+        get: operations["list_missions_api_v1_missions_get"];
+        put?: never;
+        /**
+         * Create Mission
+         * @description Create a mission; it becomes the astronaut's current mission (day 1 = start date, UTC).
+         *
+         *     A mission on a simulated crew record is marked simulated too, so generated and real
+         *     records never mix.
+         */
+        post: operations["create_mission_api_v1_missions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Symptom Catalog */
+        get: operations["symptom_catalog_api_v1_symptoms_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Reports */
+        get: operations["list_reports_api_v1_symptoms_get"];
+        put?: never;
+        /** Create Report */
+        post: operations["create_report_api_v1_symptoms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms/{report_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Report */
+        post: operations["resolve_report_api_v1_symptoms__report_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Proposals */
+        get: operations["list_proposals_api_v1_symptoms_proposals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms/proposals/{proposal_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm Proposal */
+        post: operations["confirm_proposal_api_v1_symptoms_proposals__proposal_id__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/symptoms/proposals/{proposal_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss Proposal */
+        post: operations["dismiss_proposal_api_v1_symptoms_proposals__proposal_id__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/streaks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Streaks */
+        get: operations["get_streaks_api_v1_streaks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal/day-level-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Day Level Rules */
+        get: operations["day_level_rules_api_v1_journal_day_level_rules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal/{astronaut_id}/days/{day}/narrative": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write Day Narrative */
+        post: operations["write_day_narrative_api_v1_journal__astronaut_id__days__day__narrative_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal/{astronaut_id}/narratives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write Narratives
+         * @description Regenerate the days, then write their narratives one after another (a local model runs one at a time).
+         */
+        post: operations["write_narratives_api_v1_journal__astronaut_id__narratives_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal/{astronaut_id}/days/{day}/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Day Conversations
+         * @description That day's user and assistant messages from all of the astronaut's conversations, oldest first.
+         */
+        get: operations["day_conversations_api_v1_journal__astronaut_id__days__day__conversations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Settings */
+        get: operations["list_settings_api_v1_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Setting */
+        put: operations["update_setting_api_v1_settings__key__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/diagnostics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Diagnostics */
+        get: operations["get_diagnostics_api_v1_admin_diagnostics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Privacy */
+        get: operations["get_privacy_api_v1_admin_privacy_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Admin Audit
+         * @description Audit entries for settings, backups and ground-report packages (the data-handling trail).
+         */
+        get: operations["admin_audit_api_v1_admin_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Backups */
+        get: operations["list_backups_api_v1_admin_backups_get"];
+        put?: never;
+        /** Create Backup */
+        post: operations["create_backup_api_v1_admin_backups_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/backups/{backup_id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify Backup */
+        post: operations["verify_backup_api_v1_admin_backups__backup_id__verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/ground-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Ground Report */
+        post: operations["create_ground_report_api_v1_admin_outbox_ground_report_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Outbox */
+        get: operations["list_outbox_api_v1_admin_outbox_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/{package_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Package
+         * @description Return a package file (the JSON by default; `file` selects another file of the package).
+         *
+         *     The download is audited. The person's name comes from the X-AM-Actor header,
+         *     percent-encoded UTF-8, so it stays out of URLs and server access logs.
+         */
+        get: operations["download_package_api_v1_admin_outbox__package_id__download_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/{package_id}/mark-exported": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Exported */
+        post: operations["mark_exported_api_v1_admin_outbox__package_id__mark_exported_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guidance/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Guidance Levels */
+        get: operations["guidance_levels_api_v1_guidance_levels_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guidance/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Guidance Current
+         * @description The most serious open item (alert or active symptom) and the guidance for its level.
+         */
+        get: operations["guidance_current_api_v1_guidance_current_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guidance/alerts/{alert_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Guidance For Alert */
+        get: operations["guidance_for_alert_api_v1_guidance_alerts__alert_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/guidance/symptoms/{symptom_report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Guidance For Symptom */
+        get: operations["guidance_for_symptom_api_v1_guidance_symptoms__symptom_report_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Escalations */
+        get: operations["list_escalations_api_v1_escalations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/escalations/{event_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge Escalation */
+        post: operations["acknowledge_escalation_api_v1_escalations__event_id__acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bodymap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Body Map */
+        get: operations["body_map_api_v1_bodymap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -712,6 +1339,16 @@ export interface components {
         };
         /** AckIn */
         AckIn: {
+            /** Actor */
+            actor: string;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** AcknowledgeIn */
+        AcknowledgeIn: {
             /** Actor */
             actor: string;
             /**
@@ -917,6 +1554,72 @@ export interface components {
              */
             created_at: string;
         };
+        /** BackupDiag */
+        BackupDiag: {
+            /** Last Backup At */
+            last_backup_at: string | null;
+            /** Last Backup Id */
+            last_backup_id: number | null;
+            /** Stored */
+            stored: number;
+            /** Retention */
+            retention: number;
+        };
+        /** BackupIn */
+        BackupIn: {
+            /**
+             * Passphrase
+             * Format: password
+             */
+            passphrase: string;
+            /** Actor */
+            actor: string;
+            /** Reason */
+            reason: string;
+        };
+        /** BackupOut */
+        BackupOut: {
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Authorized By */
+            authorized_by: string;
+            /** Reason */
+            reason: string;
+            /** Status */
+            status: string;
+            /** File Name */
+            file_name: string | null;
+            /** Location */
+            location: string | null;
+            /** File Present */
+            file_present: boolean;
+            /** Sha256 */
+            sha256: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Plaintext Bytes */
+            plaintext_bytes: number | null;
+            /** Encrypted */
+            encrypted: boolean;
+            /** Cipher */
+            cipher: string | null;
+            /** Kdf */
+            kdf: {
+                [key: string]: unknown;
+            };
+            /** Alembic Revision */
+            alembic_revision: string | null;
+            /**
+             * Pruned Backup Ids
+             * @default []
+             */
+            pruned_backup_ids: number[];
+        };
         /** BaselineAuditOut */
         BaselineAuditOut: {
             /** Id */
@@ -1032,6 +1735,80 @@ export interface components {
             /** Results */
             results: components["schemas"]["IngestOut"][];
         };
+        /** BodyMapOut */
+        BodyMapOut: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Simulated */
+            simulated: boolean;
+            /** Label */
+            label: string;
+            /** Rules */
+            rules: components["schemas"]["StatusRuleOut"][];
+            /** Rules Note */
+            rules_note: string;
+            /** Knowledge Indexed */
+            knowledge_indexed: boolean;
+            /** Systems */
+            systems: components["schemas"]["BodySystemOut"][];
+        };
+        /** BodySystemOut */
+        BodySystemOut: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "red" | "yellow" | "watch" | "green" | "no_data";
+            /** Level */
+            level: ("WATCH" | "WARNING" | "CRITICAL") | null;
+            /** Coverage */
+            coverage: string;
+            /** Reasons */
+            reasons: components["schemas"]["ReasonOut"][];
+            /** Metrics */
+            metrics: components["schemas"]["SystemReadingOut"][];
+            /** Active Symptoms */
+            active_symptoms: components["schemas"]["SystemSymptomOut"][];
+            /** Open Alerts */
+            open_alerts: components["schemas"]["SystemAlertOut"][];
+            /** Documents */
+            documents: components["schemas"]["SystemDocumentOut"][];
+            /** Last Data At */
+            last_data_at: string | null;
+        };
+        /** CatalogItemOut */
+        CatalogItemOut: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /** Category */
+            category: string;
+            /** Body System */
+            body_system: string;
+            /** Body System Label */
+            body_system_label: string;
+            /** Report Promptly */
+            report_promptly: boolean;
+        };
+        /** CatalogOut */
+        CatalogOut: {
+            /** Report Promptly Label */
+            report_promptly_label: string;
+            /** Severities */
+            severities: string[];
+            /** Symptoms */
+            symptoms: components["schemas"]["CatalogItemOut"][];
+        };
         /** CheckinIn */
         CheckinIn: {
             /** Astronaut Id */
@@ -1060,6 +1837,24 @@ export interface components {
             /** High Anchor */
             high_anchor: string;
         };
+        /** ConfirmIn */
+        ConfirmIn: {
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "mild" | "moderate" | "severe";
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** ConfirmOut */
+        ConfirmOut: {
+            proposal: components["schemas"]["ProposalOut"];
+            report: components["schemas"]["SymptomReportOut"];
+        };
         /** ConversationIn */
         ConversationIn: {
             /** Astronaut Id */
@@ -1083,6 +1878,137 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** CurrentGuidanceOut */
+        CurrentGuidanceOut: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Level */
+            level: ("WATCH" | "WARNING" | "CRITICAL") | null;
+            guidance: components["schemas"]["LevelGuidanceOut"] | null;
+            /** Items */
+            items: components["schemas"]["CurrentItemOut"][];
+            /** Open Escalations */
+            open_escalations: number;
+            /** Label */
+            label: string;
+            /** Matrix Version */
+            matrix_version: string;
+            /** Note */
+            note: string;
+        };
+        /** CurrentItemOut */
+        CurrentItemOut: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "alert" | "symptom_report";
+            /** Id */
+            id: number;
+            /** Title */
+            title: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /** Reason */
+            reason: string;
+        };
+        /** DatabaseDiag */
+        DatabaseDiag: {
+            /** Engine */
+            engine: string;
+            /** Path */
+            path: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Wal Bytes */
+            wal_bytes: number;
+            /** Alembic Revision */
+            alembic_revision: string | null;
+            /** Alembic Head */
+            alembic_head: string | null;
+            /** At Head */
+            at_head: boolean;
+            /** Row Counts */
+            row_counts: {
+                [key: string]: number;
+            };
+        };
+        /** DayLevelInfoOut */
+        DayLevelInfoOut: {
+            /** Level */
+            level: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+        };
+        /** DayLevelRuleOut */
+        DayLevelRuleOut: {
+            /** Id */
+            id: string;
+            /** Level */
+            level: string;
+            /** Text */
+            text: string;
+            /** Detail */
+            detail: string;
+        };
+        /** DayLevelRulesOut */
+        DayLevelRulesOut: {
+            /** Version */
+            version: string;
+            /** Label */
+            label: string;
+            /** Note */
+            note: string;
+            /** Levels */
+            levels: components["schemas"]["DayLevelInfoOut"][];
+            /** Rules */
+            rules: components["schemas"]["DayLevelRuleOut"][];
+        };
+        /** DayMessageOut */
+        DayMessageOut: {
+            /** Id */
+            id: number;
+            /** Conversation Id */
+            conversation_id: number;
+            /** Conversation Title */
+            conversation_title: string;
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Device Name */
+            device_name: string | null;
+            /** Client Host */
+            client_host: string | null;
+            /** Generated By */
+            generated_by: string;
+            /** Model */
+            model: string | null;
+        };
+        /** DiagnosticsOut */
+        DiagnosticsOut: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            database: components["schemas"]["DatabaseDiag"];
+            storage: components["schemas"]["StorageDiag"];
+            ollama: components["schemas"]["OllamaDiag"];
+            embeddings: components["schemas"]["EmbeddingDiag"];
+            backups: components["schemas"]["BackupDiag"];
+            versions: components["schemas"]["VersionsDiag"];
         };
         /** DocumentOut */
         DocumentOut: {
@@ -1116,6 +2042,223 @@ export interface components {
             retrieved_at: string | null;
             /** Verification Notes */
             verification_notes: string;
+        };
+        /** EmbeddingDiag */
+        EmbeddingDiag: {
+            /** Embed Model */
+            embed_model: string;
+            /** Chunks Total */
+            chunks_total: number;
+            /** Chunks Current Model */
+            chunks_current_model: number;
+            /** Chunks Other Model */
+            chunks_other_model: number;
+            /** Chunks Without Embedding */
+            chunks_without_embedding: number;
+            /** Coverage Percent */
+            coverage_percent: number | null;
+            /** Search Method */
+            search_method: string;
+        };
+        /** EntryAlertOut */
+        EntryAlertOut: {
+            /** Id */
+            id: number;
+            /** Severity */
+            severity: string;
+            /** Peak Severity */
+            peak_severity: string;
+            /** Status */
+            status: string;
+            /** Threshold Label */
+            threshold_label: string;
+        };
+        /** EntryAssessmentOut */
+        EntryAssessmentOut: {
+            /** Status */
+            status: string;
+            /** Severity */
+            severity: string | null;
+            /** Instant Severity */
+            instant_severity: string | null;
+            /** Z */
+            z: number | null;
+            /** Direction */
+            direction: string | null;
+            /** Persistence Count */
+            persistence_count: number;
+            /** Baseline Profile Id */
+            baseline_profile_id: number | null;
+            /** Rule Id */
+            rule_id: string | null;
+            /** Reasons */
+            reasons: string[];
+        };
+        /** EntryChoiceOut */
+        EntryChoiceOut: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+        };
+        /** EntryConversionOut */
+        EntryConversionOut: {
+            /** Entered Value */
+            entered_value: number;
+            /** Entered Unit */
+            entered_unit: string;
+            /** Entered Label */
+            entered_label: string;
+            /** Canonical Value */
+            canonical_value: number;
+            /** Canonical Unit */
+            canonical_unit: string;
+            /** Canonical Label */
+            canonical_label: string;
+            /** Formula */
+            formula: string;
+            /** Source */
+            source: string;
+        };
+        /** EntryMetricOut */
+        EntryMetricOut: {
+            /** Code */
+            code: string;
+            /** Display Name */
+            display_name: string;
+            /** Category */
+            category: string;
+            /** Category Label */
+            category_label: string;
+            /** Unit */
+            unit: string;
+            /** Unit Label */
+            unit_label: string;
+            /** Accepted Units */
+            accepted_units: components["schemas"]["EntryUnitOut"][];
+            /** Contexts */
+            contexts: string[];
+            /** Plausible Min */
+            plausible_min: number | null;
+            /** Plausible Max */
+            plausible_max: number | null;
+            /** Sanity Note */
+            sanity_note: string;
+            /** Bound Note */
+            bound_note: string;
+            /** Baseline Enabled */
+            baseline_enabled: boolean;
+            /** Alert Rule Id */
+            alert_rule_id: string | null;
+        };
+        /** EntrySpecOut */
+        EntrySpecOut: {
+            /** Metrics */
+            metrics: components["schemas"]["EntryMetricOut"][];
+            /** Categories */
+            categories: components["schemas"]["EntryChoiceOut"][];
+            /** Contexts */
+            contexts: components["schemas"]["EntryChoiceOut"][];
+            /** Default Source Name */
+            default_source_name: string;
+            /** Max Future Minutes */
+            max_future_minutes: number;
+            /** Degraded Confidence Below */
+            degraded_confidence_below: number;
+            /** Degraded Signal Quality */
+            degraded_signal_quality: string[];
+            /** Threshold Label */
+            threshold_label: string;
+        };
+        /** EntryUnitOut */
+        EntryUnitOut: {
+            /** Unit */
+            unit: string;
+            /** Label */
+            label: string;
+            /** Canonical */
+            canonical: boolean;
+            /** Factor */
+            factor: number;
+            /** Offset */
+            offset: number;
+            /** Note */
+            note: string;
+            /** Source */
+            source: string;
+            /** Aliases */
+            aliases: string[];
+        };
+        /** EscalationAlertOut */
+        EscalationAlertOut: {
+            /** Id */
+            id: number;
+            /** Metric Code */
+            metric_code: string;
+            /** Display Name */
+            display_name: string;
+            /** Context */
+            context: string;
+            /** Direction */
+            direction: string;
+            /** Severity */
+            severity: string;
+            /** Peak Severity */
+            peak_severity: string;
+            /** Status */
+            status: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+        };
+        /** EscalationOut */
+        EscalationOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Alert Id */
+            alert_id: number | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /** Procedure Id */
+            procedure_id: string;
+            /** Status */
+            status: string;
+            /** Plain Meaning */
+            plain_meaning: string;
+            /** Who To Involve */
+            who_to_involve: string;
+            /** Guidance */
+            guidance: string;
+            /** Label */
+            label: string;
+            /** Data Time */
+            data_time: string | null;
+            /** Acknowledged By */
+            acknowledged_by: string | null;
+            /** Acknowledged At */
+            acknowledged_at: string | null;
+            /** Acknowledgement Note */
+            acknowledgement_note: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            alert: components["schemas"]["EscalationAlertOut"] | null;
         };
         /** FindingOut */
         FindingOut: {
@@ -1159,6 +2302,72 @@ export interface components {
             summary: string;
             /** Caveat */
             caveat: string;
+        };
+        /** GroundReportIn */
+        GroundReportIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** First Day */
+            first_day: number;
+            /** Last Day */
+            last_day: number;
+            /** Sections */
+            sections: ("alerts" | "journal" | "observations" | "symptoms" | "checkins" | "missions")[];
+            /** Authorized By */
+            authorized_by: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Encrypt
+             * @default false
+             */
+            encrypt: boolean;
+            /** Passphrase */
+            passphrase?: string | null;
+        };
+        /** GuidanceLevelsOut */
+        GuidanceLevelsOut: {
+            /** Version */
+            version: string;
+            /** Label */
+            label: string;
+            /** Levels */
+            levels: components["schemas"]["LevelGuidanceOut"][];
+            /** Symptom Rules */
+            symptom_rules: components["schemas"]["SymptomRuleOut"][];
+            /** Report Promptly Label */
+            report_promptly_label: string;
+            /** Report Promptly Symptoms */
+            report_promptly_symptoms: components["schemas"]["PromptSymptomOut"][];
+            /** Disclaimer */
+            disclaimer: string;
+        };
+        /** GuidanceOut */
+        GuidanceOut: {
+            subject: components["schemas"]["SubjectOut"];
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /** Procedure Id */
+            procedure_id: string;
+            /** Plain Meaning */
+            plain_meaning: string;
+            /** Who To Involve */
+            who_to_involve: string;
+            /** Guidance */
+            guidance: string;
+            /** Label */
+            label: string;
+            /** Matrix Version */
+            matrix_version: string;
+            /** Applies Now */
+            applies_now: boolean;
+            /** Reasons */
+            reasons: string[];
+            /** Escalations */
+            escalations: components["schemas"]["EscalationOut"][];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1222,6 +2431,36 @@ export interface components {
              * Format: date-time
              */
             generated_at: string;
+            /**
+             * Day Level
+             * @default none
+             */
+            day_level: string;
+            /**
+             * Day Level Reasons
+             * @default []
+             */
+            day_level_reasons: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Narrative
+             * @default
+             */
+            narrative: string;
+            /** Narrative Generated By */
+            narrative_generated_by?: string | null;
+            /** Narrative Model */
+            narrative_model?: string | null;
+            /**
+             * Narrative Grounding
+             * @default {}
+             */
+            narrative_grounding: {
+                [key: string]: unknown;
+            };
+            /** Narrative Generated At */
+            narrative_generated_at?: string | null;
         };
         /** KnowledgeIngestOut */
         KnowledgeIngestOut: {
@@ -1254,6 +2493,119 @@ export interface components {
             category: string;
             measurement: components["schemas"]["MeasurementOut"];
             baseline: components["schemas"]["BaselineOut"] | null;
+            /**
+             * Baseline Enabled
+             * @default true
+             */
+            baseline_enabled: boolean;
+        };
+        /** LevelGuidanceOut */
+        LevelGuidanceOut: {
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /** Procedure Id */
+            procedure_id: string;
+            /** Plain Meaning */
+            plain_meaning: string;
+            /** Who To Involve */
+            who_to_involve: string;
+            /** Guidance */
+            guidance: string;
+            /** Raises Event */
+            raises_event: boolean;
+        };
+        /** ManualEntryIn */
+        ManualEntryIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Metric Code */
+            metric_code: string;
+            /** Value */
+            value: number;
+            /** Unit */
+            unit: string;
+            /** Context */
+            context: string;
+            /** Recorded At */
+            recorded_at?: string | null;
+            /**
+             * Source Name
+             * @default manual entry
+             */
+            source_name: string;
+            /** Confidence */
+            confidence?: number | null;
+            /** Signal Quality */
+            signal_quality?: string | null;
+        };
+        /** ManualEntryOut */
+        ManualEntryOut: {
+            /** Accepted */
+            accepted: boolean;
+            entry: components["schemas"]["ManualEntryRowOut"];
+            assessment: components["schemas"]["EntryAssessmentOut"];
+            alert: components["schemas"]["EntryAlertOut"] | null;
+            baseline_event: components["schemas"]["BaselineEventOut"] | null;
+            /** Threshold Label */
+            threshold_label: string;
+        };
+        /** ManualEntryRowOut */
+        ManualEntryRowOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Metric Code */
+            metric_code: string;
+            /** Display Name */
+            display_name: string;
+            /** Value */
+            value: number;
+            /** Unit */
+            unit: string;
+            /** Unit Label */
+            unit_label: string;
+            conversion: components["schemas"]["EntryConversionOut"] | null;
+            /** Context */
+            context: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /**
+             * Ingested At
+             * Format: date-time
+             */
+            ingested_at: string;
+            /** Source Name */
+            source_name: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Quality */
+            quality: string;
+            /** Accepted */
+            accepted: boolean;
+            /** Confidence */
+            confidence: number | null;
+            /** Validation Notes */
+            validation_notes: string[];
+            /** Assessment Status */
+            assessment_status: string | null;
+            /** Severity */
+            severity: string | null;
+            /** Deviation Score */
+            deviation_score: number | null;
+            /** Alert Id */
+            alert_id: number | null;
+        };
+        /** MarkExportedIn */
+        MarkExportedIn: {
+            /** Actor */
+            actor: string;
         };
         /** MeasurementIn */
         MeasurementIn: {
@@ -1323,6 +2675,10 @@ export interface components {
             deviation_score: number | null;
             /** Baseline Profile Id */
             baseline_profile_id: number | null;
+            /** Original Value */
+            original_value?: number | null;
+            /** Original Unit */
+            original_unit?: string | null;
         };
         /** MemoryOut */
         MemoryOut: {
@@ -1403,6 +2759,79 @@ export interface components {
             /** Baseline Enabled */
             baseline_enabled: boolean;
         };
+        /** MilestoneOut */
+        MilestoneOut: {
+            /** Days */
+            days: number;
+            /** Label */
+            label: string;
+            /** Reached */
+            reached: boolean;
+            /** Reached Day */
+            reached_day: number | null;
+        };
+        /** MissionCreateIn */
+        MissionCreateIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Name */
+            name: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /** Planned Days */
+            planned_days?: number | null;
+            /**
+             * Environment
+             * @enum {string}
+             */
+            environment: "leo_station" | "lunar_surface" | "deep_space_transit" | "mars_surface" | "ground_analog" | "unspecified";
+            /**
+             * Actor
+             * @default operator
+             */
+            actor: string;
+        };
+        /** MissionDetailOut */
+        MissionDetailOut: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /** Planned Days */
+            planned_days: number | null;
+            /** Environment */
+            environment: string;
+            /** Environment Label */
+            environment_label: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Is Current */
+            is_current: boolean;
+        };
+        /** MissionEnvironmentOut */
+        MissionEnvironmentOut: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+        };
         /** MissionOut */
         MissionOut: {
             /** Id */
@@ -1418,8 +2847,44 @@ export interface components {
             start_date: string;
             /** Planned Days */
             planned_days: number | null;
+            /**
+             * Environment
+             * @default unspecified
+             */
+            environment: string;
             /** Is Simulated */
             is_simulated: boolean;
+        };
+        /** ModelServiceOut */
+        ModelServiceOut: {
+            /** Url */
+            url: string;
+            /** Host */
+            host: string;
+            /** Is Local */
+            is_local: boolean;
+            /** Note */
+            note: string;
+        };
+        /** NarrativeIn */
+        NarrativeIn: {
+            /**
+             * Use Llm
+             * @default true
+             */
+            use_llm: boolean;
+        };
+        /** NarrativeRangeIn */
+        NarrativeRangeIn: {
+            /** First Day */
+            first_day: number;
+            /** Last Day */
+            last_day: number;
+            /**
+             * Use Llm
+             * @default true
+             */
+            use_llm: boolean;
         };
         /** ObservationIn */
         ObservationIn: {
@@ -1473,6 +2938,29 @@ export interface components {
              */
             created_at: string;
         };
+        /** OllamaDiag */
+        OllamaDiag: {
+            /** Url */
+            url: string;
+            /** Reachable */
+            reachable: boolean;
+            /** Reason */
+            reason: string | null;
+            /** Installed Models */
+            installed_models: string[];
+            /** Chat Model */
+            chat_model: string;
+            /** Chat Model Source */
+            chat_model_source: string;
+            /** Chat Model Installed */
+            chat_model_installed: boolean | null;
+            /** Embed Model */
+            embed_model: string;
+            /** Embed Model Source */
+            embed_model_source: string;
+            /** Embed Model Installed */
+            embed_model_installed: boolean | null;
+        };
         /** OperatorAction */
         OperatorAction: {
             /** Actor */
@@ -1497,6 +2985,164 @@ export interface components {
             /** Simulated */
             simulated: boolean;
         };
+        /** PackageFileOut */
+        PackageFileOut: {
+            /** Name */
+            name: string;
+            /** Media Type */
+            media_type: string;
+            /** Sha256 */
+            sha256: string;
+            /** Size Bytes */
+            size_bytes: number;
+        };
+        /** PackageOut */
+        PackageOut: {
+            /** Id */
+            id: number;
+            /** Kind */
+            kind: string;
+            /** Astronaut Id */
+            astronaut_id: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Authorized By */
+            authorized_by: string;
+            /** Reason */
+            reason: string;
+            /** Status */
+            status: string;
+            /** Encrypted */
+            encrypted: boolean;
+            /** Sha256 */
+            sha256: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Location */
+            location: string | null;
+            /** First Day */
+            first_day: number | null;
+            /** Last Day */
+            last_day: number | null;
+            /** Sections */
+            sections: string[];
+            /** Files */
+            files: components["schemas"]["PackageFileOut"][];
+            /** Record Counts */
+            record_counts: {
+                [key: string]: number;
+            };
+            /** Simulated */
+            simulated: boolean;
+            /** Thresholds Label */
+            thresholds_label: string | null;
+            /** Exported By */
+            exported_by: string | null;
+            /** Exported At */
+            exported_at: string | null;
+        };
+        /** PrivacyOut */
+        PrivacyOut: {
+            /** Stores */
+            stores: components["schemas"]["StoreOut"][];
+            model_service: components["schemas"]["ModelServiceOut"];
+            /** Transmission */
+            transmission: string;
+            /** Warnings */
+            warnings: string[];
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+        };
+        /** PromptSymptomOut */
+        PromptSymptomOut: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+        };
+        /** ProposalOut */
+        ProposalOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Message Id */
+            message_id: number;
+            /** Conversation Id */
+            conversation_id: number | null;
+            /** Symptom Code */
+            symptom_code: string;
+            /** Label */
+            label: string;
+            /** Report Promptly */
+            report_promptly: boolean;
+            /** Quote */
+            quote: string;
+            /** Detector */
+            detector: string;
+            /** Status */
+            status: string;
+            /** Decided At */
+            decided_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** RadiationCumulativeOut */
+        RadiationCumulativeOut: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Unit */
+            unit: string;
+            /** Days */
+            days: components["schemas"]["RadiationDayOut"][];
+            /** Total */
+            total: number;
+            /** Entries */
+            entries: number;
+            /** Mission Start */
+            mission_start: string | null;
+            /** Simulated */
+            simulated: boolean;
+            /** Note */
+            note: string;
+        };
+        /** RadiationDayOut */
+        RadiationDayOut: {
+            /**
+             * Utc Date
+             * Format: date
+             */
+            utc_date: string;
+            /** Mission Day */
+            mission_day: number | null;
+            /** Dose */
+            dose: number;
+            /** Entries */
+            entries: number;
+            /** Cumulative */
+            cumulative: number;
+            /** Simulated */
+            simulated: boolean;
+        };
+        /** ReasonOut */
+        ReasonOut: {
+            /** Text */
+            text: string;
+            /** Level */
+            level?: ("WATCH" | "WARNING" | "CRITICAL") | null;
+            /** Ref Type */
+            ref_type?: string | null;
+            /** Ref Id */
+            ref_id?: number | null;
+        };
         /** RebuildIn */
         RebuildIn: {
             /** Actor */
@@ -1519,13 +3165,6 @@ export interface components {
              * Format: date-time
              */
             window_end: string;
-        };
-        /** ResolveIn */
-        ResolveIn: {
-            /** Actor */
-            actor: string;
-            /** Note */
-            note: string;
         };
         /** ReviewIn */
         ReviewIn: {
@@ -1617,6 +3256,40 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** SettingIn */
+        SettingIn: {
+            /** Value */
+            value: unknown;
+            /** Actor */
+            actor: string;
+        };
+        /** SettingOut */
+        SettingOut: {
+            /** Key */
+            key: string;
+            /** Kind */
+            kind: string;
+            /** Value */
+            value: unknown;
+            /** Default */
+            default: unknown;
+            /** Effective */
+            effective: unknown;
+            /** Deployment Default */
+            deployment_default: string | null;
+            /** Is Default */
+            is_default: boolean;
+            /** Description */
+            description: string;
+            /** Min Value */
+            min_value: number | null;
+            /** Max Value */
+            max_value: number | null;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
         /** SimulationRunIn */
         SimulationRunIn: {
             /** Scenario */
@@ -1664,12 +3337,283 @@ export interface components {
          * @enum {string}
          */
         SourceKind: "sensor" | "manual" | "lab" | "simulated";
+        /** StatusRuleOut */
+        StatusRuleOut: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "red" | "yellow" | "watch" | "green" | "no_data";
+            /** Meaning */
+            meaning: string;
+        };
+        /** StorageDiag */
+        StorageDiag: {
+            /** Data Dir */
+            data_dir: string;
+            /** Backups Dir */
+            backups_dir: string;
+            /** Outbox Dir */
+            outbox_dir: string;
+            /** Free Bytes */
+            free_bytes: number;
+            /** Total Bytes */
+            total_bytes: number;
+            /** Backups Bytes */
+            backups_bytes: number;
+            /** Outbox Bytes */
+            outbox_bytes: number;
+        };
+        /** StoreOut */
+        StoreOut: {
+            /** Key */
+            key: string;
+            /** What */
+            what: string;
+            /** Where */
+            where: string;
+            /** Protection */
+            protection: string;
+        };
+        /** StreakDayOut */
+        StreakDayOut: {
+            /** Mission Day */
+            mission_day: number;
+            /**
+             * Day Date
+             * Format: date
+             */
+            day_date: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "done" | "missed" | "no_data" | "pending";
+            /** Simulated */
+            simulated: boolean;
+        };
+        /** StreakOut */
+        StreakOut: {
+            /** Code */
+            code: string;
+            /** Title */
+            title: string;
+            /** Rule */
+            rule: string;
+            /** Current */
+            current: number;
+            /** At Risk */
+            at_risk: boolean;
+            /** Today Done */
+            today_done: boolean;
+            /** Longest */
+            longest: number;
+            /** Longest Days */
+            longest_days: number[];
+            /** Total Done */
+            total_done: number;
+            /** Next Milestone */
+            next_milestone: number | null;
+            /** Milestones */
+            milestones: components["schemas"]["MilestoneOut"][];
+            /** Calendar */
+            calendar: components["schemas"]["StreakDayOut"][];
+        };
+        /** StreaksOut */
+        StreaksOut: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Mission Id */
+            mission_id: number;
+            /**
+             * Mission Start
+             * Format: date
+             */
+            mission_start: string;
+            /** Mission Day */
+            mission_day: number;
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+            /** Simulated */
+            simulated: boolean;
+            /** Window Days */
+            window_days: number;
+            /** Rules */
+            rules: string;
+            /** Milestone Note */
+            milestone_note: string;
+            /** Streaks */
+            streaks: components["schemas"]["StreakOut"][];
+        };
+        /** SubjectOut */
+        SubjectOut: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "alert" | "symptom_report";
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Title */
+            title: string;
+            /** Status */
+            status: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+        };
         /** SuggestionOut */
         SuggestionOut: {
             /** Text */
             text: string;
             /** Reason */
             reason: string;
+        };
+        /** SymptomReportIn */
+        SymptomReportIn: {
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Symptom Code */
+            symptom_code: string;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "mild" | "moderate" | "severe";
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Onset At */
+            onset_at?: string | null;
+        };
+        /** SymptomReportOut */
+        SymptomReportOut: {
+            /** Id */
+            id: number;
+            /** Astronaut Id */
+            astronaut_id: number;
+            /** Symptom Code */
+            symptom_code: string;
+            /** Label */
+            label: string;
+            /** Category */
+            category: string;
+            /** Body System */
+            body_system: string;
+            /** Report Promptly */
+            report_promptly: boolean;
+            /** Severity */
+            severity: string;
+            /** Note */
+            note: string;
+            /** Onset At */
+            onset_at: string | null;
+            /**
+             * Reported At
+             * Format: date-time
+             */
+            reported_at: string;
+            /** Source */
+            source: string;
+            /** Proposal Id */
+            proposal_id: number | null;
+            /** Status */
+            status: string;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Is Simulated */
+            is_simulated: boolean;
+        };
+        /** SymptomRuleOut */
+        SymptomRuleOut: {
+            /** When */
+            when: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+        };
+        /** SystemAlertOut */
+        SystemAlertOut: {
+            /** Id */
+            id: number;
+            /** Metric Code */
+            metric_code: string;
+            /** Display Name */
+            display_name: string;
+            /** Context */
+            context: string;
+            /** Direction */
+            direction: string;
+            /** Severity */
+            severity: string;
+            /** Peak Severity */
+            peak_severity: string;
+            /** Status */
+            status: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+        };
+        /** SystemDocumentOut */
+        SystemDocumentOut: {
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Organization */
+            organization: string;
+            /** Url */
+            url: string;
+            /** Matched Topics */
+            matched_topics: string[];
+        };
+        /** SystemReadingOut */
+        SystemReadingOut: {
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "measurement" | "self_report";
+            /** Record Id */
+            record_id: number;
+            /** Code */
+            code: string;
+            /** Display Name */
+            display_name: string;
+            /** Context */
+            context: string;
+            /** Value */
+            value: number;
+            /** Unit */
+            unit: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /** Severity */
+            severity: string | null;
+            /** Assessment Status */
+            assessment_status: string | null;
+            /** Is Simulated */
+            is_simulated: boolean;
         };
         /** SystemStatusOut */
         SystemStatusOut: {
@@ -1689,6 +3633,35 @@ export interface components {
             ollama: {
                 [key: string]: unknown;
             };
+        };
+        /** SystemSymptomOut */
+        SystemSymptomOut: {
+            /** Id */
+            id: number;
+            /** Symptom Code */
+            symptom_code: string;
+            /** Label */
+            label: string;
+            /** Severity */
+            severity: string;
+            /** Report Promptly */
+            report_promptly: boolean;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "WATCH" | "WARNING" | "CRITICAL";
+            /**
+             * Reported At
+             * Format: date-time
+             */
+            reported_at: string;
+            /** Onset At */
+            onset_at: string | null;
+            /** Source */
+            source: string;
+            /** Is Simulated */
+            is_simulated: boolean;
         };
         /** TaskOut */
         TaskOut: {
@@ -1792,6 +3765,11 @@ export interface components {
             ai_available: boolean;
             /** Fallback Reason */
             fallback_reason: string | null;
+            /**
+             * Proposals
+             * @default []
+             */
+            proposals: components["schemas"]["ProposalOut"][];
         };
         /** ValidationError */
         ValidationError: {
@@ -1805,6 +3783,79 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VerifyIn */
+        VerifyIn: {
+            /**
+             * Passphrase
+             * Format: password
+             */
+            passphrase: string;
+            /**
+             * Actor
+             * @default unnamed operator
+             */
+            actor: string;
+        };
+        /** VerifyOut */
+        VerifyOut: {
+            /** Backup Id */
+            backup_id: number;
+            /** Ok */
+            ok: boolean;
+            /** Checksum Ok */
+            checksum_ok: boolean;
+            /** Decrypted */
+            decrypted: boolean;
+            /** Integrity */
+            integrity: string[];
+            /** Alembic Revision */
+            alembic_revision: string | null;
+            /** Tables */
+            tables: number | null;
+            /** Message */
+            message: string;
+            /**
+             * Verified At
+             * Format: date-time
+             */
+            verified_at: string;
+        };
+        /** VersionsDiag */
+        VersionsDiag: {
+            /** App */
+            app: string;
+            /** Python */
+            python: string;
+            /** Sqlite */
+            sqlite: string;
+            /** Sqlalchemy */
+            sqlalchemy: string;
+            /** Fastapi */
+            fastapi: string;
+            /** Os */
+            os: string;
+            /** Thresholds Version */
+            thresholds_version: string;
+            /** Thresholds Label */
+            thresholds_label: string;
+            /** Baseline Policy Version */
+            baseline_policy_version: string;
+        };
+        /** ResolveIn */
+        am__api__v1__symptoms__ResolveIn: {
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** ResolveIn */
+        am__schemas__ResolveIn: {
+            /** Actor */
+            actor: string;
+            /** Note */
+            note: string;
         };
     };
     responses: never;
@@ -2369,7 +4420,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ResolveIn"];
+                "application/json": components["schemas"]["am__schemas__ResolveIn"];
             };
         };
         responses: {
@@ -3193,6 +5244,1135 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    entry_spec_api_v1_entry_spec_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntrySpecOut"];
+                };
+            };
+        };
+    };
+    list_manual_entries_api_v1_manual_entries_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManualEntryRowOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_manual_entry_api_v1_manual_entries_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualEntryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManualEntryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    radiation_cumulative_api_v1_radiation_cumulative_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RadiationCumulativeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mission_environments_api_v1_missions_environments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MissionEnvironmentOut"][];
+                };
+            };
+        };
+    };
+    list_missions_api_v1_missions_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MissionDetailOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_mission_api_v1_missions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MissionCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MissionDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    symptom_catalog_api_v1_symptoms_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogOut"];
+                };
+            };
+        };
+    };
+    list_reports_api_v1_symptoms_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SymptomReportOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_report_api_v1_symptoms_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SymptomReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SymptomReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_report_api_v1_symptoms__report_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["am__api__v1__symptoms__ResolveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SymptomReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_proposals_api_v1_symptoms_proposals_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_proposal_api_v1_symptoms_proposals__proposal_id__confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_proposal_api_v1_symptoms_proposals__proposal_id__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_streaks_api_v1_streaks_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreaksOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    day_level_rules_api_v1_journal_day_level_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayLevelRulesOut"];
+                };
+            };
+        };
+    };
+    write_day_narrative_api_v1_journal__astronaut_id__days__day__narrative_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                astronaut_id: number;
+                day: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["NarrativeIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_narratives_api_v1_journal__astronaut_id__narratives_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                astronaut_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NarrativeRangeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    day_conversations_api_v1_journal__astronaut_id__days__day__conversations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                astronaut_id: number;
+                day: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayMessageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_settings_api_v1_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingOut"][];
+                };
+            };
+        };
+    };
+    update_setting_api_v1_settings__key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_diagnostics_api_v1_admin_diagnostics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticsOut"];
+                };
+            };
+        };
+    };
+    get_privacy_api_v1_admin_privacy_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivacyOut"];
+                };
+            };
+        };
+    };
+    admin_audit_api_v1_admin_audit_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_backups_api_v1_admin_backups_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupOut"][];
+                };
+            };
+        };
+    };
+    create_backup_api_v1_admin_backups_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BackupIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_backup_api_v1_admin_backups__backup_id__verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                backup_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_ground_report_api_v1_admin_outbox_ground_report_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroundReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_outbox_api_v1_admin_outbox_get: {
+        parameters: {
+            query?: {
+                astronaut_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_package_api_v1_admin_outbox__package_id__download_get: {
+        parameters: {
+            query?: {
+                file?: string | null;
+            };
+            header?: {
+                "x-am-actor"?: string | null;
+            };
+            path: {
+                package_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_exported_api_v1_admin_outbox__package_id__mark_exported_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkExportedIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    guidance_levels_api_v1_guidance_levels_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuidanceLevelsOut"];
+                };
+            };
+        };
+    };
+    guidance_current_api_v1_guidance_current_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentGuidanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    guidance_for_alert_api_v1_guidance_alerts__alert_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alert_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuidanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    guidance_for_symptom_api_v1_guidance_symptoms__symptom_report_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                symptom_report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuidanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_escalations_api_v1_escalations_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EscalationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_escalation_api_v1_escalations__event_id__acknowledge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                event_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcknowledgeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EscalationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    body_map_api_v1_bodymap_get: {
+        parameters: {
+            query: {
+                astronaut_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodyMapOut"];
                 };
             };
             /** @description Validation Error */

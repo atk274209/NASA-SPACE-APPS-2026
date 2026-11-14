@@ -52,11 +52,11 @@ function ServiceLights() {
     <div className="flex items-center gap-4 text-sm text-ink-dim">
       <span className="inline-flex items-center gap-1.5" title="Local AM service and database">
         <span className="size-2 rounded-full" style={{ background: backendOk ? 'var(--color-sev-normal)' : 'var(--color-sev-critical)' }} />
-        Core {backendOk ? 'online' : 'unreachable'}
+        <span className="hidden sm:inline">Core {backendOk ? 'online' : 'unreachable'}</span>
       </span>
       <span className="inline-flex items-center gap-1.5" title="Local language model (Ollama). Monitoring works without it.">
         <span className="size-2 rounded-full" style={{ background: llmState === 'ready' ? 'var(--color-sev-normal)' : 'var(--color-ink-faint)' }} />
-        AI {llmState}
+        <span className="hidden sm:inline">AI {llmState}</span>
       </span>
     </div>
   )

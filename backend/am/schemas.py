@@ -34,6 +34,7 @@ class MissionOut(ORM):
     astronaut_id: int
     start_date: date
     planned_days: int | None
+    environment: str = "unspecified"
     is_simulated: bool
 
 
@@ -82,6 +83,8 @@ class MeasurementOut(ORM):
     severity: str | None
     deviation_score: float | None
     baseline_profile_id: int | None
+    original_value: float | None = None  # as entered, before unit conversion (None if not converted)
+    original_unit: str | None = None
 
 
 class AssessmentOut(BaseModel):
@@ -286,6 +289,7 @@ class LatestReadingOut(BaseModel):
     category: str
     measurement: MeasurementOut
     baseline: BaselineOut | None
+    baseline_enabled: bool = True  # False: logged only (e.g. radiation dose), never baselined
 
 
 class OverviewOut(BaseModel):

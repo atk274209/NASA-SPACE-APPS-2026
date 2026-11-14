@@ -36,7 +36,8 @@ def set_setting(session: Session, key: str, value: Any, actor: str) -> AppSettin
     if key not in DEFAULTS:
         raise KeyError(f"unknown setting '{key}'")
     row = session.get(AppSetting, key)
-    old = None if row is None else row.value
+    was_default = row is None
+    old = DEFAULTS[key] if row is None else row.value
     if row is None:
         row = AppSetting(key=key, value=value, updated_by=actor)
         session.add(row)
@@ -44,7 +45,7 @@ def set_setting(session: Session, key: str, value: Any, actor: str) -> AppSettin
         row.value = value
         row.updated_by = actor
     audit(session, actor=actor, action="setting.changed", entity="app_setting", entity_id=key,
-          payload={"old": old, "new": value})
+          payload={"old": old, "old_was_default": was_default, "new": value})
     session.flush()
     return row
 

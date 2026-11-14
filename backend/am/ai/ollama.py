@@ -90,6 +90,8 @@ class OllamaClient:
             payload["format"] = format
         try:
             r = self._client.post("/api/chat", json=payload)
+        except httpx.TimeoutException as exc:  # the service answered too slowly: busy, not absent
+            raise LLMUnavailable("model_timeout", type(exc).__name__) from exc
         except httpx.HTTPError as exc:
             raise LLMUnavailable("service_unreachable", type(exc).__name__) from exc
         if r.status_code == 404:

@@ -123,7 +123,8 @@ def test_setting_changes_are_type_checked_and_audited(client):
 
     changed = [a for a in client.get("/api/v1/admin/audit").json() if a["action"] == "setting.changed"]
     assert sorted(a["entity_id"] for a in changed) == ["backup_retention", "symptom_llm_detection"]
-    assert {"old": None, "new": False} in [a["payload"] for a in changed]
+    # the first change records the default that was in effect, flagged as such
+    assert {"old": True, "old_was_default": True, "new": False} in [a["payload"] for a in changed]
     assert all(a["actor"] == "ops lead" for a in changed)
     rows = {s["key"]: s for s in client.get("/api/v1/settings").json()}
     assert rows["backup_retention"]["value"] == 3 and rows["symptom_llm_detection"]["value"] is False

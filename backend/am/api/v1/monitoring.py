@@ -155,6 +155,7 @@ def astronaut_overview(astronaut_id: int, db: DB, ctx: CTX):
             metric_code=row.metric_code, context=row.context, display_name=md.display_name, category=md.category,
             measurement=MeasurementOut.model_validate(row),
             baseline=baseline_out(svc, prof) if prof else None,
+            baseline_enabled=md.baseline_enabled,
         ))
 
     if open_alerts:

@@ -53,3 +53,44 @@ def test_built_console_is_served_with_spa_fallback(tmp_path):
         assert "nope" not in c.get("/../secret.txt").text
         assert c.get("/api/v1/does-not-exist").status_code == 404
         assert c.get("/api/v1/system/status").json()["database"] == "ok"
+
+
+def test_resolving_an_alert_closes_its_escalations(client):
+    run = client.post("/api/v1/simulation/run", json={"scenario": "acute_rest_hr", "astronaut_code": "ESC-1"}).json()
+    aid = run["astronaut"]["id"]
+    events = client.get("/api/v1/escalations", params={"astronaut_id": aid}).json()
+    assert events and any(e["status"] == "open" for e in events)
+    alert_id = events[0]["alert_id"]
+    r = client.post(f"/api/v1/alerts/{alert_id}/resolve", json={"actor": "cmo", "note": "reviewed in simulation"})
+    assert r.status_code == 200
+    after = [e for e in client.get("/api/v1/escalations", params={"astronaut_id": aid}).json()
+             if e["alert_id"] == alert_id]
+    assert after and all(e["status"] == "closed" for e in after)
+
+
+def test_status_and_overview_expose_new_fields(client):
+    run = client.post("/api/v1/simulation/run", json={"scenario": "nominal", "astronaut_code": "OV-1"}).json()
+    ov = client.get(f"/api/v1/astronauts/{run['astronaut']['id']}/overview").json()
+    assert ov["mission"]["environment"] == "unspecified"
+    rad = [r for r in ov["latest"] if r["metric_code"] == "radiation_dose"]
+    assert rad and rad[0]["baseline_enabled"] is False
+    assert all("original_value" in r["measurement"] for r in ov["latest"])
+    st = client.get("/api/v1/system/status").json()
+    assert st["ollama"]["configured_chat_model"] == "qwen2.5:7b-instruct"
+
+
+def test_slow_model_is_reported_as_timeout_not_absent():
+    import httpx
+
+    from am.ai.ollama import LLMUnavailable, OllamaClient
+
+    def slow(_request):
+        raise httpx.ReadTimeout("slow")
+
+    client = OllamaClient("http://ollama.test", transport=httpx.MockTransport(slow))
+    try:
+        client.chat("m", [{"role": "user", "content": "hi"}])
+    except LLMUnavailable as exc:
+        assert exc.reason == "model_timeout"
+    else:
+        raise AssertionError("expected LLMUnavailable")

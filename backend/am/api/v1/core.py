@@ -11,6 +11,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from am.api.deps import AppContext, get_ctx, get_db
+from am.settings_store import effective_chat_model, effective_embed_model
 from am.db.models import Astronaut, AuditLog, Measurement, MetricDefinition, Mission
 from am.health.ingest import IngestResult, IngestService, MeasurementInput
 from am.schemas import (
@@ -49,8 +50,8 @@ def system_status(db: DB, ctx: CTX) -> SystemStatusOut:
         ollama["models"] = [m.get("name") for m in r.json().get("models", [])]
     except Exception as exc:
         ollama["error"] = type(exc).__name__
-    ollama["configured_chat_model"] = ctx.settings.chat_model
-    ollama["configured_embed_model"] = ctx.settings.embed_model
+    ollama["configured_chat_model"] = effective_chat_model(db, ctx.settings)
+    ollama["configured_embed_model"] = effective_embed_model(db, ctx.settings)
     return SystemStatusOut(
         status="ok" if db_state == "ok" else "degraded",
         database=db_state,
