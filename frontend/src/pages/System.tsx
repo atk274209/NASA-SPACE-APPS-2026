@@ -1,9 +1,235 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { api } from '../api/client'
-import { Button, ErrorNote, Field, inputCls, KeyValue, Loading, Section } from '../components/ui'
+import { crewApi } from '../api/crew'
+import { Button, ErrorNote, Field, inputCls, KeyValue, Loading, Section, SimulatedMark } from '../components/ui'
 import { fmtDateTime } from '../lib/format'
 import { useSession } from '../state/session'
+
+/** Today's date in UTC (YYYY-MM-DD): AM counts mission days from the start date in UTC. */
+const utcToday = () => new Date().toISOString().slice(0, 10)
+
+// Inputs with a validation message get a red border while the message is shown.
+const fieldCls = `${inputCls} aria-[invalid=true]:border-sev-critical`
+
+function AddCrewMember() {
+  const qc = useQueryClient()
+  const { astronauts, selectAstronaut } = useSession()
+  const [code, setCode] = useState('')
+  const [name, setName] = useState('')
+  const [attempted, setAttempted] = useState(false)
+  const add = useMutation({
+    mutationFn: () => crewApi.createAstronaut(code.trim(), name.trim()),
+    onSuccess: async (a) => {
+      setCode('')
+      setName('')
+      setAttempted(false)
+      await qc.invalidateQueries({ queryKey: ['astronauts'] })
+      selectAstronaut(a.id)
+    },
+  })
+  const taken = astronauts.some((a) => a.code.toLowerCase() === code.trim().toLowerCase())
+  const codeError = !code.trim() ? (attempted ? 'Enter a crew code, for example CREW-01.' : null)
+    : taken ? 'This crew code is already in use.' : null
+  const nameError = !name.trim() && attempted ? 'Enter the name to show for this crew member.' : null
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    setAttempted(true)
+    if (code.trim() && name.trim() && !taken) add.mutate()
+  }
+
+  return (
+    <form className="flex flex-col gap-3" onSubmit={submit} noValidate>
+      <h3 className="text-sm font-semibold text-ink">Add a crew member</h3>
+      <div className="grid gap-3 sm:grid-cols-[160px_1fr]">
+        <Field label="Crew code">
+          <input className={`${fieldCls} num`} maxLength={32} value={code} onChange={(e) => setCode(e.target.value)}
+            aria-invalid={codeError !== null} placeholder="CREW-01" />
+        </Field>
+        <Field label="Display name">
+          <input className={fieldCls} maxLength={128} value={name} onChange={(e) => setName(e.target.value)}
+            aria-invalid={nameError !== null} />
+        </Field>
+      </div>
+      {(codeError || nameError) && (
+        <p role="alert" className="text-xs text-sev-critical">{[codeError, nameError].filter(Boolean).join(' ')}</p>
+      )}
+      <div>
+        <Button type="submit" disabled={add.isPending}>{add.isPending ? 'Adding…' : 'Add crew member'}</Button>
+      </div>
+      {add.error && <ErrorNote error={add.error} />}
+      {add.data && (
+        <p role="status" className="text-sm text-sev-normal">
+          Added {add.data.display_name} ({add.data.code}). Now viewing this record.
+        </p>
+      )}
+    </form>
+  )
+}
+
+function StartMission() {
+  const qc = useQueryClient()
+  const { astronauts, astronaut, operator } = useSession()
+  const environments = useQuery({ queryKey: ['mission-environments'], queryFn: crewApi.environments, staleTime: Infinity })
+  const [crewId, setCrewId] = useState<number | null>(null)
+  const [name, setName] = useState('')
+  const [start, setStart] = useState(utcToday)
+  const [plannedRaw, setPlannedRaw] = useState('')
+  const [environment, setEnvironment] = useState('')
+  const [attempted, setAttempted] = useState(false)
+
+  const targetId = crewId ?? astronaut?.id ?? null
+  const target = astronauts.find((a) => a.id === targetId)
+  const planned = plannedRaw.trim() === '' ? null : Number(plannedRaw)
+  const errors = [
+    !name.trim() && 'Enter a mission name.',
+    !start ? 'Choose the start date.' : start > utcToday() && 'The start date cannot be in the future (UTC).',
+    planned !== null && !(Number.isInteger(planned) && planned >= 1) && 'Planned days must be a whole number of 1 or more.',
+    !environment && 'Choose an environment, or Not specified.',
+  ].filter((x): x is string => typeof x === 'string')
+
+  const create = useMutation({
+    mutationFn: () =>
+      crewApi.createMission({
+        astronaut_id: targetId as number,
+        name: name.trim(),
+        start_date: start,
+        planned_days: planned,
+        environment,
+        actor: operator.trim() || 'operator',
+      }),
+    onSuccess: () => {
+      setName('')
+      setPlannedRaw('')
+      setAttempted(false)
+      qc.invalidateQueries()
+    },
+  })
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    setAttempted(true)
+    if (targetId !== null && errors.length === 0) create.mutate()
+  }
+  const envHelp = environments.data?.find((x) => x.code === environment)?.description
+
+  return (
+    <form className="flex flex-col gap-3" onSubmit={submit} noValidate>
+      <h3 className="text-sm font-semibold text-ink">Start a mission</h3>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Crew member">
+          <select className={inputCls} value={targetId ?? ''} onChange={(e) => setCrewId(Number(e.target.value))}>
+            {astronauts.map((a) => <option key={a.id} value={a.id}>{a.display_name} ({a.code})</option>)}
+          </select>
+        </Field>
+        <Field label="Mission name">
+          <input className={inputCls} maxLength={128} value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Field label="Start date (UTC)">
+          <input className={`${inputCls} num`} type="date" max={utcToday()} value={start}
+            onChange={(e) => setStart(e.target.value)} />
+        </Field>
+        <Field label="Planned days (optional)">
+          <input className={`${inputCls} num`} inputMode="numeric" value={plannedRaw}
+            onChange={(e) => setPlannedRaw(e.target.value)} />
+        </Field>
+      </div>
+      <Field label="Environment">
+        <select className={inputCls} value={environment} onChange={(e) => setEnvironment(e.target.value)}>
+          <option value="" disabled>Choose an environment</option>
+          {environments.data?.map((x) => <option key={x.code} value={x.code}>{x.label}</option>)}
+        </select>
+      </Field>
+      {envHelp && <p className="text-xs text-ink-dim">{envHelp}</p>}
+      {environments.error && <ErrorNote error={environments.error} />}
+      {attempted && errors.length > 0 && <p role="alert" className="text-xs text-sev-critical">{errors.join(' ')}</p>}
+      {target?.is_simulated && (
+        <p className="text-xs text-ink-dim">
+          {target.code} is a simulated record, so this mission is marked simulated too.
+        </p>
+      )}
+      <p className="text-xs text-ink-faint">
+        The newest mission becomes the current one: mission day 1 is its start date. Recorded in the audit trail as{' '}
+        {operator.trim() || 'operator'}.
+      </p>
+      <div>
+        <Button type="submit" disabled={create.isPending || targetId === null}>
+          {create.isPending ? 'Creating…' : 'Create mission'}
+        </Button>
+      </div>
+      {create.error && <ErrorNote error={create.error} />}
+      {create.data && (
+        <p role="status" className="text-sm text-sev-normal">
+          Created {create.data.name} ({create.data.environment_label}). It is now the current mission for{' '}
+          {astronauts.find((a) => a.id === create.data.astronaut_id)?.code ?? 'this crew member'}.
+        </p>
+      )}
+    </form>
+  )
+}
+
+function MissionList() {
+  const { astronaut } = useSession()
+  const missions = useQuery({
+    queryKey: ['crew-missions', astronaut?.id],
+    queryFn: () => crewApi.missions(astronaut!.id),
+    enabled: !!astronaut,
+  })
+  if (!astronaut) return null
+  return (
+    <div>
+      <h3 className="mb-2 text-sm font-semibold text-ink">Missions for {astronaut.display_name}</h3>
+      {missions.isError ? <ErrorNote error={missions.error} /> : !missions.data ? <Loading /> : missions.data.length === 0 ? (
+        <p className="text-sm text-ink-dim">No missions yet. Mission days and the journal start once a mission exists.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="text-left text-ink-dim">
+              <tr>
+                <th className="pb-1 font-normal">Mission</th>
+                <th className="pb-1 font-normal">Environment</th>
+                <th className="pb-1 font-normal">Start (UTC)</th>
+                <th className="pb-1 text-right font-normal">Planned days</th>
+              </tr>
+            </thead>
+            <tbody>
+              {missions.data.map((m) => (
+                <tr key={m.id} className="border-t border-seam/60">
+                  <td className="py-1.5">
+                    <span className="inline-flex flex-wrap items-center gap-2">
+                      {m.name}
+                      {m.is_current && <span className="text-xs text-signal">Current</span>}
+                      {m.is_simulated && <SimulatedMark />}
+                    </span>
+                  </td>
+                  <td className="py-1.5 text-ink-dim">{m.environment_label}</td>
+                  <td className="num py-1.5 text-ink-dim">{m.start_date}</td>
+                  <td className="num py-1.5 text-right">{m.planned_days ?? '–'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CrewAndMissions() {
+  const { astronauts } = useSession()
+  return (
+    <Section title="Crew and missions">
+      <div className="flex flex-col gap-6">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <AddCrewMember />
+          {astronauts.length ? <StartMission /> : (
+            <p className="text-sm text-ink-dim">Add a crew member first, then start a mission for them.</p>
+          )}
+        </div>
+        <MissionList />
+      </div>
+    </Section>
+  )
+}
 
 function SimulationRunner() {
   const qc = useQueryClient()
@@ -117,6 +343,7 @@ export function SystemPage() {
           )}
         </Section>
       </div>
+      <CrewAndMissions />
       <SimulationRunner />
       <Section title="Audit trail" aside="Latest 40 entries">
         {audit.isError ? <ErrorNote error={audit.error} /> : !audit.data ? <Loading /> : (

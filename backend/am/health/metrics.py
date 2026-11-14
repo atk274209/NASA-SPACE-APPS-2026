@@ -17,6 +17,30 @@ from am.db.models import MetricDefinition
 SANITY_NOTE = "AM engineering sanity bound for error rejection; NOT a clinical reference range."
 
 PHYSIO = [C.REST.value, C.EXERCISE.value, C.SLEEP.value, C.OTHER.value]
+GLUCOSE_CONTEXTS = [C.FASTING.value, C.POSTPRANDIAL.value, C.OTHER.value]
+
+# Plain-language labels for grouping indicators in entry forms.
+CATEGORY_LABELS = {
+    "cardiovascular": "Cardiovascular",
+    "immune": "Immune and temperature",
+    "metabolic": "Metabolic",
+    "musculoskeletal": "Musculoskeletal and activity",
+    "sleep": "Sleep",
+    "nutrition": "Nutrition and hydration",
+    "radiation": "Radiation",
+}
+
+# What each measurement context means, so a reading is filed under the right baseline.
+# Descriptions are deliberately qualitative: AM does not define clinical fasting windows.
+CONTEXT_LABELS: dict[str, tuple[str, str]] = {
+    C.REST.value: ("Resting", "At rest, for example seated or lying quietly."),
+    C.EXERCISE.value: ("Exercise", "During or right after exercise."),
+    C.SLEEP.value: ("Sleep", "While asleep."),
+    C.OTHER.value: ("Other", "Any other situation."),
+    C.DAILY.value: ("Daily total", "One value that covers the whole day."),
+    C.FASTING.value: ("Fasting", "Before eating, for example before breakfast."),
+    C.POSTPRANDIAL.value: ("After a meal", "After eating."),
+}
 
 
 @dataclass(frozen=True)
@@ -30,6 +54,12 @@ class MetricSpec:
     plausible_max: float | None
     baseline_enabled: bool = True
     unit_aliases: tuple[str, ...] = field(default=())
+    # Why this metric's sanity bounds sit where they do (appended to SANITY_NOTE).
+    bound_note: str = ""
+
+    @property
+    def sanity_note(self) -> str:
+        return f"{SANITY_NOTE} {self.bound_note}".strip()
 
 
 METRICS: list[MetricSpec] = [
@@ -60,6 +90,20 @@ METRICS: list[MetricSpec] = [
     MetricSpec("water_intake", "nutrition", "Water intake", "mL", [C.DAILY.value], 0, 10000,
                unit_aliases=("ml",)),
     MetricSpec("energy_intake", "nutrition", "Energy intake", "kcal", [C.DAILY.value], 0, 10000),
+    # Metabolic. The bounds only catch entry errors, most often a mmol/L value typed while
+    # mg/dL is selected (5.5 mmol/L stored as 5.5 mg/dL) or a mg/dL value typed while
+    # mmol/L is selected (99 becomes about 1784 mg/dL). They are not a clinical range and
+    # never classify a reading: deviations are judged against the astronaut's own baseline
+    # by the DEMO rule in thresholds.demo.yaml.
+    MetricSpec("blood_glucose", "metabolic", "Blood glucose", "mg/dL", GLUCOSE_CONTEXTS, 10, 1000,
+               bound_note="Wide bounds that catch entry errors such as a mmol/L value entered as mg/dL."),
+    # Radiation: personal dosimeter dose for one day. Logged and summed only, so there is
+    # no personal baseline and no alert rule. The upper bound is deliberately very wide so
+    # that a real reading is never rejected; it only catches gross entry errors such as a
+    # misplaced decimal point. It is not an exposure limit.
+    MetricSpec("radiation_dose", "radiation", "Radiation dose", "mSv", [C.DAILY.value], 0, 10000,
+               baseline_enabled=False,
+               bound_note="Not an exposure limit; AM does not evaluate exposure limits."),
 ]
 
 _BY_CODE = {m.code: m for m in METRICS}
@@ -92,6 +136,6 @@ def seed_metric_registry(session: Session) -> None:
         row.allowed_contexts = list(spec.allowed_contexts)
         row.plausible_min = spec.plausible_min
         row.plausible_max = spec.plausible_max
-        row.plausibility_note = SANITY_NOTE
+        row.plausibility_note = spec.sanity_note
         row.baseline_enabled = spec.baseline_enabled
     session.flush()

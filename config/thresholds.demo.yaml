@@ -51,3 +51,20 @@ metrics:
     rule_id: temp_personal_deviation
   respiratory_rate:
     rule_id: rr_personal_deviation
+  # DEMO: blood glucose is judged ONLY as a deviation from the astronaut's own baseline
+  # in the same context (fasting is never compared with after-a-meal readings). There are
+  # no absolute clinical cut-offs here. AM expects glucose entries about once a day (the
+  # simulator logs one fasting reading per day), so the persistence window is widened from
+  # 12 h to 72 h: consecutive daily readings can then confirm each other. The 72 h figure
+  # is a demonstration choice, not clinical guidance.
+  blood_glucose:
+    rule_id: glucose_personal_deviation
+    persistence:
+      lookback: 6
+      max_age_hours: 72
+      required:
+        WATCH: 2
+        WARNING: 2
+        CRITICAL: 3
+  # radiation_dose deliberately has no rule: it is logged and summed only, and AM does
+  # not evaluate exposure limits.

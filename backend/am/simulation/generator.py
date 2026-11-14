@@ -49,6 +49,8 @@ class Scenario:
     days: int
     streams: list[StreamParams]
     perturbations: list[Perturbation] = field(default_factory=list)
+    # Streams sampled from a separate generator so they never shift the `streams` draws.
+    extra_streams: list[StreamParams] = field(default_factory=lambda: list(_M5_STREAMS))
 
 
 _BASE_STREAMS = [
@@ -62,6 +64,20 @@ _BASE_STREAMS = [
     StreamParams("exercise_duration", "min", C.DAILY.value, 120, 15, 1, (21, 22)),
     StreamParams("water_intake", "mL", C.DAILY.value, 2500, 250, 1, (22, 23)),
 ]
+
+# M5 streams. Like everything here, the parameters are ARBITRARY demonstration values:
+# not a physiological norm, not a reference range and not a reference exposure rate.
+# They are drawn from their own random generator (see `generate`), so adding them leaves
+# every value of the base streams above unchanged for a given seed.
+_M5_STREAMS = [
+    # Fasting blood glucose, once a day before breakfast.
+    StreamParams("blood_glucose", "mg/dL", C.FASTING.value, 92, 6, 1, (6, 7)),
+    # Personal dosimeter dose for the day, logged once each evening.
+    StreamParams("radiation_dose", "mSv", C.DAILY.value, 0.45, 0.05, 1, (23, 24), decimals=3),
+]
+
+# Salt that derives the M5 streams' generator from the scenario seed.
+_M5_SEED_SALT = 5
 
 SCENARIOS: dict[str, Scenario] = {
     "nominal": Scenario(
@@ -111,13 +127,32 @@ def generate(
     end: datetime,
     seed: int = 42,
 ) -> list[MeasurementInput]:
-    rng = np.random.default_rng(seed)
     start_day = (end - timedelta(days=scenario.days)).replace(hour=0, minute=0, second=0, microsecond=0)
     source = f"am-simulator/{scenario.name}/seed-{seed}"
+    out = _sample(scenario, scenario.streams, np.random.default_rng(seed),
+                  astronaut_id=astronaut_id, start_day=start_day, end=end, source=source)
+    # A second, independent generator: the base streams consume exactly the same draws as
+    # before M5, so existing scenarios reproduce value for value.
+    out += _sample(scenario, scenario.extra_streams, np.random.default_rng((seed, _M5_SEED_SALT)),
+                   astronaut_id=astronaut_id, start_day=start_day, end=end, source=source)
+    out.sort(key=lambda x: x.recorded_at)
+    return out
+
+
+def _sample(
+    scenario: Scenario,
+    streams: list[StreamParams],
+    rng: np.random.Generator,
+    *,
+    astronaut_id: int,
+    start_day: datetime,
+    end: datetime,
+    source: str,
+) -> list[MeasurementInput]:
     out: list[MeasurementInput] = []
     for d in range(scenario.days + 1):
         day0 = start_day + timedelta(days=d)
-        for sp in scenario.streams:
+        for sp in streams:
             h0, h1 = sp.hours
             step = (h1 - h0) * 3600 / sp.per_day
             for i in range(sp.per_day):
@@ -143,5 +178,4 @@ def generate(
                         confidence=0.95,
                     )
                 )
-    out.sort(key=lambda x: x.recorded_at)
     return out
