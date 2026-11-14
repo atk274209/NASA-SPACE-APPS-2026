@@ -146,6 +146,7 @@ class BaselineOut(ORM):
     supersedes_id: int | None
     policy_version: str
     created_at: datetime
+    deviation_scale: float | None = None  # scale used by the anomaly engine for this profile
 
 
 class BaselineAuditOut(ORM):
@@ -261,6 +262,41 @@ class AuditOut(ORM):
     entity_id: str | None
     payload: dict[str, Any]
     created_at: datetime
+
+
+class ThresholdRuleOut(BaseModel):
+    metric_code: str
+    rule_id: str
+    direction: str
+    bands: dict[str, float]
+    persistence_required: dict[str, int]
+    persistence_lookback: int
+
+
+class ThresholdsOut(BaseModel):
+    version: str
+    label: str
+    rules: list[ThresholdRuleOut]
+
+
+class LatestReadingOut(BaseModel):
+    metric_code: str
+    context: str
+    display_name: str
+    category: str
+    measurement: MeasurementOut
+    baseline: BaselineOut | None
+
+
+class OverviewOut(BaseModel):
+    astronaut: AstronautOut
+    mission: MissionOut | None
+    mission_day: int | None
+    status: str  # worst open-alert severity, or NORMAL / UNASSESSED
+    open_alerts: list[AlertOut]
+    latest: list[LatestReadingOut]
+    measurement_count: int
+    simulated: bool
 
 
 class SystemStatusOut(BaseModel):

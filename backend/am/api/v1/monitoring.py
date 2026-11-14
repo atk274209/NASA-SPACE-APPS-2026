@@ -13,8 +13,17 @@ from am.alerts.service import AlertService
 from am.api.deps import AppContext, get_ctx, get_db
 from am.baseline.service import BaselineService
 from am.db.base import utcnow
-from am.db.enums import AlertStatus, BaselineStatus
-from am.db.models import Alert, AlertEvidence, Astronaut, BaselineAudit, BaselineProfile, Mission
+from am.db.enums import AlertStatus, BaselineStatus, DataQuality, Severity
+from am.db.models import (
+    Alert,
+    AlertEvidence,
+    Astronaut,
+    BaselineAudit,
+    BaselineProfile,
+    Measurement,
+    MetricDefinition,
+    Mission,
+)
 from am.health.ingest import IngestService
 from am.schemas import (
     AckIn,
@@ -23,13 +32,18 @@ from am.schemas import (
     AstronautOut,
     BaselineAuditOut,
     BaselineOut,
+    LatestReadingOut,
+    MeasurementOut,
     MissionOut,
+    OverviewOut,
     OperatorAction,
     RebuildIn,
     ResolveIn,
     ScenarioOut,
     SimulationRunIn,
     SimulationRunOut,
+    ThresholdRuleOut,
+    ThresholdsOut,
 )
 from am.simulation.generator import SCENARIOS, generate
 
@@ -40,14 +54,22 @@ CTX = Annotated[AppContext, Depends(get_ctx)]
 
 # ---------------------------------------------------------------- baselines
 @router.get("/baselines", response_model=list[BaselineOut], tags=["baselines"])
-def list_baselines(db: DB, astronaut_id: int, include_history: bool = False, metric_code: str | None = None):
+def list_baselines(db: DB, ctx: CTX, astronaut_id: int, include_history: bool = False, metric_code: str | None = None):
     stmt = select(BaselineProfile).where(BaselineProfile.astronaut_id == astronaut_id)
     if not include_history:
         stmt = stmt.where(BaselineProfile.status != BaselineStatus.SUPERSEDED.value)
     if metric_code:
         stmt = stmt.where(BaselineProfile.metric_code == metric_code)
-    return db.scalars(stmt.order_by(BaselineProfile.metric_code, BaselineProfile.context,
+    rows = db.scalars(stmt.order_by(BaselineProfile.metric_code, BaselineProfile.context,
                                     BaselineProfile.version)).all()
+    svc = BaselineService(db, ctx.policy, ctx.thresholds)
+    return [baseline_out(svc, p) for p in rows]
+
+
+def baseline_out(svc: BaselineService, p: BaselineProfile) -> BaselineOut:
+    out = BaselineOut.model_validate(p)
+    out.deviation_scale = svc.scale_of(p)
+    return out
 
 
 @router.get("/baselines/audit", response_model=list[BaselineAuditOut], tags=["baselines"])
@@ -70,7 +92,7 @@ def unfreeze_baseline(profile_id: int, body: OperatorAction, db: DB, ctx: CTX):
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from exc
     db.commit()
-    return p
+    return baseline_out(svc, p)
 
 
 @router.post("/baselines/rebuild", response_model=BaselineOut, status_code=201, tags=["baselines"])
@@ -83,7 +105,81 @@ def rebuild_baseline(body: RebuildIn, db: DB, ctx: CTX):
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     db.commit()
-    return p
+    return baseline_out(svc, p)
+
+
+@router.get("/thresholds", response_model=ThresholdsOut, tags=["baselines"])
+def get_thresholds(ctx: CTX):
+    t = ctx.thresholds
+    return ThresholdsOut(
+        version=t.version,
+        label=t.label,
+        rules=[
+            ThresholdRuleOut(
+                metric_code=code,
+                rule_id=r.rule_id,
+                direction=r.direction,
+                bands={k.value: v for k, v in r.bands.items()},
+                persistence_required={k.value: v for k, v in r.persistence.required.items()},
+                persistence_lookback=r.persistence.lookback,
+            )
+            for code, r in t.rules.items()
+        ],
+    )
+
+
+@router.get("/astronauts/{astronaut_id}/overview", response_model=OverviewOut, tags=["astronauts"])
+def astronaut_overview(astronaut_id: int, db: DB, ctx: CTX):
+    astronaut = db.get(Astronaut, astronaut_id)
+    if astronaut is None:
+        raise HTTPException(404, "astronaut not found")
+    mission = db.scalars(select(Mission).where(Mission.astronaut_id == astronaut_id)
+                         .order_by(Mission.id.desc()).limit(1)).first()
+    mission_day = (utcnow().date() - mission.start_date).days + 1 if mission else None
+    open_alerts = db.scalars(select(Alert).where(Alert.astronaut_id == astronaut_id,
+                                                 Alert.status != AlertStatus.RESOLVED.value)
+                             .order_by(Alert.last_seen_at.desc())).all()
+
+    # latest non-rejected reading per (metric, context)
+    latest_ids = select(func.max(Measurement.id)).where(
+        Measurement.astronaut_id == astronaut_id, Measurement.quality != DataQuality.REJECTED.value
+    ).group_by(Measurement.metric_code, Measurement.context)
+    latest_rows = db.scalars(select(Measurement).where(Measurement.id.in_(latest_ids))).all()
+    metrics = {md.code: md for md in db.scalars(select(MetricDefinition)).all()}
+    svc = BaselineService(db, ctx.policy, ctx.thresholds)
+    latest = []
+    for row in sorted(latest_rows, key=lambda r: (metrics[r.metric_code].category, r.metric_code, r.context)):
+        prof = svc.active_profile(astronaut_id, row.metric_code, row.context)
+        md = metrics[row.metric_code]
+        latest.append(LatestReadingOut(
+            metric_code=row.metric_code, context=row.context, display_name=md.display_name, category=md.category,
+            measurement=MeasurementOut.model_validate(row),
+            baseline=baseline_out(svc, prof) if prof else None,
+        ))
+
+    if open_alerts:
+        # Unacknowledged alerts report their PEAK severity: a critical episode stays visible
+        # until a person has reviewed it, even if the latest reading is less deviant.
+        status = max(
+            (Severity(a.peak_severity if a.status == AlertStatus.ACTIVE.value else a.severity) for a in open_alerts),
+            key=lambda s: s.rank,
+        ).value
+    elif any(r.baseline for r in latest):
+        status = Severity.NORMAL.value
+    else:
+        status = "UNASSESSED"
+    count = db.scalar(select(func.count()).select_from(Measurement)
+                      .where(Measurement.astronaut_id == astronaut_id)) or 0
+    return OverviewOut(
+        astronaut=AstronautOut.model_validate(astronaut),
+        mission=MissionOut.model_validate(mission) if mission else None,
+        mission_day=mission_day,
+        status=status,
+        open_alerts=[AlertOut.model_validate(a) for a in open_alerts],
+        latest=latest,
+        measurement_count=count,
+        simulated=astronaut.is_simulated,
+    )
 
 
 # ---------------------------------------------------------------- alerts

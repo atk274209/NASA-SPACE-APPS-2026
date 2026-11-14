@@ -13,7 +13,7 @@ from am.db.enums import Severity
 
 class Persistence(BaseModel):
     lookback: int = 6
-    max_age_hours: float = 6.0
+    max_age_hours: float = 12.0
     required: dict[Severity, int] = Field(default_factory=lambda: {Severity.WARNING: 2, Severity.CRITICAL: 3})
 
 

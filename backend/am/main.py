@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from am.api.deps import AppContext
 from am.api.v1 import core, monitoring
@@ -51,6 +52,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "not clinically validated.",
         lifespan=lifespan,
     )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

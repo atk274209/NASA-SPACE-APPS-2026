@@ -24,6 +24,7 @@ def settings(tmp_path) -> Settings:
         data_dir=tmp_path / "data",
         database_url=f"sqlite:///{(tmp_path / 'test.sqlite3').as_posix()}",
         ollama_url="http://127.0.0.1:9",  # deliberately unreachable: tests must not need a model
+        allowed_hosts=["localhost", "127.0.0.1", "testserver"],
     )
 
 

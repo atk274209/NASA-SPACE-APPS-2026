@@ -96,12 +96,12 @@ SCENARIOS: dict[str, Scenario] = {
 
 def _offset(p: Perturbation, day_f: float, total_days: int) -> float:
     end = p.end_day if p.end_day is not None else total_days
-    if day_f < p.start_day or day_f > end:
+    if day_f < p.start_day or (p.end_day is not None and day_f > p.end_day):
         return 0.0
     if p.kind == "step":
         return p.delta
     span = max(end - p.start_day, 1e-9)
-    return p.delta * (day_f - p.start_day) / span
+    return p.delta * min((day_f - p.start_day) / span, 1.0)  # ramp holds at full delta after `end`
 
 
 def generate(

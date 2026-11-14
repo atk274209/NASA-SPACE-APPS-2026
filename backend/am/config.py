@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     embed_model: str = "nomic-embed-text"
 
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    # Host header allow-list: blocks DNS-rebinding access to local health data.
+    allowed_hosts: list[str] = ["localhost", "127.0.0.1", "[::1]"]
     run_migrations_on_startup: bool = True
 
     @property

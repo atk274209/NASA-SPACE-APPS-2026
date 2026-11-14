@@ -26,6 +26,8 @@ used to classify health status.
   - the threshold version
   - the baseline profile it was compared against
   - the measurement IDs that support it (`alert_evidence`)
+- An unacknowledged alert reports its peak severity in the overview status, so a critical
+  episode stays visible until someone reviews it.
 - Alerts are never auto-resolved. A named person must acknowledge and resolve them, and a
   resolution note is mandatory. If severity rises after acknowledgement, the alert returns
   to `ACTIVE`.

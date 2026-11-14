@@ -44,7 +44,7 @@ def test_resting_115_against_70_baseline_escalates_with_persistence(ingest, astr
     last = feed_baseline(ingest, astronaut.id, start=START, n=36, every_min=5)
     baseline = ingest.baselines.active_profile(astronaut.id, "heart_rate", "rest")
 
-    gap = timedelta(hours=7)  # outside persistence lookback -> earlier noise cannot contribute
+    gap = _outside_persistence_window(ingest)  # earlier noise cannot contribute
     last = last + gap
     r1 = _ingest(ingest, astronaut.id, 115, last + timedelta(minutes=10))
     assert r1.assessment.instant_severity == Severity.CRITICAL
@@ -81,8 +81,8 @@ def test_single_moderate_deviation_does_not_alert(ingest, astronaut):
     last = feed_baseline(ingest, astronaut.id, start=START, n=36, every_min=5)
     p = ingest.baselines.active_profile(astronaut.id, "heart_rate", "rest")
     scale = ingest.baselines.scale_of(p)
-    # between WATCH and WARNING bands, 7 h after the feed so no earlier noise is in the window
-    r = _ingest(ingest, astronaut.id, round(p.median + 2.5 * scale, 1), last + timedelta(hours=7))
+    # between WATCH and WARNING bands, outside the persistence window so no earlier noise counts
+    r = _ingest(ingest, astronaut.id, round(p.median + 2.5 * scale, 1), last + _outside_persistence_window(ingest))
     assert r.assessment.instant_severity == Severity.WATCH
     assert r.assessment.severity == Severity.NORMAL
     assert r.alert_id is None
@@ -187,3 +187,8 @@ def test_unfreeze_requires_frozen_and_is_audited(ingest, astronaut, db):
 
 def ctx_min_samples(ingest) -> int:
     return ingest.baselines.policy.provisional.min_samples
+
+
+def _outside_persistence_window(ingest) -> timedelta:
+    hours = ingest.anomaly.thresholds.rule_for("heart_rate").persistence.max_age_hours
+    return timedelta(hours=hours + 1)

@@ -1,0 +1,71 @@
+@import '@fontsource/barlow-semi-condensed/400.css';
+@import '@fontsource/barlow-semi-condensed/500.css';
+@import '@fontsource/barlow-semi-condensed/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import 'tailwindcss';
+
+/* AM design tokens. Severity colours are reserved for severity; teal is the only accent. */
+@theme {
+  --font-sans: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-void: #08111f;      /* app background */
+  --color-hull: #0e1a2b;      /* panels */
+  --color-deck: #142338;      /* raised rows, inputs */
+  --color-seam: #1f3049;      /* hairlines */
+  --color-seam-strong: #2c4363;
+  --color-ink: #d3deec;       /* primary text */
+  --color-ink-dim: #8ea2bd;   /* secondary text */
+  --color-ink-faint: #5d7190; /* tertiary */
+  --color-signal: #3fc1c9;    /* accent */
+  --color-signal-dim: #1d5d66;
+
+  --color-sev-normal: #4fb286;
+  --color-sev-watch: #d9b44a;
+  --color-sev-warning: #e8863a;
+  --color-sev-critical: #ef4f5a;
+  --color-sim: #9d8cf0;       /* simulated-data marker */
+}
+
+html {
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+/* Diagonal hatch used to mark simulated data everywhere it appears. */
+.sim-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, var(--color-sim) 22%, transparent) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

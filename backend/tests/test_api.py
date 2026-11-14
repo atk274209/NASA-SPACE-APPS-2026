@@ -145,3 +145,22 @@ def test_baseline_rebuild_and_unfreeze_endpoints(client):
     })
     assert rb.status_code == 201, rb.text
     assert rb.json()["is_anchor"] is True and rb.json()["supersedes_id"] == rest["id"]
+
+
+def test_untrusted_host_header_is_rejected(client):
+    r = client.get("/api/v1/system/status", headers={"host": "attacker.example"})
+    assert r.status_code == 400
+
+
+def test_overview_and_thresholds(client):
+    run = _sim(client, "acute_rest_hr", "SIM-OV")
+    ov = client.get(f"/api/v1/astronauts/{run['astronaut']['id']}/overview").json()
+    assert ov["simulated"] is True
+    assert ov["status"] == "CRITICAL"
+    assert ov["mission_day"] >= 4
+    hr = next(x for x in ov["latest"] if x["metric_code"] == "heart_rate" and x["context"] == "rest")
+    assert hr["baseline"]["deviation_scale"] > 0
+    th = client.get("/api/v1/thresholds").json()
+    assert th["label"].startswith("DEMO")
+    assert next(r for r in th["rules"] if r["metric_code"] == "heart_rate")["bands"]["WARNING"] == 3.0
+    assert client.get("/api/v1/astronauts/999/overview").status_code == 404

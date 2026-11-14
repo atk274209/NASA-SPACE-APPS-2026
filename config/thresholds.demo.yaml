@@ -18,7 +18,7 @@ defaults:
     CRITICAL: 4.5
   persistence:
     lookback: 6              # last N assessed measurements (incl. current) in same metric/context
-    max_age_hours: 6         # ignore older measurements when counting persistence
+    max_age_hours: 12        # ignore older readings when counting persistence (bridges a sleep period)
     # A level is only granted when at least this many lookback readings deviate in
     # the same direction at >= WATCH band. Otherwise the result is capped one level
     # below. Single outliers (often artifacts) therefore cannot reach CRITICAL alone.
