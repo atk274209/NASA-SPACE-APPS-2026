@@ -6,6 +6,10 @@ Safety properties:
   * Every assistant message stores the tool calls and record refs it relied on.
   * A grounding check flags numbers in the answer that do not appear in the retrieved data.
   * If the model is unavailable, AM answers with a deterministic status summary instead.
+  * Every user message is scanned for symptoms. A match only becomes a pending proposal that
+    the astronaut confirms or dismisses; the model never records a symptom.
+  * Asking what to do about a mentioned symptom gets a fixed, rule-based answer (who can advise,
+    what AM records) and never reaches the model, which tends to answer with self-care advice.
 """
 
 from __future__ import annotations
@@ -25,10 +29,17 @@ from am.ai.tools import TOOLS, ToolEnv, run_tool
 from am.db.base import utcnow
 from am.db.models import Astronaut
 from am.db.models_ai import Conversation, Message
+from am.db.models_m5 import SymptomProposal
 from am.policy import BaselinePolicy, ThresholdConfig
+from am.settings_store import get_setting
+from am.symptoms import catalog as symptom_catalog
+from am.symptoms.detect import Detection, asks_for_advice, detect_keywords
+from am.symptoms.service import SymptomService, symptom_label
 
 MAX_TOOL_ROUNDS = 4
 HISTORY_MESSAGES = 12
+PROMPT_ACTIVE_SYMPTOMS = 10
+PROMPT_PENDING_PROPOSALS = 5
 
 SYSTEM_PROMPT = """You are AM, the onboard health companion of a long-duration space mission.
 You talk with one astronaut about their own health data.
@@ -58,7 +69,18 @@ Rules you must follow:
 8. If the data is marked simulated, mention that it is simulated data.
 9. Be concise and calm: short paragraphs or bullets, plain language, numbers with units.
    Answer the question asked; do not list every indicator unless asked.
-10. Reply in the same language the astronaut writes in."""
+10. Reply in the same language the astronaut writes in.
+11. Symptoms are reported and rated by the astronaut; they are not diagnoses.
+    - Do not say what might cause a symptom, and do not link it to a measurement, an alert or
+      another symptom (no "could be related to", "may be due to", "associated with"), unless the
+      astronaut explicitly asks why; then follow rule 6.
+    - Do not give self-care advice: nothing about drinking, eating, resting, sleeping,
+      exercising, remedies, medication or doses.
+    - A symptom AM only noticed in chat is NOT recorded. You may say that AM noticed it and ask
+      the astronaut to confirm or dismiss it in the companion; only a confirmed symptom is
+      recorded for the medical team and adds follow-up tasks to the daily missions.
+    - For a symptom rated severe or on the DEMO report-promptly list, recommend contacting the
+      crew medical officer or flight surgeon."""
 
 
 @dataclass
@@ -76,6 +98,7 @@ class TurnResult:
     trace: list[ToolTraceItem] = field(default_factory=list)
     ai_available: bool = True
     fallback_reason: str | None = None
+    proposals: list[SymptomProposal] = field(default_factory=list)  # new, pending, from this user message
 
 
 _NUM = re.compile(r"(?<![\w.])[-+−]?\d+(?:[.,]\d+)?")
@@ -112,13 +135,15 @@ def grounding_check(answer: str, sources: list[str]) -> list[float]:
 
 class CompanionService:
     def __init__(self, session: Session, llm: OllamaClient, model: str,
-                 thresholds: ThresholdConfig, policy: BaselinePolicy):
+                 thresholds: ThresholdConfig, policy: BaselinePolicy, *, embed_model: str | None = None):
         self.s = session
         self.llm = llm
         self.model = model
         self.thresholds = thresholds
         self.policy = policy
+        self.embed_model = embed_model  # None: knowledge search uses its offline keyword fallback
         self.memory = MemoryService(session)
+        self.symptoms = SymptomService(session)
 
     # -------------------------------------------------------------- conversations
     def create_conversation(self, astronaut_id: int) -> Conversation:
@@ -144,7 +169,27 @@ class CompanionService:
         if mem.short:
             lines += ["", "Today's notes from the astronaut (self-reported):"]
             lines += [f"- [{m.occurred_at:%H:%M}] {m.content}" for m in mem.short]
+        lines += self._symptom_lines(conv.astronaut_id)
         return "\n".join(x for x in lines if x is not None)
+
+    def _symptom_lines(self, astronaut_id: int) -> list[str]:
+        """Active symptom reports (facts the astronaut confirmed) and unconfirmed proposals, kept apart."""
+        lines: list[str] = []
+        active = self.symptoms.active(astronaut_id)
+        if active:
+            lines += ["", "Active symptoms reported by the astronaut (self-rated severity; not diagnoses):"]
+            for r in active[:PROMPT_ACTIVE_SYMPTOMS]:
+                sym = symptom_catalog.get(r.symptom_code)
+                flag = " [on the DEMO report-promptly list]" if sym and sym.report_promptly else ""
+                lines.append(f"- {symptom_label(r.symptom_code)}: {r.severity}, reported "
+                             f"{r.reported_at:%Y-%m-%d %H:%M} UTC (symptom report {r.id}){flag}")
+        pending = self.symptoms.proposals(astronaut_id, "pending")
+        if pending:
+            lines += ["", "Possible symptoms AM noticed in chat, NOT confirmed (the astronaut can confirm or "
+                          "dismiss them in the companion):"]
+            lines += [f'- {symptom_label(p.symptom_code)}, from: "{p.quote[:160]}"'
+                      for p in pending[:PROMPT_PENDING_PROPOSALS]]
+        return lines
 
     def _history(self, conv: Conversation, exclude_id: int) -> list[dict[str, Any]]:
         rows = self.s.scalars(select(Message).where(
@@ -165,7 +210,19 @@ class CompanionService:
         if conv.title == "New conversation":
             conv.title = (content[:60] + "…") if len(content) > 60 else content
 
-        env = ToolEnv(self.s, conv.astronaut_id, self.thresholds, self.policy)
+        # Deterministic, model-independent: proposals exist even when the model is offline.
+        proposals = self.symptoms.detect_keywords(conv.astronaut_id, user_msg)
+        mentioned = detect_keywords(user_msg.content) if asks_for_advice(user_msg.content) else []
+        if mentioned:  # "what should I do about <symptom>?" never reaches the model
+            t0 = time.perf_counter()
+            text, advice_refs = self._advice_reply(conv.astronaut_id, mentioned)
+            assistant = Message(conversation_id=conv.id, role="assistant", content=text, refs=advice_refs,
+                                generated_by="deterministic", latency_ms=int((time.perf_counter() - t0) * 1000))
+            self.s.add(assistant)
+            self.s.flush()
+            return TurnResult(user_msg, assistant, [], True, None, proposals)
+        env = ToolEnv(self.s, conv.astronaut_id, self.thresholds, self.policy,
+                      llm=self.llm, embed_model=self.embed_model)
         system = self._system_block(conv)
         messages: list[dict[str, Any]] = [{"role": "system", "content": system},
                                           *self._history(conv, user_msg.id),
@@ -207,16 +264,60 @@ class CompanionService:
                                 latency_ms=int((time.perf_counter() - t0) * 1000))
             self.s.add(assistant)
             self.s.flush()
-            return TurnResult(user_msg, assistant, trace, True, None)
+            proposals += self._llm_proposals(conv.astronaut_id, user_msg)
+            return TurnResult(user_msg, assistant, trace, True, None, proposals)
         except LLMUnavailable as exc:
-            text, fb_refs = self._fallback(env, exc.reason)
+            text, fb_refs = self._fallback(env, exc.reason, proposals)
             assistant = Message(conversation_id=conv.id, role="assistant", content=text, refs=fb_refs,
                                 generated_by="deterministic", latency_ms=int((time.perf_counter() - t0) * 1000))
             self.s.add(assistant)
             self.s.flush()
-            return TurnResult(user_msg, assistant, trace, False, exc.reason)
+            return TurnResult(user_msg, assistant, trace, False, exc.reason, proposals)
 
-    def _fallback(self, env: ToolEnv, reason: str) -> tuple[str, list[dict[str, Any]]]:
+    def _advice_reply(self, astronaut_id: int, mentioned: list[Detection]) -> tuple[str, list[dict[str, Any]]]:
+        """Fixed answer when the astronaut asks what to do about a symptom they mention.
+
+        A 7B model slips into self-care advice when asked directly, whatever the prompt says, so
+        AM states what it can do (record, follow-up missions) and who can advise. The wording comes
+        from the catalog's DEMO procedures; nothing here suggests treatment.
+        """
+        active = {r.symptom_code: r for r in reversed(self.symptoms.active(astronaut_id))}  # newest wins
+        lines = ["AM does not give treatment or self-care advice, and it does not guess what causes a symptom.", ""]
+        refs: list[dict[str, Any]] = []
+        for d in mentioned:
+            sym = symptom_catalog.get(d.code)
+            label = sym.label if sym else d.code
+            r = active.get(d.code)
+            if r is not None:
+                refs.append({"type": "symptom_report", "id": r.id})
+                lines.append(f"- {label} is recorded (self-rated {r.severity}); its follow-up tasks are in your "
+                             "daily missions.")
+            else:
+                lines.append(f"- {label}: confirm or dismiss it in the companion. Once confirmed it is recorded for "
+                             "the medical team and adds follow-up tasks to your daily missions.")
+            if sym is not None and sym.report_promptly:
+                lines.append(f"- {label} is on the DEMO report-promptly list: contact the crew medical officer or "
+                             "flight surgeon now, using the mission's medical contact procedure.")
+            elif r is not None and r.severity == "severe":
+                lines.append(f"- You rated {label.lower()} severe: contact the crew medical officer or flight "
+                             "surgeon now, using the mission's medical contact procedure.")
+        lines.append("- For advice, talk to the crew medical officer or flight surgeon at your next private medical "
+                     "conference, or sooner if it gets worse.")
+        refs.append({"type": "safety_rule", "rule": "no_treatment_advice"})
+        return "\n".join(lines), refs
+
+    def _llm_proposals(self, astronaut_id: int, message: Message) -> list[SymptomProposal]:
+        """Optional second detector for symptoms phrased in ways the keyword stems miss.
+
+        It runs only when the setting is on and only after the model has just answered, so an
+        unavailable model never delays the turn; any failure simply yields no extra proposals.
+        """
+        if get_setting(self.s, "symptom_llm_detection") is not True:
+            return []
+        return self.symptoms.detect_llm(astronaut_id, message, self.llm, self.model)
+
+    def _fallback(self, env: ToolEnv, reason: str,
+                  proposals: list[SymptomProposal] | None = None) -> tuple[str, list[dict[str, Any]]]:
         """Deterministic status summary used when the language model is unavailable."""
         data, refs = run_tool(env, "get_health_overview", {})
         why = {"service_unreachable": "the local language model service is not running",
@@ -236,7 +337,15 @@ class CompanionService:
         for r in flagged:
             lines.append(f"- Latest {r['metric'].replace('_', ' ')} ({r['context']}): {r['value']} {r['unit']}, "
                          f"{r['severity']} (robust z {r['robust_z']}).")
+        for s in self.symptoms.active(env.astronaut_id)[:PROMPT_ACTIVE_SYMPTOMS]:
+            lines.append(f"- Active symptom: {symptom_label(s.symptom_code)}, self-rated {s.severity}, "
+                         f"reported {s.reported_at:%Y-%m-%d %H:%M} UTC.")
+            refs.append({"type": "symptom_report", "id": s.id})
         lines.append(f"Thresholds: {data.get('threshold_label')}.")
+        if proposals:
+            names = ", ".join(symptom_label(p.symptom_code).lower() for p in proposals)
+            lines += ["", f"AM noticed a possible symptom in your message: {names}. Nothing is recorded until you "
+                          "confirm it in the companion."]
         return "\n".join(lines), _dedupe(refs)
 
 

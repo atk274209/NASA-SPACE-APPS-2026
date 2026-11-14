@@ -4,11 +4,17 @@ Tasks are monitoring, logging and protocol-adherence prompts. AM never prescribe
 medication, changes treatment, or sets exercise/nutrition targets: those come from the
 mission's approved protocols, referenced here by placeholder IDs marked DEMO until real
 protocols are configured.
+
+Personalised missions: each active symptom report adds that symptom's catalog task templates
+(logging, protocol adherence, telling the crew medical officer) for today. A template code
+that is already planned is reused and the symptom is appended to its reason, so a symptom
+never duplicates a task.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 from sqlalchemy import select
@@ -18,9 +24,12 @@ from am.db.base import utcnow
 from am.db.enums import AlertStatus, DataQuality, Severity
 from am.db.models import Alert, Astronaut, Measurement
 from am.db.models_ai import SelfReport
+from am.db.models_m5 import SymptomReport
 from am.db.models_research import DailyTask
 from am.research.reference import REFERENCE_DAYS, reference_for
-from am.research.series import DailySeries, build_daily_series, current_mission_day, day_bounds, mission_start
+from am.research.series import DailySeries, build_daily_series, current_mission_day, day_bounds, day_of, \
+    mission_start
+from am.symptoms import catalog as symptom_catalog
 
 PROTOCOL_LABEL = "DEMO protocol placeholder: replace with the mission's approved protocol"
 
@@ -61,6 +70,32 @@ T = {t.code: t for t in [
              "Add a short note about your day in the check-in.", "AM-DEMO-BH-03", "manual"),
 ]}
 
+# Categories for the symptom-specific catalog templates. Generic codes (hydration_log,
+# exercise_session, ...) keep the category of their mission template above.
+SYMPTOM_TASK_CATEGORY = {
+    "bowel_log": "monitoring",
+    "meal_log": "nutrition",
+    "symptom_daily_log": "monitoring",
+    "temperature_check": "monitoring",
+    "symptom_followup_cmo": "medical",
+    "symptom_contact_now": "medical",
+    "crew_conflict_note": "mental",
+}
+CONTACT_NOW = "symptom_contact_now"
+# Every task template the catalog defines, by code (the first symptom that defines a code wins).
+_CATALOG_TASKS: dict[str, symptom_catalog.TaskTemplate] = {}
+for _s in symptom_catalog.SYMPTOMS:
+    for _t in _s.tasks:
+        _CATALOG_TASKS.setdefault(_t.code, _t)
+
+
+def _from_catalog(t: symptom_catalog.TaskTemplate) -> Template:
+    """Reuse the generic mission template when the code exists; otherwise build it from the catalog."""
+    if t.code in T:
+        return T[t.code]
+    return Template(t.code, SYMPTOM_TASK_CATEGORY.get(t.code, "monitoring"), t.title, t.detail, t.protocol_ref,
+                    t.completion_rule)
+
 
 @dataclass
 class Plan:
@@ -68,6 +103,7 @@ class Plan:
     priority: int
     reason: str
     refs: list[dict[str, Any]]
+    template: Template | None = field(default=None)  # None: the generic template T[code]
 
 
 def _recent_label(s: DailySeries | None, upto: int, label: str, need: int = 2, window: int = 3) -> list[int]:
@@ -79,6 +115,17 @@ def _recent_label(s: DailySeries | None, upto: int, label: str, need: int = 2, w
     days = [d for d in range(max(REFERENCE_DAYS + 1, upto - window + 1), upto + 1) if d in s.values]
     hits = [d for d in days if ref.label(s.values[d]) == label]
     return hits if len(hits) >= need else []
+
+
+def _symptom_reason(sym: symptom_catalog.Symptom, r: SymptomReport, start: date | None) -> str:
+    """Names the symptom, the astronaut's own severity rating and the day it was reported."""
+    when = f"{r.reported_at:%Y-%m-%d}"
+    if start is not None and day_of(start, r.reported_at) >= 1:
+        when = f"mission day {day_of(start, r.reported_at)} ({when})"
+    reason = f"Symptom: {sym.label.lower()}, self-rated {r.severity}, reported on {when}."
+    if sym.report_promptly:
+        reason += " It is on the DEMO report-promptly list."
+    return reason
 
 
 class MissionService:
@@ -144,7 +191,43 @@ class MissionService:
             plans.append(Plan("behavioral_support", 1, f"High stress self-reported on days {high_stress}.",
                               [{"type": "daily_series", "key": "selfreport:stress", "days": high_stress}]))
         plans.append(Plan("daily_reflection", 3, "Daily routine.", []))
-        return sorted(plans, key=lambda p: p.priority)
+
+        by_code = {p.code: p for p in plans}
+        for p in self._symptom_plans(astronaut_id):
+            cur = by_code.get(p.code)
+            if cur is None:
+                by_code[p.code] = p
+            else:  # reuse the planned task: keep the higher priority and add the symptom to the reason
+                cur.priority = min(cur.priority, p.priority)
+                cur.reason = f"{cur.reason} {p.reason}"
+                cur.refs = [*cur.refs, *p.refs]
+        return sorted(by_code.values(), key=lambda p: p.priority)
+
+    def _symptom_plans(self, astronaut_id: int) -> list[Plan]:
+        """Monitoring and reporting prompts for each active symptom report; never treatment.
+
+        Priority follows the astronaut's own rating: 1 for moderate or severe, 2 for mild. A
+        severe symptom, or one on the DEMO report-promptly list, always adds the contact-now
+        task at priority 1.
+        """
+        start = mission_start(self.s, astronaut_id)
+        reports = self.s.scalars(select(SymptomReport).where(
+            SymptomReport.astronaut_id == astronaut_id, SymptomReport.status == "active")
+            .order_by(SymptomReport.reported_at, SymptomReport.id)).all()
+        out: list[Plan] = []
+        for r in reports:
+            sym = symptom_catalog.get(r.symptom_code)
+            if sym is None:
+                continue
+            reason = _symptom_reason(sym, r, start)
+            priority = 1 if r.severity in ("moderate", "severe") else 2
+            templates = list(sym.tasks)
+            if (sym.report_promptly or r.severity == "severe") and all(t.code != CONTACT_NOW for t in templates):
+                templates.append(_CATALOG_TASKS[CONTACT_NOW])
+            for t in templates:
+                out.append(Plan(t.code, 1 if t.code == CONTACT_NOW else priority, reason,
+                                [{"type": "symptom_report", "id": r.id}], _from_catalog(t)))
+        return out
 
     def ensure_today(self, astronaut_id: int) -> list[DailyTask]:
         if self.s.get(Astronaut, astronaut_id) is None:
@@ -154,8 +237,9 @@ class MissionService:
             raise ValueError("astronaut has no mission; mission days are undefined")
         existing = {t.template_code: t for t in self.s.scalars(select(DailyTask).where(
             DailyTask.astronaut_id == astronaut_id, DailyTask.mission_day == today))}
-        for p in self.plan(astronaut_id):
-            tpl = T[p.code]
+        plans = self.plan(astronaut_id)
+        for p in plans:
+            tpl = p.template or T[p.code]
             task = existing.get(p.code)
             if task is None:
                 task = DailyTask(astronaut_id=astronaut_id, mission_day=today, template_code=tpl.code,
@@ -166,9 +250,23 @@ class MissionService:
                 existing[p.code] = task
             elif task.status == "pending":  # adapt priority/reason as new data arrives
                 task.priority, task.reason, task.reason_refs = p.priority, p.reason, p.refs
+        self._drop_resolved_symptom_tasks(existing, {p.code for p in plans})
         self.s.flush()
         self.sync_completion(astronaut_id, today)
         return sorted(existing.values(), key=lambda t: (t.status == "done", t.priority, t.id))
+
+    def _drop_resolved_symptom_tasks(self, existing: dict[str, DailyTask], planned: set[str]) -> None:
+        """Remove open tasks that existed only for symptoms that are no longer active.
+
+        Without this, a resolved symptom would leave its prompts (even "contact the crew medical
+        officer now") open for the rest of the day. Completed or skipped tasks stay as history.
+        """
+        for code, task in list(existing.items()):
+            refs = task.reason_refs or []
+            if (code not in planned and task.status == "pending" and refs
+                    and all(r.get("type") == "symptom_report" for r in refs)):
+                self.s.delete(task)
+                del existing[code]
 
     def sync_completion(self, astronaut_id: int, day: int) -> None:
         """Mark data-verifiable tasks done when the stored data shows they happened."""

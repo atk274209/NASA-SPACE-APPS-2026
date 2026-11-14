@@ -14,7 +14,9 @@ from am.ai.checkin import CHECKIN_ITEMS, submit_checkin, suggestions
 from am.ai.companion import CompanionService
 from am.ai.memory import MemoryService
 from am.api.deps import AppContext, get_ctx, get_db
+from am.api.v1.symptoms import ProposalOut, proposal_out
 from am.db.models_ai import Conversation, Message, SelfReport
+from am.settings_store import effective_chat_model, effective_embed_model
 
 router = APIRouter(tags=["companion"])
 DB = Annotated[Session, Depends(get_db)]
@@ -75,6 +77,7 @@ class TurnOut(BaseModel):
     trace: list[TraceOut]
     ai_available: bool
     fallback_reason: str | None
+    proposals: list[ProposalOut] = []  # symptoms AM noticed in this user message, pending confirmation
 
 
 class SuggestionOut(BaseModel):
@@ -119,12 +122,13 @@ class SelfReportOut(ORM):
 
 
 def _companion(db: Session, ctx: AppContext) -> CompanionService:
-    return CompanionService(db, ctx.llm, ctx.settings.chat_model, ctx.thresholds, ctx.policy)
+    return CompanionService(db, ctx.llm, effective_chat_model(db, ctx.settings), ctx.thresholds, ctx.policy,
+                            embed_model=effective_embed_model(db, ctx.settings))
 
 
 @router.get("/ai/status", response_model=AIStatusOut)
-def ai_status(ctx: CTX):
-    return AIStatusOut(**ctx.llm.status(ctx.settings.chat_model))
+def ai_status(db: DB, ctx: CTX):
+    return AIStatusOut(**ctx.llm.status(effective_chat_model(db, ctx.settings)))
 
 
 @router.get("/companion/conversations", response_model=list[ConversationOut])
@@ -167,6 +171,7 @@ def send_message(conversation_id: int, body: SendIn, db: DB, ctx: CTX):
         trace=[TraceOut(**t.__dict__) for t in r.trace],
         ai_available=r.ai_available,
         fallback_reason=r.fallback_reason,
+        proposals=[proposal_out(p, conversation_id) for p in r.proposals],
     )
 
 

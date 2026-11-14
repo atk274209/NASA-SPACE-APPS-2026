@@ -15,15 +15,22 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from am.ai.ollama import OllamaClient
 from am.baseline.service import BaselineService
 from am.db.base import utcnow
 from am.db.enums import AlertStatus, DataQuality
 from am.db.models import Alert, Astronaut, Measurement, MetricDefinition, Mission
 from am.db.models_ai import SelfReport
+from am.db.models_m5 import SymptomReport
 from am.policy import BaselinePolicy, ThresholdConfig
+from am.rag.knowledge import search as knowledge_search
+from am.symptoms import catalog as symptom_catalog
 
 Ref = dict[str, Any]
 ToolResult = tuple[dict[str, Any], list[Ref]]
+
+KNOWLEDGE_HITS = 4
+KNOWLEDGE_TEXT_CHARS = 700  # keeps the excerpts within the model's context window
 
 
 @dataclass
@@ -32,6 +39,9 @@ class ToolEnv:
     astronaut_id: int
     thresholds: ThresholdConfig
     policy: BaselinePolicy
+    # Knowledge search uses embeddings when both are set; otherwise its offline keyword fallback.
+    llm: OllamaClient | None = None
+    embed_model: str | None = None
 
 
 @dataclass
@@ -297,6 +307,57 @@ def self_reports(env: ToolEnv, args: dict[str, Any]) -> ToolResult:
     return data, [{"type": "self_report", "id": r.id} for r in rows[-40:]]
 
 
+def symptom_reports(env: ToolEnv, args: dict[str, Any]) -> ToolResult:
+    status = str(args.get("status") or "active")
+    if status not in ("active", "all"):
+        return {"error": "status must be 'active' (default) or 'all'"}, []
+    stmt = select(SymptomReport).where(SymptomReport.astronaut_id == env.astronaut_id)
+    if status == "active":
+        stmt = stmt.where(SymptomReport.status == "active")
+    rows = env.session.scalars(stmt.order_by(SymptomReport.reported_at.desc()).limit(30)).all()
+    items = []
+    for r in rows:
+        sym = symptom_catalog.get(r.symptom_code)
+        items.append({
+            "report_id": r.id, "symptom": sym.label if sym else r.symptom_code, "code": r.symptom_code,
+            "self_rated_severity": r.severity, "status": r.status, "reported_at": _ts(r.reported_at),
+            "onset_at": _ts(r.onset_at) if r.onset_at else None,
+            "resolved_at": _ts(r.resolved_at) if r.resolved_at else None,
+            "source": r.source, "note": r.note or None,
+            "on_demo_report_promptly_list": bool(sym and sym.report_promptly),
+        })
+    data = {"status_filter": status,
+            "note": "Symptoms the astronaut reported, with their own severity rating. They are not diagnoses.",
+            "report_promptly_list": symptom_catalog.REPORT_PROMPTLY_LABEL,
+            "symptoms": items}
+    return data, [{"type": "symptom_report", "id": r.id} for r in rows]
+
+
+def search_knowledge(env: ToolEnv, args: dict[str, Any]) -> ToolResult:
+    query = str(args.get("query") or "").strip()
+    if not query:
+        return {"error": "query is required: a few keywords, for example 'bone loss resistive exercise'"}, []
+    use_embeddings = env.llm is not None and bool(env.embed_model)
+    hits = knowledge_search(env.session, query[:300], llm=env.llm if use_embeddings else None,
+                            embed_model=env.embed_model or "", k=KNOWLEDGE_HITS)
+    results, refs = [], []
+    for h in hits:
+        doc = h.chunk.document
+        url = h.chunk.source_url or doc.url
+        results.append({"chunk_id": h.chunk.id, "title": doc.title, "organization": doc.organization,
+                        "published_date": doc.published_date, "url": url, "kind": h.chunk.kind,
+                        "text": h.chunk.text[:KNOWLEDGE_TEXT_CHARS]})
+        refs.append({"type": "knowledge", "id": h.chunk.id, "doc_slug": doc.slug, "title": doc.title, "url": url})
+    data = {"query": query,
+            "note": ("Excerpts from AM's curated public sources about spaceflight health in general, not about "
+                     "this astronaut. kind 'passage' is a verbatim quote; 'finding' and 'limitation' are AM's own "
+                     "summaries. Name the source title when you use one."),
+            "results": results}
+    if not results:
+        data["note"] = "No matching excerpts in the knowledge base (it may not be loaded yet)."
+    return data, refs
+
+
 _STREAM = {
     "type": "object",
     "properties": {
@@ -334,6 +395,15 @@ TOOLS: list[Tool] = [
          "quality, motivation). Measured sleep duration and exercise duration are NOT here; use "
          "get_recent_measurements with context 'daily' for those.", {"type": "object", "properties": {
              "days": {"type": "integer", "description": "how many days back (default 7)"}}}, self_reports),
+    Tool("get_symptom_reports", "Symptoms the astronaut reported themselves, with their own severity rating "
+         "(mild, moderate, severe). These are not diagnoses. Active symptoms only unless status is 'all'.",
+         {"type": "object", "properties": {"status": {"type": "string", "enum": ["active", "all"]}}},
+         symptom_reports),
+    Tool("search_knowledge", "Search AM's curated knowledge base of public spaceflight-health sources (mostly NASA "
+         "Human Research Program pages). Returns short excerpts with source titles. Use it for general background "
+         "questions; it says nothing about this astronaut's own data.",
+         {"type": "object", "properties": {"query": {"type": "string", "description": "a few keywords"}},
+          "required": ["query"]}, search_knowledge),
 ]
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}
 

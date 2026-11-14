@@ -1,14 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, type ChatMessage, type CheckinItem } from '../api/client'
+import {
+  SEVERITIES,
+  SOURCE_LABEL,
+  symptomsApi,
+  type SymptomProposal,
+  type SymptomSeverity,
+} from '../api/symptoms'
 import { Button, Empty, ErrorNote, inputCls, Loading, Section, SimulatedMark } from '../components/ui'
-import { fmtAgo, fmtDateTime, fmtTime } from '../lib/format'
+import { fmtAgo, fmtDateTime, fmtTime, titleCase } from '../lib/format'
 import { useSession } from '../state/session'
 import { NoCrew } from './Overview'
 
-type Ref = { type: string; id?: number; unverified_numbers?: number[] }
+type Ref = { type: string; id?: number; unverified_numbers?: number[]; doc_slug?: string; title?: string; url?: string }
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 
 function Sources({ msg }: { msg: ChatMessage }) {
   const refs = msg.refs as Ref[]
@@ -16,16 +25,21 @@ function Sources({ msg }: { msg: ChatMessage }) {
   const alertIds = refs.filter((r) => r.type === 'alert').map((r) => r.id!)
   const grounding = refs.find((r) => r.type === 'grounding_check')
   const tools = (msg.tool_calls as { name: string; ok: boolean }[]) ?? []
+  const docs = [...new Map(refs.filter((r) => r.type === 'knowledge' && r.url).map((r) => [r.doc_slug, r])).values()]
+  const ruleAnswer = refs.some((r) => r.type === 'safety_rule')
   const parts = [
     count('measurement') && `${count('measurement')} measurements`,
     count('baseline') && `${count('baseline')} baselines`,
     count('self_report') && `${count('self_report')} check-in ratings`,
+    count('symptom_report') && plural(count('symptom_report'), 'symptom report'),
   ].filter(Boolean)
   return (
     <div className="mt-2 space-y-1 text-xs text-ink-dim">
-      {msg.generated_by === 'deterministic' && (
+      {msg.generated_by === 'deterministic' && (ruleAnswer ? (
+        <p>Fixed answer from AM&apos;s rules: questions about treating a symptom are not sent to the language model.</p>
+      ) : (
         <p className="text-sev-watch">Written by AM&apos;s rule-based summary because the language model is unavailable.</p>
-      )}
+      ))}
       {tools.length > 0 && (
         <p>Checked: {tools.map((t) => t.name.replace('get_', '').replaceAll('_', ' ')).join(', ')}</p>
       )}
@@ -43,6 +57,18 @@ function Sources({ msg }: { msg: ChatMessage }) {
               ))}
             </>
           )}
+        </p>
+      )}
+      {docs.length > 0 && (
+        <p>
+          Background from{' '}
+          {docs.map((d, i) => (
+            <span key={d.doc_slug}>
+              {i > 0 && '; '}
+              <a href={d.url} target="_blank" rel="noreferrer" className="text-signal hover:underline">{d.title}</a>
+            </span>
+          ))}
+          . General research, not your own data.
         </p>
       )}
       {grounding?.unverified_numbers?.length ? (
@@ -81,21 +107,326 @@ function Bubble({ msg }: { msg: ChatMessage }) {
   )
 }
 
+// ------------------------------------------------------------------ symptoms
+function useSymptomCatalog() {
+  return useQuery({ queryKey: ['symptom-catalog'], queryFn: symptomsApi.catalog, staleTime: Infinity })
+}
+
+/** Everything a symptom decision can change: reports, proposals, memory notes and today's missions. */
+function useSymptomRefresh(astronautId: number) {
+  const qc = useQueryClient()
+  return () => {
+    for (const key of ['symptoms', 'proposals', 'memory', 'today']) qc.invalidateQueries({ queryKey: [key, astronautId] })
+  }
+}
+
+function PromptlyTag() {
+  const catalog = useSymptomCatalog()
+  return (
+    <span title={catalog.data?.report_promptly_label} className="text-xs text-sev-warning">
+      Report promptly (DEMO list)
+    </span>
+  )
+}
+
+function SeverityPicker({ name, value, onChange }: {
+  name: string
+  value: SymptomSeverity | null
+  onChange: (s: SymptomSeverity) => void
+}) {
+  return (
+    <fieldset className="flex flex-wrap items-center gap-1.5">
+      <legend className="mb-1 text-xs text-ink-dim">How strong is it? Your own rating</legend>
+      {SEVERITIES.map((s) => (
+        <label key={s} className="cursor-pointer">
+          <input type="radio" name={name} value={s} checked={value === s} onChange={() => onChange(s)} className="peer sr-only" />
+          <span className="inline-block rounded-md border border-seam-strong px-2.5 py-1 text-sm text-ink-dim peer-checked:border-signal peer-checked:bg-signal/15 peer-checked:text-ink peer-focus-visible:outline-2 peer-focus-visible:outline-signal">
+            {titleCase(s)}
+          </span>
+        </label>
+      ))}
+    </fieldset>
+  )
+}
+
+function ProposalActions({ p, astronautId }: { p: SymptomProposal; astronautId: number }) {
+  const refresh = useSymptomRefresh(astronautId)
+  const [severity, setSeverity] = useState<SymptomSeverity | null>(null)
+  const confirm = useMutation({ mutationFn: (s: SymptomSeverity) => symptomsApi.confirm(p.id, s), onSuccess: refresh })
+  const dismiss = useMutation({ mutationFn: () => symptomsApi.dismiss(p.id), onSuccess: refresh })
+  const busy = confirm.isPending || dismiss.isPending
+  const error = confirm.error ?? dismiss.error
+  return (
+    <div className="flex flex-col gap-2 text-sm">
+      <p className="flex flex-wrap items-baseline gap-x-2">
+        <span className="font-medium text-ink">{p.label}</span>
+        {p.report_promptly && <PromptlyTag />}
+      </p>
+      <blockquote className="border-l-2 border-seam-strong pl-2.5 text-ink-dim">“{p.quote}”</blockquote>
+      <SeverityPicker name={`proposal-${p.id}`} value={severity} onChange={setSeverity} />
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => severity && confirm.mutate(severity)} disabled={!severity || busy}>Confirm symptom</Button>
+        <Button variant="quiet" onClick={() => dismiss.mutate()} disabled={busy}>Dismiss</Button>
+      </div>
+      {error && <ErrorNote error={error} />}
+    </div>
+  )
+}
+
+/** Shown under the user's own message: what AM noticed in it, and what was decided. */
+function NoticedInline({ proposals, astronautId }: { proposals: SymptomProposal[]; astronautId: number }) {
+  const pending = proposals.filter((p) => p.status === 'pending')
+  const decided = proposals.filter((p) => p.status !== 'pending')
+  return (
+    <li className="flex justify-end">
+      <div className="flex w-full max-w-[min(68ch,85%)] flex-col gap-3">
+        {pending.length > 0 && (
+          <div className="flex flex-col gap-4 rounded-md border border-sev-watch/40 px-3.5 py-3">
+            <p className="text-xs text-sev-watch">
+              AM noticed a possible symptom in this message. Nothing is recorded until you confirm it.
+            </p>
+            {pending.map((p) => <ProposalActions key={p.id} p={p} astronautId={astronautId} />)}
+          </div>
+        )}
+        {decided.map((p) => (
+          <p key={p.id} className="text-right text-xs text-ink-faint">
+            {p.label}: {p.status === 'confirmed' ? 'confirmed and recorded' : 'dismissed'}
+          </p>
+        ))}
+      </div>
+    </li>
+  )
+}
+
+function NoticedPanel({ astronautId, onOpenConversation }: { astronautId: number; onOpenConversation: (id: number) => void }) {
+  const q = useQuery({ queryKey: ['proposals', astronautId], queryFn: () => symptomsApi.proposals(astronautId, 'all') })
+  const pending = (q.data ?? []).filter((p) => p.status === 'pending')
+  return (
+    <Section title="Possible symptoms noticed" aside={pending.length ? pending.length : undefined}>
+      {q.isLoading ? <Loading /> : q.error ? <ErrorNote error={q.error} /> : pending.length === 0 ? (
+        <p className="text-sm text-ink-faint">
+          Nothing waiting. If you mention a symptom in chat, AM asks you here before anything is recorded.
+        </p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-seam/60">
+          {pending.map((p) => (
+            <li key={p.id} className="py-3 first:pt-0">
+              <ProposalActions p={p} astronautId={astronautId} />
+              <p className="mt-1.5 text-xs text-ink-faint">
+                {p.detector === 'llm' ? 'Noticed by the local model' : 'Noticed from keywords'}, {fmtAgo(p.created_at)}
+                {p.conversation_id != null && (
+                  <>
+                    {', '}
+                    <button className="text-signal hover:underline" onClick={() => onOpenConversation(p.conversation_id!)}>
+                      show in conversation
+                    </button>
+                  </>
+                )}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
+  )
+}
+
+function ResolveControl({ id, label, astronautId }: { id: number; label: string; astronautId: number }) {
+  const refresh = useSymptomRefresh(astronautId)
+  const [open, setOpen] = useState(false)
+  const [note, setNote] = useState('')
+  const resolve = useMutation({ mutationFn: () => symptomsApi.resolve(id, note), onSuccess: refresh })
+  if (!open) {
+    return <Button variant="quiet" onClick={() => setOpen(true)}>Resolve</Button>
+  }
+  return (
+    <form className="mt-2 flex flex-col gap-2" onSubmit={(e) => { e.preventDefault(); resolve.mutate() }}>
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="text-ink-dim">Note for the medical team (optional)</span>
+        <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} className={inputCls} />
+      </label>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={resolve.isPending}>Mark {label.toLowerCase()} resolved</Button>
+        <Button type="button" variant="quiet" onClick={() => setOpen(false)}>Cancel</Button>
+      </div>
+      {resolve.error && <ErrorNote error={resolve.error} />}
+    </form>
+  )
+}
+
+function ActiveSymptomsPanel({ astronautId }: { astronautId: number }) {
+  const q = useQuery({ queryKey: ['symptoms', astronautId], queryFn: () => symptomsApi.reports(astronautId) })
+  const active = (q.data ?? []).filter((r) => r.status === 'active')
+  return (
+    <Section title="Active symptoms" aside={active.length ? active.length : undefined}>
+      {q.isLoading ? <Loading /> : q.error ? <ErrorNote error={q.error} /> : active.length === 0 ? (
+        <p className="text-sm text-ink-faint">No active symptoms.</p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-seam/60 text-sm">
+          {active.map((r) => (
+            <li key={r.id} className="py-2.5 first:pt-0">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <p className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-medium text-ink">{r.label}</span>
+                  <span className="text-ink-dim">{r.severity}</span>
+                  {r.report_promptly && <PromptlyTag />}
+                </p>
+                <ResolveControl id={r.id} label={r.label} astronautId={astronautId} />
+              </div>
+              <p className="text-xs text-ink-faint">
+                {titleCase(SOURCE_LABEL[r.source] ?? r.source)}, {fmtDateTime(r.reported_at)}
+                {r.onset_at && `, started ${fmtDateTime(r.onset_at)}`}
+              </p>
+              {r.note && <p className="mt-0.5 text-ink-dim">{r.note}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {active.length > 0 && (
+        <p className="mt-2 text-xs text-ink-faint">
+          Each active symptom adds follow-up prompts to your <Link to="/missions" className="text-signal hover:underline">daily missions</Link>.
+        </p>
+      )}
+    </Section>
+  )
+}
+
+/** Local datetime-local value for "now", used as the latest selectable onset time. */
+function localNow(): string {
+  const d = new Date()
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16)
+}
+
+function ReportSymptomPanel({ astronautId }: { astronautId: number }) {
+  const refresh = useSymptomRefresh(astronautId)
+  const catalog = useSymptomCatalog()
+  const reports = useQuery({ queryKey: ['symptoms', astronautId], queryFn: () => symptomsApi.reports(astronautId) })
+  const listId = useId()
+  const [search, setSearch] = useState('')
+  const [code, setCode] = useState<string | null>(null)
+  const [severity, setSeverity] = useState<SymptomSeverity | null>(null)
+  const [onset, setOnset] = useState('')
+  const [note, setNote] = useState('')
+  const submit = useMutation({
+    mutationFn: () => symptomsApi.report({
+      astronaut_id: astronautId,
+      symptom_code: code!,
+      severity: severity!,
+      note,
+      onset_at: onset ? new Date(onset).toISOString() : null,
+    }),
+    onSuccess: () => {
+      setCode(null)
+      setSeverity(null)
+      setOnset('')
+      setNote('')
+      setSearch('')
+      refresh()
+    },
+  })
+
+  const activeCodes = new Set((reports.data ?? []).filter((r) => r.status === 'active').map((r) => r.symptom_code))
+  const term = search.trim().toLowerCase()
+  const matches = (catalog.data?.symptoms ?? []).filter(
+    (s) => !term || s.label.toLowerCase().includes(term) || s.body_system_label.toLowerCase().includes(term),
+  )
+  const selected = catalog.data?.symptoms.find((s) => s.code === code)
+
+  return (
+    <Section title="Report a symptom">
+      {catalog.isLoading ? <Loading /> : catalog.error ? <ErrorNote error={catalog.error} /> : (
+        <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); if (code && severity) submit.mutate() }}>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-dim">Search symptoms</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-controls={listId}
+              placeholder="For example: headache, sleep, digestion"
+              className={inputCls}
+            />
+          </label>
+          <fieldset id={listId} className="max-h-52 overflow-y-auto rounded-md border border-seam">
+            <legend className="sr-only">Symptom</legend>
+            {matches.length === 0 && <p className="px-3 py-2 text-sm text-ink-faint">No symptom matches “{search}”.</p>}
+            {matches.map((s) => (
+              <label
+                key={s.code}
+                className={`flex cursor-pointer items-baseline gap-2 px-3 py-1.5 text-sm ${s.code === code ? 'bg-signal/15 text-ink' : 'text-ink-dim hover:bg-deck/60'}`}
+              >
+                <input type="radio" name="symptom" value={s.code} checked={s.code === code} onChange={() => setCode(s.code)} className="accent-[var(--color-signal)]" />
+                <span className="text-ink">{s.label}</span>
+                <span className="ml-auto shrink-0 text-xs text-ink-faint">
+                  {activeCodes.has(s.code) ? 'active' : s.body_system_label}
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          {selected?.report_promptly && (
+            <p className="text-sm text-sev-warning">
+              On the DEMO report-promptly list: tell the crew medical officer or flight surgeon without waiting.
+              <span className="mt-0.5 block text-xs text-ink-faint">{catalog.data?.report_promptly_label}</span>
+            </p>
+          )}
+          <SeverityPicker name="report-severity" value={severity} onChange={setSeverity} />
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-dim">When did it start? (optional)</span>
+            <input type="datetime-local" value={onset} max={localNow()} onChange={(e) => setOnset(e.target.value)} className={inputCls} />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-dim">Note (optional)</span>
+            <textarea rows={2} value={note} maxLength={1000} onChange={(e) => setNote(e.target.value)} className={`${inputCls} resize-none`} />
+          </label>
+          <Button type="submit" disabled={!code || !severity || submit.isPending}>Report symptom</Button>
+          {submit.isSuccess && (
+            <p role="status" className="text-sm text-sev-normal">
+              Recorded. Follow-up prompts are in your <Link to="/missions" className="underline">daily missions</Link>.
+            </p>
+          )}
+          {submit.error && <ErrorNote error={submit.error} />}
+          <p className="text-xs text-ink-faint">
+            Your own rating, not a diagnosis. AM adds logging and reporting prompts; it never suggests treatment.
+          </p>
+        </form>
+      )}
+    </Section>
+  )
+}
+
+// ------------------------------------------------------------------ chat
 function Chat({ conversationId, astronautId }: { conversationId: number; astronautId: number }) {
   const qc = useQueryClient()
   const [draft, setDraft] = useState('')
   const listRef = useRef<HTMLOListElement>(null)
   const messages = useQuery({ queryKey: ['messages', conversationId], queryFn: () => api.messages(conversationId) })
   const suggestions = useQuery({ queryKey: ['suggestions', astronautId], queryFn: () => api.suggestions(astronautId) })
+  const proposals = useQuery({ queryKey: ['proposals', astronautId], queryFn: () => symptomsApi.proposals(astronautId, 'all') })
   const send = useMutation({
-    mutationFn: (text: string) => api.send(conversationId, text),
+    mutationFn: (text: string) => symptomsApi.send(conversationId, text),
     onMutate: () => setDraft(''),
+    onSuccess: (turn) => {
+      // show what AM noticed under the message right away, before the refetch lands
+      if (turn.proposals.length) {
+        qc.setQueryData<SymptomProposal[]>(['proposals', astronautId], (old = []) => [
+          ...turn.proposals,
+          ...old.filter((p) => !turn.proposals.some((n) => n.id === p.id)),
+        ])
+      }
+    },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['messages', conversationId] })
       qc.invalidateQueries({ queryKey: ['conversations', astronautId] })
+      qc.invalidateQueries({ queryKey: ['proposals', astronautId] })
     },
   })
   const pendingText = send.isPending ? send.variables : null
+
+  const byMessage = useMemo(() => {
+    const m = new Map<number, SymptomProposal[]>()
+    for (const p of proposals.data ?? []) m.set(p.message_id, [...(m.get(p.message_id) ?? []), p])
+    return m
+  }, [proposals.data])
 
   useEffect(() => {
     listRef.current?.lastElementChild?.scrollIntoView({ block: 'end', behavior: 'smooth' })
@@ -112,7 +443,10 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
       <ol ref={listRef} aria-live="polite" className="flex flex-1 flex-col gap-5 overflow-y-auto pb-4">
         {msgs.length === 0 && !pendingText && (
           <li className="py-6">
-            <p className="text-ink-dim">Ask about your readings, alerts, baselines or recent check-ins.</p>
+            <p className="text-ink-dim">
+              Ask about your readings, alerts, baselines or recent check-ins, or tell AM how you feel. If you mention a
+              symptom, AM asks you to confirm it before recording anything.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(suggestions.data ?? []).map((s) => (
                 <button
@@ -127,7 +461,15 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
             </div>
           </li>
         )}
-        {msgs.map((m) => <Bubble key={m.id} msg={m} />)}
+        {msgs.map((m) => {
+          const noticed = m.role === 'user' ? byMessage.get(m.id) : undefined
+          return (
+            <Fragment key={m.id}>
+              <Bubble msg={m} />
+              {noticed?.length ? <NoticedInline proposals={noticed} astronautId={astronautId} /> : null}
+            </Fragment>
+          )
+        })}
         {pendingText && (
           <>
             <li className="flex justify-end">
@@ -233,7 +575,7 @@ function MemoryPanel({ astronautId }: { astronautId: number }) {
             <h3 className="text-ink-dim">Today, from you</h3>
             {short.length ? (
               <ul className="mt-1 space-y-1">{short.map((m) => <li key={m.id}>{m.content} <span className="text-xs text-ink-faint">{fmtAgo(m.occurred_at)}</span></li>)}</ul>
-            ) : <p className="mt-1 text-ink-faint">Nothing yet. A check-in adds to it; it clears after 24 hours.</p>}
+            ) : <p className="mt-1 text-ink-faint">Nothing yet. A check-in or a symptom report adds to it; it clears after 24 hours.</p>}
           </div>
           <div>
             <h3 className="text-ink-dim">Mission events</h3>
@@ -334,6 +676,9 @@ export function CompanionPage() {
         </div>
 
         <aside className="flex flex-col gap-8">
+          <NoticedPanel astronautId={astronaut.id} onOpenConversation={setActive} />
+          <ActiveSymptomsPanel astronautId={astronaut.id} />
+          <ReportSymptomPanel astronautId={astronaut.id} />
           <CheckinPanel astronautId={astronaut.id} />
           <MemoryPanel astronautId={astronaut.id} />
         </aside>
