@@ -21,6 +21,7 @@ from am.db.models_m6 import UserAccount
 from am.db.models_m6a import AstronautProfile, DayCloseRun
 from am.endday import pipeline
 from am.main import create_app
+from am.testapi.router import HIDDEN_ERROR
 from tests.conftest import sign_in
 
 TC = {"X-AM-Client": "test-console"}
@@ -196,6 +197,23 @@ def test_end_day_resumes_after_a_failed_step(client, crew, monkeypatch):
     second = client.post("/api/test/end-day", json={}).json()
     assert second["status"] == "completed" and second["id"] == first["id"]
     assert calls["baselines"] == 1 and calls["journal"] == 2 and calls["advance_clock"] == 1  # no step ran twice
+
+
+def test_failed_end_day_error_text_is_hidden_from_astronauts(client, crew, monkeypatch):
+    secret = "record of AST-002: abdominal pain severe"
+
+    def boom(*_args):
+        raise RuntimeError(secret)
+
+    monkeypatch.setitem(pipeline.STEPS, "journal", boom)
+    me = astro(client, crew, "AST-001")
+    run = me.post("/api/test/end-day", json={}).json()
+    assert run["status"] == "failed"
+    assert secret not in repr(run) and "journal" in run["error"] and "doctor" in run["error"]
+    assert run["steps"]["journal"]["detail"] == {"error": HIDDEN_ERROR}
+    assert secret not in repr(me.get("/api/test/end-day/runs").json())
+    doctor = client.get("/api/test/end-day/runs").json()[0]  # the doctor sees the real error
+    assert secret in doctor["error"] and secret in doctor["steps"]["journal"]["detail"]["error"]
 
 
 # ------------------------------------------------------------------ scenario fixtures

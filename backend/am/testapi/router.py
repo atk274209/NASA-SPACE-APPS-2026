@@ -248,25 +248,39 @@ class EndDayOut(BaseModel):
     finished_at: datetime | None
 
 
-def _visible(run: DayCloseRun, principal) -> tuple[dict[str, Any], dict[str, Any]]:
-    """An astronaut sees only their own part of a crew-wide run; the doctor sees everything."""
+HIDDEN_ERROR = "Details are visible to the doctor account only."
+
+
+def _visible(run: DayCloseRun, principal) -> tuple[dict[str, Any], dict[str, Any], str | None]:
+    """An astronaut sees only their own part of a crew-wide run; the doctor sees everything.
+
+    A failed step's error text can come from any crew member's records, so an astronaut gets
+    only the name of the failed step, never the error itself.
+    """
     if principal.is_doctor:
-        return run.steps, run.results
+        return run.steps, run.results, run.error
     me = str(principal.astronaut_id)
     steps: dict[str, Any] = {}
+    failed: str | None = None
     for name in STEP_ORDER:
         st = run.steps.get(name)
         if st is None:
             continue
+        if st.get("status") == "failed":
+            failed = failed or name
+            steps[name] = {"status": "failed", "at": st.get("at"), "detail": {"error": HIDDEN_ERROR}}
+            continue
         detail = st.get("detail") or {}
         mine = detail.get(me) if any(k.isdigit() for k in detail) else detail
         steps[name] = {"status": st.get("status"), "at": st.get("at"), "detail": mine or {}}
-    return steps, {me: run.results[me]} if me in (run.results or {}) else {}
+    error = f"End Day stopped at step '{failed}'. {HIDDEN_ERROR}" if run.error and failed else (
+        HIDDEN_ERROR if run.error else None)
+    return steps, ({me: run.results[me]} if me in (run.results or {}) else {}), error
 
 
 def _end_day_out(run: DayCloseRun, replayed: bool, principal) -> EndDayOut:
-    steps, results = _visible(run, principal)
-    return EndDayOut(id=run.id, close_date=run.close_date, status=run.status, replayed=replayed, error=run.error,
+    steps, results, error = _visible(run, principal)
+    return EndDayOut(id=run.id, close_date=run.close_date, status=run.status, replayed=replayed, error=error,
                      steps=steps, results=results, mission_now=utcnow(), mission_date=mission_date(),
                      started_at=run.started_at, finished_at=run.finished_at)
 
