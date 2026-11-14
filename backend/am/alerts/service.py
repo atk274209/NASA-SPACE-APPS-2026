@@ -3,6 +3,10 @@
 Alerts are opened/escalated only from deterministic assessments. They are never
 auto-resolved: a human must acknowledge and resolve them (audited). If severity rises
 above the level at which an alert was acknowledged, it returns to ACTIVE.
+
+Opening an alert or raising its peak severity also records an escalation event for that
+level (once per alert and level) when the DEMO escalation matrix involves someone other
+than the astronaut; see am.guidance.escalation.
 """
 
 from __future__ import annotations
@@ -15,6 +19,7 @@ from am.audit import audit
 from am.db.base import utcnow
 from am.db.enums import AlertStatus, AssessmentStatus, Severity
 from am.db.models import Alert, AlertAck, AlertEvidence, Measurement
+from am.guidance.escalation import record_escalation
 from am.policy import ThresholdConfig
 
 SYSTEM_ACTOR = "am-system"
@@ -73,6 +78,7 @@ class AlertService:
             self.events.append(("opened", alert, m.id))
             audit(self.s, actor=SYSTEM_ACTOR, action="alert.opened", entity="alert", entity_id=alert.id,
                   payload={"severity": alert.severity, "measurement_id": m.id, "z": a.z})
+            record_escalation(self.s, alert, a.severity, measurement_id=m.id, data_time=m.recorded_at)
         else:
             prev_peak = Severity(alert.peak_severity)
             alert.severity = a.severity.value
@@ -89,6 +95,7 @@ class AlertService:
                 self.events.append(("escalated", alert, m.id))
                 audit(self.s, actor=SYSTEM_ACTOR, action="alert.escalated", entity="alert", entity_id=alert.id,
                       payload={"from": prev_peak.value, "to": a.severity.value, "measurement_id": m.id})
+                record_escalation(self.s, alert, a.severity, measurement_id=m.id, data_time=m.recorded_at)
         self.s.add(
             AlertEvidence(alert_id=alert.id, measurement_id=m.id, severity_at_time=a.severity.value, deviation=a.z)
         )
