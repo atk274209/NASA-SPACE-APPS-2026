@@ -39,7 +39,7 @@ from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from am.audit import set_audit_user
-from am.auth.service import ROLE_ASTRONAUT, ROLE_DOCTOR, SESSION_COOKIE, resolve_session, touch_session
+from am.auth.service import ROLE_ASTRONAUT, ROLE_DOCTOR, resolve_session, session_cookie_name, touch_session
 
 PUBLIC = "public"
 SIGNED_IN = "signed_in"
@@ -165,7 +165,7 @@ def _token_from(request: Request) -> str | None:
     header = request.headers.get("authorization", "")
     if header.lower().startswith("bearer "):
         return header[7:].strip() or None
-    return request.cookies.get(SESSION_COOKIE)
+    return request.cookies.get(session_cookie_name(request.headers))
 
 
 def _same_origin(request: Request) -> bool:

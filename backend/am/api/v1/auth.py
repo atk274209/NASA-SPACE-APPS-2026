@@ -15,7 +15,6 @@ from am.audit import audit
 from am.auth.guard import CurrentUser, MaybeUser, Principal, doctor_only, is_loopback, public, signed_in
 from am.auth.service import (
     ROLE_DOCTOR,
-    SESSION_COOKIE,
     SESSION_TTL,
     AuthError,
     Throttled,
@@ -24,6 +23,7 @@ from am.auth.service import (
     count_accounts,
     create_account,
     open_session,
+    session_cookie_name,
     set_disabled,
     set_password,
 )
@@ -103,10 +103,11 @@ def _client(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def _set_cookie(response: Response, token: str) -> None:
+def _set_cookie(request: Request, response: Response, token: str) -> None:
     # HttpOnly: page scripts cannot read it. SameSite=Strict: never sent on cross-site requests.
     # Not marked Secure because AM is served over plain HTTP on this computer / the habitat LAN.
-    response.set_cookie(SESSION_COOKIE, token, max_age=int(SESSION_TTL.total_seconds()), httponly=True,
+    # The Test Console gets its own cookie name (see am.auth.service.session_cookie_name).
+    response.set_cookie(session_cookie_name(request.headers), token, max_age=int(SESSION_TTL.total_seconds()), httponly=True,
                         samesite="strict", path="/")
 
 
@@ -140,7 +141,7 @@ def login(body: LoginIn, request: Request, response: Response, db: DB, ctx: CTX)
     except Throttled as t:
         raise HTTPException(429, "Too many failed sign-in attempts. Try again later.",
                             headers={"Retry-After": str(t.retry_after_s)}) from None
-    user = authenticate(db, body.username, body.password, n_log2=ctx.settings.password_scrypt_n_log2)
+    user = authenticate(db, body.username, body.password, profile=ctx.settings.password_hash_profile)
     if user is None:
         throttle.failed(client, body.username)
         audit(db, actor="am-auth", action="auth.login_failed", entity="user_account", entity_id=None,
@@ -152,7 +153,7 @@ def login(body: LoginIn, request: Request, response: Response, db: DB, ctx: CTX)
     audit(db, actor=user.username, action="auth.login", entity="user_account", entity_id=user.id,
           payload={"client": client, "device": body.device_name[:80]})
     db.commit()
-    _set_cookie(response, token)
+    _set_cookie(request, response, token)
     return UserOut(id=user.id, username=user.username, display_name=user.display_name, role=user.role,
                    astronaut_id=user.astronaut_id, is_test_account=user.is_test_account)
 
@@ -160,9 +161,10 @@ def login(body: LoginIn, request: Request, response: Response, db: DB, ctx: CTX)
 @router.post("/auth/logout")
 @public
 def logout(request: Request, response: Response, db: DB):
-    if close_session(db, request.cookies.get(SESSION_COOKIE)):
+    name = session_cookie_name(request.headers)
+    if close_session(db, request.cookies.get(name)):
         db.commit()
-    response.delete_cookie(SESSION_COOKIE, path="/")
+    response.delete_cookie(name, path="/")
     return {"signed_in": False}
 
 
@@ -176,13 +178,13 @@ def first_run_setup(body: SetupIn, request: Request, response: Response, db: DB,
         raise HTTPException(403, "First-run setup must be done on the computer that runs AM.")
     try:
         user = create_account(db, username=body.username, display_name=body.display_name, role=ROLE_DOCTOR,
-                              password=body.password, n_log2=ctx.settings.password_scrypt_n_log2,
+                              password=body.password, profile=ctx.settings.password_hash_profile,
                               actor="first-run-setup")
     except AuthError as exc:
         raise HTTPException(422, str(exc)) from exc
     token = open_session(db, user, device_name="setup", client_host=_client(request))
     db.commit()
-    _set_cookie(response, token)
+    _set_cookie(request, response, token)
     return UserOut(id=user.id, username=user.username, display_name=user.display_name, role=user.role,
                    astronaut_id=None, is_test_account=False)
 
@@ -208,7 +210,7 @@ def add_account(body: AccountCreateIn, db: DB, ctx: CTX, principal: CurrentUser)
     try:
         user = create_account(db, username=body.username, display_name=body.display_name, role=body.role,
                               password=body.password, astronaut_id=body.astronaut_id,
-                              n_log2=ctx.settings.password_scrypt_n_log2, actor=principal.username)
+                              profile=ctx.settings.password_hash_profile, actor=principal.username)
     except AuthError as exc:
         raise HTTPException(422, str(exc)) from exc
     db.commit()
@@ -227,7 +229,7 @@ def _account(db: Session, account_id: int) -> UserAccount:
 def reset_password(account_id: int, body: PasswordIn, db: DB, ctx: CTX, principal: CurrentUser):
     user = _account(db, account_id)
     try:
-        set_password(db, user, body.password, n_log2=ctx.settings.password_scrypt_n_log2, actor=principal.username)
+        set_password(db, user, body.password, profile=ctx.settings.password_hash_profile, actor=principal.username)
     except AuthError as exc:
         raise HTTPException(422, str(exc)) from exc
     db.commit()

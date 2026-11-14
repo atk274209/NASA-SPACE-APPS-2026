@@ -96,6 +96,8 @@ class Measurement(Base):
     ingested_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     source_id: Mapped[int] = mapped_column(ForeignKey("data_source.id"))
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
+    # MANUAL_TEST_ENTRY | SIMULATED_GENERATOR | REAL_DEVICE (see am.db.models_m6a.DataOrigin)
+    data_origin: Mapped[str] = mapped_column(String(24), default=None)
 
     quality: Mapped[str] = mapped_column(String(16))
     confidence: Mapped[float | None] = mapped_column(Float)
@@ -240,3 +242,4 @@ from am.db import models_ai  # noqa: E402,F401  (register companion tables)
 from am.db import models_research  # noqa: E402,F401  (register M4 tables)
 from am.db import models_m5  # noqa: E402,F401  (register M5 tables)
 from am.db import models_m6  # noqa: E402,F401  (register M6 tables)
+from am.db import models_m6a  # noqa: E402,F401  (register M6a tables and the data_origin default)

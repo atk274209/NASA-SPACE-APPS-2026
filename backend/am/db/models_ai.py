@@ -95,5 +95,6 @@ class SelfReport(Base):
     scale_max: Mapped[int] = mapped_column(Integer, default=5)
     note: Mapped[str] = mapped_column(Text, default="")
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
+    data_origin: Mapped[str] = mapped_column(String(24), default=None)  # see am.db.models_m6a.DataOrigin
     recorded_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

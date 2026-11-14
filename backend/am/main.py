@@ -111,6 +111,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     for module in (auth, core, monitoring, companion, research, crew, symptoms, streaks, journal_ext, admin,
                    guidance, notes, crewlog, testbench):
         app.include_router(module.router, prefix="/api/v1", dependencies=[Depends(authorize)])
+    if settings.test_mode:
+        # Test Console controls (/api/test/*): only with AM_TEST_MODE=1, same guard as /api/v1.
+        from am.testapi.router import router as test_router
+
+        app.include_router(test_router, prefix="/api", dependencies=[Depends(authorize)])
     mount_frontend(app, settings.frontend_dist)
     return app
 

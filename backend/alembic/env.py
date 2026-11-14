@@ -10,6 +10,7 @@ import am.db.models_ai  # noqa: F401
 import am.db.models_research  # noqa: F401
 import am.db.models_m5  # noqa: F401
 import am.db.models_m6  # noqa: F401
+import am.db.models_m6a  # noqa: F401
 from am.config import get_settings
 from am.db.base import Base
 

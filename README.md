@@ -140,6 +140,34 @@ If the backend schemas change, regenerate the frontend API types:
 cd frontend && npm run gen:api
 ```
 
+## Test crew and Test Console (M6a)
+
+Create the five FICTIONAL test astronauts and the doctor account. The sign-in details are
+written to `TEST_CREDENTIALS.txt` at the repository root (gitignored, testing only):
+
+```bash
+cd backend && uv run python -m am.cli seed-crew
+```
+
+`--fresh-db` first renames the current database file (it is kept, not deleted).
+`--reset-passwords` issues new passwords.
+
+The Test Console is a separate app on port 5174. It needs the backend started with
+`AM_TEST_MODE=1`, which mounts `/api/test/*`:
+
+```bash
+cd backend && AM_TEST_MODE=1 uv run uvicorn am.main:app --port 8000
+```
+
+```bash
+cd frontend && npm run dev:testconsole
+```
+
+Then open http://localhost:5174. It has live test entries, End Day and scenario fixtures. See
+[docs/M6_SPEC.md](docs/M6_SPEC.md).
+
+In this OneDrive folder, set `UV_LINK_MODE=copy` if `uv run` fails with "os error 396".
+
 ## Test
 
 ```bash

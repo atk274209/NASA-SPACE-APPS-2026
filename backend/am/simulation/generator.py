@@ -107,6 +107,43 @@ SCENARIOS: dict[str, Scenario] = {
             Perturbation("sleep_duration", C.DAILY.value, 16, None, "ramp", -1.5),
         ],
     ),
+    # M6a scenario fixtures for the Test Console (master prompt v1, Module K). Like everything
+    # here, the sizes of the injected changes are ARBITRARY demonstration values.
+    "exercise_decline": Scenario(
+        name="exercise_decline",
+        description="SIMULATED: 21 days; from day 8 daily exercise duration ramps down (-70 min by the end) "
+                    "and resting HR drifts up slightly.",
+        days=21,
+        streams=_BASE_STREAMS,
+        perturbations=[
+            Perturbation("exercise_duration", C.DAILY.value, 8, None, "ramp", -70.0),
+            Perturbation("heart_rate", C.REST.value, 8, None, "ramp", 5.0),
+        ],
+    ),
+    "poor_sleep": Scenario(
+        name="poor_sleep",
+        description="SIMULATED: 21 days; from day 10 sleep duration drops by 2 h and sleeping HR is a "
+                    "little higher; HRV ramps down.",
+        days=21,
+        streams=_BASE_STREAMS,
+        perturbations=[
+            Perturbation("sleep_duration", C.DAILY.value, 10, None, "step", -2.0),
+            Perturbation("heart_rate", C.SLEEP.value, 10, None, "step", 5.0),
+            Perturbation("hrv_rmssd", C.REST.value, 10, None, "ramp", -12.0),
+        ],
+    ),
+    "acute_symptom_escalation": Scenario(
+        name="acute_symptom_escalation",
+        description="SIMULATED: stable days, then from day 6.66 of the generated window (the last hours "
+                    "before loading) resting HR is stepped up by +25 bpm and body temperature by +0.9 degC "
+                    "(paired with symptom reports by the fixture).",
+        days=7,
+        streams=_BASE_STREAMS,
+        perturbations=[
+            Perturbation("heart_rate", C.REST.value, 6.66, None, "step", 25.0),
+            Perturbation("body_temperature", C.REST.value, 6.66, None, "step", 0.9),
+        ],
+    ),
 }
 
 

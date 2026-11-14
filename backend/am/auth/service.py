@@ -22,7 +22,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from am.audit import audit
-from am.auth.passwords import DEFAULT_N_LOG2, check_new_password, hash_password, verify_password
+from am.auth.passwords import DEFAULT_PROFILE, check_new_password, hash_password, needs_rehash, verify_password
 from am.db.base import real_utcnow
 from am.db.models import Astronaut
 from am.db.models_m6 import AuthSession, UserAccount
@@ -32,6 +32,16 @@ ROLE_DOCTOR = "doctor"
 ROLES = (ROLE_ASTRONAUT, ROLE_DOCTOR)
 
 SESSION_COOKIE = "am_session"
+# The Test Console runs on its own port. Browsers send cookies to every port of a host, so it
+# keeps its session in a cookie of its own; its dev proxy marks requests with CLIENT_HEADER.
+TEST_CONSOLE_COOKIE = "am_tc_session"
+CLIENT_HEADER = "x-am-client"
+TEST_CONSOLE_CLIENT = "test-console"
+
+
+def session_cookie_name(headers) -> str:
+    """Cookie that carries the session for this client (main app or Test Console)."""
+    return TEST_CONSOLE_COOKIE if headers.get(CLIENT_HEADER, "").lower() == TEST_CONSOLE_CLIENT else SESSION_COOKIE
 SESSION_TTL = timedelta(hours=12)
 LAST_SEEN_RESOLUTION = timedelta(minutes=1)  # do not write to the database on every request
 
@@ -94,7 +104,7 @@ def count_accounts(session: Session) -> int:
 
 def create_account(session: Session, *, username: str, display_name: str, role: str, password: str,
                    astronaut_id: int | None = None, is_test_account: bool = False,
-                   n_log2: int = DEFAULT_N_LOG2, actor: str = "am-system") -> UserAccount:
+                   profile: str = DEFAULT_PROFILE, actor: str = "am-system") -> UserAccount:
     username = normalize_username(username)
     if not _USERNAME.match(username):
         raise AuthError("username must be 3 to 40 characters: lowercase letters, digits, dot, dash or underscore")
@@ -116,7 +126,7 @@ def create_account(session: Session, *, username: str, display_name: str, role: 
     if session.scalars(select(UserAccount).where(UserAccount.username == username)).first():
         raise AuthError("this username is already taken")
     user = UserAccount(username=username, display_name=display_name.strip(), role=role, astronaut_id=astronaut_id,
-                       password_hash=hash_password(password, n_log2), is_test_account=is_test_account)
+                       password_hash=hash_password(password, profile), is_test_account=is_test_account)
     session.add(user)
     session.flush()
     audit(session, actor=actor, action="account.created", entity="user_account", entity_id=user.id,
@@ -124,13 +134,13 @@ def create_account(session: Session, *, username: str, display_name: str, role: 
     return user
 
 
-def set_password(session: Session, user: UserAccount, password: str, *, n_log2: int = DEFAULT_N_LOG2,
+def set_password(session: Session, user: UserAccount, password: str, *, profile: str = DEFAULT_PROFILE,
                  actor: str) -> None:
     try:
         check_new_password(password)
     except ValueError as exc:
         raise AuthError(str(exc)) from exc
-    user.password_hash = hash_password(password, n_log2)
+    user.password_hash = hash_password(password, profile)
     revoke_all_sessions(session, user.id)
     audit(session, actor=actor, action="account.password_changed", entity="user_account", entity_id=user.id)
 
@@ -143,10 +153,10 @@ def set_disabled(session: Session, user: UserAccount, disabled: bool, *, actor: 
           entity="user_account", entity_id=user.id)
 
 
-_dummy_hash: dict[int, str] = {}
+_dummy_hash: dict[str, str] = {}
 
 
-def authenticate(session: Session, username: str, password: str, *, n_log2: int = DEFAULT_N_LOG2) -> UserAccount | None:
+def authenticate(session: Session, username: str, password: str, *, profile: str = DEFAULT_PROFILE) -> UserAccount | None:
     """Return the account when the password matches and the account is enabled, else None.
 
     An unknown username still costs one hash verification, so response time does not reveal
@@ -154,12 +164,17 @@ def authenticate(session: Session, username: str, password: str, *, n_log2: int 
     """
     user = session.scalars(select(UserAccount).where(UserAccount.username == normalize_username(username))).first()
     if user is None:
-        if n_log2 not in _dummy_hash:
-            _dummy_hash[n_log2] = hash_password(secrets.token_hex(8), n_log2)
-        verify_password(password, _dummy_hash[n_log2])
+        if profile not in _dummy_hash:
+            _dummy_hash[profile] = hash_password(secrets.token_hex(8), profile)
+        verify_password(password, _dummy_hash[profile])
         return None
     if not verify_password(password, user.password_hash) or user.disabled_at is not None:
         return None
+    if needs_rehash(user.password_hash, profile):
+        # Legacy scrypt hash (or outdated argon2id cost): replace it now that the password is known.
+        user.password_hash = hash_password(password, profile)
+        audit(session, actor=user.username, action="account.password_rehashed", entity="user_account",
+              entity_id=user.id)
     return user
 
 

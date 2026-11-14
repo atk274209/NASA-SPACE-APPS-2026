@@ -37,9 +37,10 @@ def settings(tmp_path) -> Settings:
         database_url=f"sqlite:///{(tmp_path / 'test.sqlite3').as_posix()}",
         ollama_url="http://127.0.0.1:9",  # deliberately unreachable: tests must not need a model
         allowed_hosts=["localhost", "127.0.0.1", "testserver"],
-        password_scrypt_n_log2=10,  # cheap hashing: tests create many accounts
+        password_hash_profile="fast",  # cheap hashing: tests create many accounts
         live_ticker=False,          # tests drive the test bench explicitly
-        test_accounts_file=tmp_path / "TEST_ACCOUNTS.txt",
+        test_accounts_file=tmp_path / "TEST_CREDENTIALS.txt",
+        test_mode=True,             # mount /api/test (the Test Console router)
     )
 
 
@@ -78,13 +79,13 @@ def sign_in(client: TestClient, *, role: str = ROLE_DOCTOR, astronaut_id: int | 
     request; the sign-in endpoint itself is covered in tests/test_auth.py.
     """
     ctx: AppContext = client.app.state.ctx
-    name = username or ("doctor" if role == ROLE_DOCTOR else f"astro{astronaut_id}")
+    name = username or ("testdoctor" if role == ROLE_DOCTOR else f"astro{astronaut_id}")
     with ctx.session_factory() as s:
         user = s.query(UserAccount).filter(UserAccount.username == name).first()
         if user is None:
             user = create_account(s, username=name, display_name=name.title(), role=role, password=TEST_PASSWORD,
                                   astronaut_id=astronaut_id, is_test_account=True,
-                                  n_log2=ctx.settings.password_scrypt_n_log2)
+                                  profile=ctx.settings.password_hash_profile)
         token = open_session(s, user, device_name="pytest", client_host="testclient")
         s.commit()
     client.cookies.set(SESSION_COOKIE, token)

@@ -8,6 +8,7 @@ __pycache__/
 # Node
 node_modules/
 dist/
+dist-testconsole/
 .vite/
 playwright-report/
 test-results/
@@ -18,6 +19,10 @@ test-results/
 *.db
 .env
 backups/
+
+# Test-only sign-in details of the fictional test crew (written by `am.cli seed-crew`)
+TEST_CREDENTIALS.txt
+TEST_ACCOUNTS.txt
 
 # Editors / OS
 .vscode/

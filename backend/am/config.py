@@ -46,10 +46,13 @@ class Settings(BaseSettings):
     # Built console served by the API when present (None disables). See am.main.mount_frontend.
     frontend_dist: Path | None = REPO_ROOT / "frontend" / "dist"
 
-    # Sign-in. scrypt cost as log2(N); see am.auth.passwords (tests lower it to stay fast).
-    password_scrypt_n_log2: int = 17
-    # Plain-text sign-in details of the TEST crew accounts, written by `am.cli seed-crew`.
-    test_accounts_file: Path = REPO_ROOT / "TEST_ACCOUNTS.txt"
+    # Sign-in. argon2id cost profile, see am.auth.passwords ("fast" is for automated tests only).
+    password_hash_profile: str = "standard"
+    # Plain-text sign-in details of the TEST crew accounts, written by `am.cli seed-crew` (gitignored).
+    test_accounts_file: Path = REPO_ROOT / "TEST_CREDENTIALS.txt"
+    # AM_TEST_MODE=1 mounts the /api/test router used by the separate Test Console (End Day,
+    # live test entries, scenario fixtures). Off by default: production-like behaviour.
+    test_mode: bool = False
     # Test bench (simulated telemetry, mission clock control). Off = production-like behaviour.
     test_bench: bool = True
     # Background generation of simulated live telemetry while the test bench is on.

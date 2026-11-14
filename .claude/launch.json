@@ -6,6 +6,7 @@
       "runtimeExecutable": "uv",
       "runtimeArgs": ["run", "uvicorn", "am.main:app", "--port", "8000"],
       "cwd": "backend",
+      "env": { "AM_TEST_MODE": "1", "UV_LINK_MODE": "copy" },
       "port": 8000
     },
     {
@@ -14,6 +15,13 @@
       "runtimeArgs": ["run", "dev"],
       "cwd": "frontend",
       "port": 5173
+    },
+    {
+      "name": "am-testconsole",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:testconsole"],
+      "cwd": "frontend",
+      "port": 5174
     }
   ]
 }

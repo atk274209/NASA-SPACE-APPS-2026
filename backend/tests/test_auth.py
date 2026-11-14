@@ -46,15 +46,47 @@ def two(client):
 
 
 # ------------------------------------------------------------------ passwords
+def _legacy_scrypt(password: str, n_log2: int = 10) -> str:
+    """A hash in the pre-M6a scrypt format, built independently of am.auth.passwords."""
+    import base64
+    import hashlib
+    import secrets
+
+    salt = secrets.token_bytes(16)
+    key = hashlib.scrypt(password.encode(), salt=salt, n=1 << n_log2, r=8, p=1, dklen=32)
+    return f"scrypt${n_log2}$8$1${base64.b64encode(salt).decode()}${base64.b64encode(key).decode()}"
+
+
 def test_password_hashing_roundtrip_and_tamper_resistance():
-    h = hash_password("correct horse 42", n_log2=10)
-    assert h.startswith("scrypt$10$8$1$") and "correct" not in h
+    h = hash_password("correct horse 42", "fast")
+    assert h.startswith("$argon2id$") and "correct" not in h
     assert verify_password("correct horse 42", h) and not verify_password("correct horse 43", h)
-    assert hash_password("correct horse 42", n_log2=10) != h  # random salt
-    assert not verify_password("x", "scrypt$30$8$1$AAAA$AAAA")  # absurd cost is refused, not computed
+    assert hash_password("correct horse 42", "fast") != h  # random salt
+    assert hash_password("correct horse 42").startswith("$argon2id$v=19$m=65536,t=3,p=4$")  # standard profile
+    assert not verify_password("x", "$argon2id$v=19$m=99999999,t=1,p=1$AAAA$AAAA")  # absurd memory is refused
+    assert not verify_password("x", "scrypt$30$8$1$AAAA$AAAA")  # absurd legacy cost is refused, not computed
     assert not verify_password("x", "not-a-hash") and not verify_password("x", "")
     pw = generate_password()
     assert len(pw) == 14 and pw.count("-") == 2 and pw != generate_password()
+
+
+def test_legacy_scrypt_hash_verifies_and_is_replaced_on_sign_in(client, anon):
+    from am.auth.passwords import needs_rehash
+
+    legacy = _legacy_scrypt("legacy-pass-123")
+    assert verify_password("legacy-pass-123", legacy) and not verify_password("legacy-pass-124", legacy)
+    assert needs_rehash(legacy) and not needs_rehash(hash_password("x" * 12, "fast"), "fast")
+    ctx = client.app.state.ctx
+    sign_in(anon, role="doctor", username="legacydoc")
+    with ctx.session_factory() as s:
+        user = s.query(UserAccount).filter_by(username="legacydoc").one()
+        user.password_hash = legacy
+        s.commit()
+    fresh = TestClient(client.app)
+    assert fresh.post("/api/v1/auth/login", json={"username": "legacydoc", "password": "legacy-pass-123"}).status_code == 200
+    with ctx.session_factory() as s:
+        stored = s.query(UserAccount).filter_by(username="legacydoc").one().password_hash
+    assert stored.startswith("$argon2id$") and verify_password("legacy-pass-123", stored)
 
 
 # ------------------------------------------------------------------ sign-in flow
@@ -107,7 +139,7 @@ def test_repeated_failures_are_throttled_per_client_and_username(anon, client):
     locked = anon.post("/api/v1/auth/login", json={"username": "medic3", "password": TEST_PASSWORD})
     assert locked.status_code == 429 and int(locked.headers["retry-after"]) > 0
     # another username from the same client is not locked
-    assert anon.post("/api/v1/auth/login", json={"username": "doctor", "password": TEST_PASSWORD}).status_code == 200
+    assert anon.post("/api/v1/auth/login", json={"username": "testdoctor", "password": TEST_PASSWORD}).status_code == 200
 
 
 def test_first_run_setup_only_while_no_account_exists(settings):

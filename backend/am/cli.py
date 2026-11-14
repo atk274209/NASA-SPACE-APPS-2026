@@ -3,6 +3,7 @@
     uv run python -m am.cli migrate
     uv run python -m am.cli ingest-knowledge
     uv run python -m am.cli seed-demo [--narratives]
+    uv run python -m am.cli seed-crew [--reset-passwords] [--fresh-db]
     uv run python -m am.cli status
 
 The demo crew is SIMULATED data: every astronaut, mission, measurement, self-report and
@@ -191,6 +192,46 @@ def _narratives(s, ctx: AppContext, astronaut_id: int, last_n: int = 3) -> None:
             print(f"  narrative for day {day} failed: {type(exc).__name__}: {exc}")
 
 
+def cmd_seed_crew(args) -> int:
+    """Create the five FICTIONAL test astronauts and the doctor account (see am.crew_seed)."""
+    from am.config import get_settings
+    from am.crew_seed import SeedError, seed_crew, set_aside_database, write_credentials
+
+    settings = get_settings()
+    if args.fresh_db:
+        if settings.database_url:
+            print("--fresh-db only works with the default database file; unset AM_DATABASE_URL first.")
+            return 2
+        db_file = settings.data_dir / "am.sqlite3"
+        stamp = utcnow().strftime("%Y%m%d-%H%M%S")
+        try:
+            moved = set_aside_database(db_file, stamp)
+        except PermissionError:
+            print("The database file is in use. Stop the AM backend, then run this again.")
+            return 2
+        for path in moved:
+            print(f"Previous database kept as {path}")
+    ctx = _ctx()
+    with ctx.session_factory() as s:
+        try:
+            rep = seed_crew(s, credentials_file=settings.test_accounts_file, reset_passwords=args.reset_passwords,
+                            profile=settings.password_hash_profile)
+        except SeedError as exc:
+            print(f"Not seeded: {exc}")
+            return 2
+        s.commit()
+    if rep.skipped:
+        print(f"Nothing to do: {rep.skipped}.")
+        return 0
+    write_credentials(rep.credentials_file, rep.credentials)
+    if rep.created_accounts:
+        print(f"Created accounts: {', '.join(rep.created_accounts)}")
+    if rep.reset_accounts:
+        print(f"New passwords for: {', '.join(rep.reset_accounts)}")
+    print(f"Test sign-in details written to {rep.credentials_file} (gitignored; testing only).")
+    return 0
+
+
 def cmd_status(_args) -> int:
     ctx = _ctx()
     with ctx.session_factory() as s:
@@ -211,6 +252,11 @@ def main(argv: list[str] | None = None) -> int:
     sd = sub.add_parser("seed-demo", help="create the SIMULATED demo crew")
     sd.add_argument("--narratives", action="store_true", help="also write AI journal narratives (needs the model)")
     sd.set_defaults(fn=cmd_seed_demo)
+    sc = sub.add_parser("seed-crew", help="create the FICTIONAL test crew (5 astronauts + doctor)")
+    sc.add_argument("--reset-passwords", action="store_true", help="issue new passwords and rewrite the file")
+    sc.add_argument("--fresh-db", action="store_true",
+                    help="first rename the current database file (kept, not deleted) and start a new one")
+    sc.set_defaults(fn=cmd_seed_crew)
     sub.add_parser("status", help="show database and model status").set_defaults(fn=cmd_status)
     args = p.parse_args(argv)
     return args.fn(args)

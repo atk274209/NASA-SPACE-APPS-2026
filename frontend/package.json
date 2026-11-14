@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:testconsole": "vite --config vite.testconsole.config.ts",
+    "build:testconsole": "vite build --config vite.testconsole.config.ts",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",

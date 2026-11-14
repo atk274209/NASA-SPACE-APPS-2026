@@ -40,6 +40,7 @@ class SymptomReport(Base):
     status: Mapped[str] = mapped_column(String(16), default="active")  # active | resolved | retracted
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime)
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
+    data_origin: Mapped[str] = mapped_column(String(24), default=None)  # see am.db.models_m6a.DataOrigin
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
