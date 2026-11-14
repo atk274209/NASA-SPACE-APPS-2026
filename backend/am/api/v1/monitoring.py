@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from am.alerts.service import AlertService
+from am.auth.guard import doctor_only, signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.baseline.service import BaselineService
 from am.db.base import utcnow
@@ -83,6 +84,7 @@ def baseline_audit(db: DB, astronaut_id: int, metric_code: str | None = None, co
 
 
 @router.post("/baselines/{profile_id}/unfreeze", response_model=BaselineOut, tags=["baselines"])
+@doctor_only
 def unfreeze_baseline(profile_id: int, body: OperatorAction, db: DB, ctx: CTX):
     svc = BaselineService(db, ctx.policy, ctx.thresholds)
     try:
@@ -96,6 +98,7 @@ def unfreeze_baseline(profile_id: int, body: OperatorAction, db: DB, ctx: CTX):
 
 
 @router.post("/baselines/rebuild", response_model=BaselineOut, status_code=201, tags=["baselines"])
+@doctor_only
 def rebuild_baseline(body: RebuildIn, db: DB, ctx: CTX):
     svc = BaselineService(db, ctx.policy, ctx.thresholds)
     try:
@@ -109,6 +112,7 @@ def rebuild_baseline(body: RebuildIn, db: DB, ctx: CTX):
 
 
 @router.get("/thresholds", response_model=ThresholdsOut, tags=["baselines"])
+@signed_in
 def get_thresholds(ctx: CTX):
     t = ctx.thresholds
     return ThresholdsOut(
@@ -226,6 +230,7 @@ def acknowledge_alert(alert_id: int, body: AckIn, db: DB, ctx: CTX):
 
 
 @router.post("/alerts/{alert_id}/resolve", response_model=AlertDetailOut, tags=["alerts"])
+@doctor_only
 def resolve_alert(alert_id: int, body: ResolveIn, db: DB, ctx: CTX):
     svc = AlertService(db, ctx.thresholds)
     return _alert_action(lambda: svc.resolve(alert_id, body.actor, body.note), alert_id, db)
@@ -233,11 +238,13 @@ def resolve_alert(alert_id: int, body: ResolveIn, db: DB, ctx: CTX):
 
 # ---------------------------------------------------------------- simulation
 @router.get("/simulation/scenarios", response_model=list[ScenarioOut], tags=["simulation"])
+@doctor_only
 def list_scenarios():
     return [ScenarioOut(name=s.name, description=s.description, days=s.days) for s in SCENARIOS.values()]
 
 
 @router.post("/simulation/run", response_model=SimulationRunOut, status_code=201, tags=["simulation"])
+@doctor_only
 def run_simulation(body: SimulationRunIn, db: DB, ctx: CTX):
     scenario = SCENARIOS.get(body.scenario)
     if scenario is None:

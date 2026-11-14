@@ -33,16 +33,27 @@ class Settings(BaseSettings):
     baseline_policy_path: Path = REPO_ROOT / "config" / "baseline_policy.yaml"
 
     ollama_url: str = "http://127.0.0.1:11434"
-    chat_model: str = "qwen2.5:7b-instruct"
+    chat_model: str = "llama3.1:8b"
     embed_model: str = "nomic-embed-text"
     llm_timeout_s: float = 180.0
 
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    # Cross-origin browser access is off by default: the console is served from the API's own
+    # origin (and the Vite dev server proxies /api), so no other origin needs access.
+    cors_origins: list[str] = []
     # Host header allow-list: blocks DNS-rebinding access to local health data.
     allowed_hosts: list[str] = ["localhost", "127.0.0.1", "[::1]"]
     run_migrations_on_startup: bool = True
     # Built console served by the API when present (None disables). See am.main.mount_frontend.
     frontend_dist: Path | None = REPO_ROOT / "frontend" / "dist"
+
+    # Sign-in. scrypt cost as log2(N); see am.auth.passwords (tests lower it to stay fast).
+    password_scrypt_n_log2: int = 17
+    # Plain-text sign-in details of the TEST crew accounts, written by `am.cli seed-crew`.
+    test_accounts_file: Path = REPO_ROOT / "TEST_ACCOUNTS.txt"
+    # Test bench (simulated telemetry, mission clock control). Off = production-like behaviour.
+    test_bench: bool = True
+    # Background generation of simulated live telemetry while the test bench is on.
+    live_ticker: bool = True
 
     @property
     def resolved_database_url(self) -> str:

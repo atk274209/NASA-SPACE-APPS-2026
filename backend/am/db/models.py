@@ -239,3 +239,4 @@ class AuditLog(Base):
 from am.db import models_ai  # noqa: E402,F401  (register companion tables)
 from am.db import models_research  # noqa: E402,F401  (register M4 tables)
 from am.db import models_m5  # noqa: E402,F401  (register M5 tables)
+from am.db import models_m6  # noqa: E402,F401  (register M6 tables)

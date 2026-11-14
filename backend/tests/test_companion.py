@@ -16,7 +16,7 @@ class FakeOllama:
 
     def __init__(self, replies: list[dict], models: list[str] | None = None, chat_status: int = 200):
         self.replies = list(replies)
-        self.models = models if models is not None else ["qwen2.5:7b-instruct"]
+        self.models = models if models is not None else ["llama3.1:8b"]
         self.chat_status = chat_status
         self.requests: list[dict] = []
 
@@ -134,7 +134,7 @@ def test_missing_model_falls_back_and_status_reports_it(client, sim):
     fake = FakeOllama([], models=["other:latest"], chat_status=404)
     client.app.state.ctx.llm = fake.client()
     st = client.get("/api/v1/ai/status").json()
-    assert st == {"reachable": True, "model": "qwen2.5:7b-instruct", "model_installed": False,
+    assert st == {"reachable": True, "model": "llama3.1:8b", "model_installed": False,
                   "installed_models": ["other:latest"], "reason": "model_not_installed"}
     cid = _conv(client, sim["astronaut"]["id"])
     t = client.post(f"/api/v1/companion/conversations/{cid}/messages", json={"content": "hi"}).json()

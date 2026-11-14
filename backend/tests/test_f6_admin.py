@@ -25,6 +25,7 @@ from am.config import REPO_ROOT
 from am.db.base import utcnow
 from am.db.models_m5 import SymptomReport
 from am.main import create_app
+from tests.conftest import sign_in
 from tests.test_companion import FakeOllama
 
 PASS = "correct horse battery staple"
@@ -102,7 +103,7 @@ def test_settings_list_defaults_descriptions_and_types(client):
     assert rows["backup_retention"]["min_value"] == 1
     assert rows["symptom_llm_detection"]["kind"] == "bool" and rows["symptom_llm_detection"]["value"] is True
     chat = rows["chat_model"]
-    assert chat["kind"] == "model" and chat["value"] is None and chat["effective"] == "qwen2.5:7b-instruct"
+    assert chat["kind"] == "model" and chat["value"] is None and chat["effective"] == "llama3.1:8b"
 
 
 def test_setting_changes_are_type_checked_and_audited(client):
@@ -124,7 +125,7 @@ def test_setting_changes_are_type_checked_and_audited(client):
     changed = [a for a in client.get("/api/v1/admin/audit").json() if a["action"] == "setting.changed"]
     assert sorted(a["entity_id"] for a in changed) == ["backup_retention", "symptom_llm_detection"]
     # the first change records the default that was in effect, flagged as such
-    assert {"old": True, "old_was_default": True, "new": False} in [a["payload"] for a in changed]
+    assert {"old": True, "old_was_default": True, "new": False, "auth_user": "doctor"} in [a["payload"] for a in changed]
     assert all(a["actor"] == "ops lead" for a in changed)
     rows = {s["key"]: s for s in client.get("/api/v1/settings").json()}
     assert rows["backup_retention"]["value"] == 3 and rows["symptom_llm_detection"]["value"] is False
@@ -135,20 +136,20 @@ def test_model_settings_accept_only_installed_models(client):
         return client.put(f"/api/v1/settings/{key}", json={"value": value, "actor": "ops"})
 
     # conftest: Ollama unreachable, so a new model cannot be confirmed
-    r = put("chat_model", "llama3.1:8b")
+    r = put("chat_model", "mistral:7b")
     assert r.status_code == 409 and "not reachable" in r.json()["detail"]
     assert put("chat_model", None).status_code == 200  # the deployment default needs no check
 
-    client.app.state.ctx.llm = FakeOllama([], models=["qwen2.5:7b-instruct", "llama3.1:8b",
+    client.app.state.ctx.llm = FakeOllama([], models=["llama3.1:8b", "mistral:7b",
                                                       "nomic-embed-text:latest"]).client()
     r = put("chat_model", "missing-model:1b")
-    assert r.status_code == 422 and "not installed" in r.json()["detail"] and "llama3.1:8b" in r.json()["detail"]
+    assert r.status_code == 422 and "not installed" in r.json()["detail"] and "mistral:7b" in r.json()["detail"]
     assert put("chat_model", 42).status_code == 422
-    r = put("chat_model", "llama3.1:8b")
-    assert r.status_code == 200 and r.json()["effective"] == "llama3.1:8b"
+    r = put("chat_model", "mistral:7b")
+    assert r.status_code == 200 and r.json()["effective"] == "mistral:7b"
     assert put("embed_model", "nomic-embed-text").status_code == 200  # untagged name means ':latest'
     r = put("chat_model", "  ")
-    assert r.json()["value"] is None and r.json()["effective"] == "qwen2.5:7b-instruct"
+    assert r.json()["value"] is None and r.json()["effective"] == "llama3.1:8b"
 
 
 def test_research_routes_use_the_effective_models(client):
@@ -158,9 +159,9 @@ def test_research_routes_use_the_effective_models(client):
     trend = next(f for f in run["findings"] if f["y_key"] == "heart_rate:rest" and f["finding_type"] == "trend")
     fake = EmbedOllama([{"role": "assistant", "content": json.dumps({
         "hypothesis": "Resting heart rate may rise with deconditioning.", "rationale": "r", "cited_chunk_ids": []})}],
-        models=["qwen2.5:7b-instruct", "llama3.1:8b", "nomic-embed-text:latest", "mxbai-embed-large:latest"])
+        models=["llama3.1:8b", "mistral:7b", "nomic-embed-text:latest", "mxbai-embed-large:latest"])
     client.app.state.ctx.llm = fake.client()
-    for key, value in (("chat_model", "llama3.1:8b"), ("embed_model", "mxbai-embed-large")):
+    for key, value in (("chat_model", "mistral:7b"), ("embed_model", "mxbai-embed-large")):
         assert client.put(f"/api/v1/settings/{key}", json={"value": value, "actor": "ops"}).status_code == 200
 
     rep = client.post("/api/v1/knowledge/ingest").json()
@@ -170,7 +171,7 @@ def test_research_routes_use_the_effective_models(client):
     assert emb["search_method"] == "embedding"
 
     obs = client.post("/api/v1/research/observations", json={"finding_id": trend["id"]}).json()
-    assert fake.requests[-1]["model"] == "llama3.1:8b" and obs["model"] == "llama3.1:8b"
+    assert fake.requests[-1]["model"] == "mistral:7b" and obs["model"] == "mistral:7b"
     assert client.get("/api/v1/knowledge/search", params={"q": "heart"}).json()[0]["method"] == "embedding"
 
     # switching the embedding model leaves the stored vectors behind: coverage drops to zero
@@ -191,7 +192,7 @@ def test_diagnostics_measure_storage_schema_and_services(client, sim):
     assert d["storage"]["free_bytes"] > 0 and d["storage"]["total_bytes"] >= d["storage"]["free_bytes"]
     o = d["ollama"]
     assert o["reachable"] is False and o["reason"] == "service_unreachable"
-    assert o["chat_model"] == "qwen2.5:7b-instruct" and o["chat_model_installed"] is None
+    assert o["chat_model"] == "llama3.1:8b" and o["chat_model_installed"] is None
     assert d["embeddings"]["search_method"] == "no documents ingested"
     assert d["backups"] == {"last_backup_at": None, "last_backup_id": None, "stored": 0, "retention": 10}
     v = d["versions"]
@@ -287,6 +288,7 @@ def test_backup_retention_prunes_the_oldest_files(client, sim, settings):
 def test_restore_cli_needs_confirm_checks_passphrase_and_keeps_a_copy(settings, monkeypatch):
     restore = _restore_cli()
     with TestClient(create_app(settings)) as c:
+        sign_in(c)  # the doctor account
         assert c.post("/api/v1/astronauts", json={"code": "KEEP-1", "display_name": "In the backup"}).status_code == 201
         b = _backup(c, "before an experiment")
         assert c.post("/api/v1/astronauts", json={"code": "LATE-1", "display_name": "After the backup"}).status_code == 201
@@ -318,6 +320,7 @@ def test_restore_cli_needs_confirm_checks_passphrase_and_keeps_a_copy(settings, 
     assert PASS.encode() not in _db_bytes(settings)
 
     with TestClient(create_app(settings)) as c:  # the restored database serves normally
+        sign_in(c)  # the doctor account is part of the restored database; a fresh session is needed
         assert [a["code"] for a in c.get("/api/v1/astronauts").json()] == ["KEEP-1"]
 
 

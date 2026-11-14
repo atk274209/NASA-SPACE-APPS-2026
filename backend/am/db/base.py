@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import MetaData, create_engine, event
 from sqlalchemy.engine import Engine
@@ -23,9 +23,38 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
-def utcnow() -> datetime:
-    """Naive UTC timestamp. All datetimes are stored as naive UTC."""
+# Mission clock. In real use the offset stays zero and mission time is UTC wall-clock time.
+# The test bench (am.simlive) may move mission time FORWARD to rehearse a long mission in
+# minutes; it can never move back, so stored records are never "in the future".
+# One process serves one database, so the offset is process-wide (persisted by am.clock).
+_clock_offset = timedelta(0)
+
+
+def real_utcnow() -> datetime:
+    """Wall-clock naive UTC. Only for security timers (session expiry, sign-in rate limits)."""
     return datetime.now(UTC).replace(tzinfo=None)
+
+
+def utcnow() -> datetime:
+    """Mission-clock naive UTC timestamp. All datetimes are stored as naive UTC."""
+    return real_utcnow() + _clock_offset
+
+
+def clock_offset() -> timedelta:
+    return _clock_offset
+
+
+def set_clock_offset(offset: timedelta, *, allow_backward: bool = False) -> None:
+    """Set how far mission time runs ahead of real time.
+
+    `allow_backward` is only for loading the persisted offset at start-up and for tests.
+    """
+    global _clock_offset
+    if offset < timedelta(0):
+        raise ValueError("mission time cannot be behind real time")
+    if offset < _clock_offset and not allow_backward:
+        raise ValueError("the mission clock cannot move backward")
+    _clock_offset = offset
 
 
 def to_naive_utc(dt: datetime) -> datetime:
@@ -44,6 +73,7 @@ def make_engine(url: str) -> Engine:
         def _sqlite_pragmas(dbapi_conn, _record):  # pragma: no cover - trivial
             cur = dbapi_conn.cursor()
             cur.execute("PRAGMA foreign_keys=ON")
+            cur.execute("PRAGMA busy_timeout=15000")  # ms; several writers (requests, live ticker) share the file
             if ":memory:" not in url:
                 cur.execute("PRAGMA journal_mode=WAL")
             cur.close()

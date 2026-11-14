@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from am.auth.guard import CurrentUser, doctor_only, signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.settings_store import effective_chat_model, effective_embed_model
 from am.db.models import Astronaut, AuditLog, Measurement, MetricDefinition, Mission
@@ -36,6 +37,7 @@ CTX = Annotated[AppContext, Depends(get_ctx)]
 
 
 @router.get("/system/status", response_model=SystemStatusOut, tags=["system"])
+@signed_in
 def system_status(db: DB, ctx: CTX) -> SystemStatusOut:
     db_state = "ok"
     try:
@@ -65,11 +67,16 @@ def system_status(db: DB, ctx: CTX) -> SystemStatusOut:
 
 # ---------------------------------------------------------------- astronauts
 @router.get("/astronauts", response_model=list[AstronautOut], tags=["astronauts"])
-def list_astronauts(db: DB):
-    return db.scalars(select(Astronaut).order_by(Astronaut.id)).all()
+@signed_in
+def list_astronauts(db: DB, principal: CurrentUser):
+    stmt = select(Astronaut).order_by(Astronaut.id)
+    if not principal.is_doctor:  # a crew member sees only their own record
+        stmt = stmt.where(Astronaut.id == principal.astronaut_id)
+    return db.scalars(stmt).all()
 
 
 @router.post("/astronauts", response_model=AstronautOut, status_code=201, tags=["astronauts"])
+@doctor_only
 def create_astronaut(body: AstronautCreate, db: DB):
     if db.scalars(select(Astronaut).where(Astronaut.code == body.code)).first():
         raise HTTPException(409, "astronaut code already exists")
@@ -86,6 +93,7 @@ def list_missions(astronaut_id: int, db: DB):
 
 # ---------------------------------------------------------------- metrics
 @router.get("/metrics", response_model=list[MetricOut], tags=["metrics"])
+@signed_in
 def list_metrics(db: DB):
     return db.scalars(select(MetricDefinition).order_by(MetricDefinition.category, MetricDefinition.code)).all()
 
@@ -179,6 +187,7 @@ def list_measurements(
 
 # ---------------------------------------------------------------- audit
 @router.get("/audit", response_model=list[AuditOut], tags=["system"])
+@doctor_only
 def list_audit(db: DB, limit: Annotated[int, Query(ge=1, le=1000)] = 200, action_prefix: str | None = None):
     stmt = select(AuditLog)
     if action_prefix:

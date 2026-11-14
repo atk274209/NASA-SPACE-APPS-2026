@@ -1,22 +1,28 @@
-"""ORM models for M5: symptoms, crew network/auth, settings, outbox, escalation."""
+"""ORM models for M5: symptoms, settings, outbox, escalation.
+
+Sign-in accounts and sessions live in am.db.models_m6.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from am.db.base import Base, utcnow
 
 
 class SymptomReport(Base):
-    """A symptom or complaint the astronaut reported (self-rated severity).
+    """A symptom or complaint in the astronaut's own words or rating.
 
-    source: checkin | manual | chat_confirmed | simulated
-    Never created by the LLM on its own: chat-detected symptoms become a SymptomProposal
-    that the astronaut must confirm.
+    source:   manual | checkin | chat_confirmed | chat_auto | simulated
+    severity: mild | moderate | severe (self-rated) | unrated (noted from chat, not rated yet)
+    status:   active | resolved | retracted (noted in error; kept for the audit trail)
+    A chat_auto report is written by AM from an exact quote of the astronaut's message
+    (see SymptomProposal); the astronaut can rate it or retract it. The language model never
+    sets severity and never writes a report without a verified quote.
     """
 
     __tablename__ = "symptom_report"
@@ -25,23 +31,25 @@ class SymptomReport(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     astronaut_id: Mapped[int] = mapped_column(ForeignKey("astronaut.id"))
     symptom_code: Mapped[str] = mapped_column(String(48))
-    severity: Mapped[str] = mapped_column(String(16))  # mild | moderate | severe (self-rated)
+    severity: Mapped[str] = mapped_column(String(16))  # mild | moderate | severe | unrated
     note: Mapped[str] = mapped_column(Text, default="")
     onset_at: Mapped[datetime | None] = mapped_column(DateTime)
     reported_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     source: Mapped[str] = mapped_column(String(16))
     proposal_id: Mapped[int | None] = mapped_column(ForeignKey("symptom_proposal.id"))
-    status: Mapped[str] = mapped_column(String(16), default="active")  # active | resolved
+    status: Mapped[str] = mapped_column(String(16), default="active")  # active | resolved | retracted
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime)
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
 class SymptomProposal(Base):
-    """A symptom AM noticed in a chat message. Pending until the astronaut confirms or dismisses.
+    """A symptom AM noticed in a chat message: the detection record (message, exact quote, detector).
 
     `quote` must be an exact substring of the source message (verified deterministically).
     detector: keyword | llm
+    status:   pending (waiting for the astronaut) | confirmed | dismissed | auto_noted (AM recorded
+              a chat_auto report from it) | retracted (the astronaut said the note was wrong)
     """
 
     __tablename__ = "symptom_proposal"
@@ -52,7 +60,7 @@ class SymptomProposal(Base):
     symptom_code: Mapped[str] = mapped_column(String(48))
     quote: Mapped[str] = mapped_column(Text)
     detector: Mapped[str] = mapped_column(String(16))
-    status: Mapped[str] = mapped_column(String(16), default="pending")  # pending | confirmed | dismissed
+    status: Mapped[str] = mapped_column(String(16), default="pending")  # see class docstring
     decided_at: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
@@ -64,42 +72,6 @@ class AppSetting(Base):
     value: Mapped[Any] = mapped_column(JSON)
     updated_by: Mapped[str] = mapped_column(String(64), default="system")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
-
-
-class AccessCode(Base):
-    """Personal access code for crew-network sign-in. Only a salted scrypt hash is stored.
-
-    role: crew (own records only) | medical (all crew) | operator (all crew + settings)
-    """
-
-    __tablename__ = "access_code"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    astronaut_id: Mapped[int | None] = mapped_column(ForeignKey("astronaut.id"))  # None for operator/medical
-    label: Mapped[str] = mapped_column(String(80))
-    role: Mapped[str] = mapped_column(String(16))
-    code_hash: Mapped[str] = mapped_column(String(256))
-    created_by: Mapped[str] = mapped_column(String(64))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime)
-    last_used_at: Mapped[datetime | None] = mapped_column(DateTime)
-
-
-class DeviceSession(Base):
-    """Signed-in device. The bearer token is random; only its SHA-256 is stored."""
-
-    __tablename__ = "device_session"
-    __table_args__ = (UniqueConstraint("token_hash", name="uq_device_session_token"),)
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    access_code_id: Mapped[int] = mapped_column(ForeignKey("access_code.id"))
-    token_hash: Mapped[str] = mapped_column(String(64))
-    device_name: Mapped[str] = mapped_column(String(80))
-    client_host: Mapped[str | None] = mapped_column(String(64))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
-    last_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 class SyncPackage(Base):

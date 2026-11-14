@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from am.auth.guard import doctor_only, signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.audit import audit
 from am.db.base import utcnow
@@ -361,6 +362,7 @@ def _mission_out(m: Mission, current_id: int | None) -> MissionDetailOut:
 
 # ---------------------------------------------------------------- entry
 @router.get("/entry-spec", response_model=EntrySpecOut)
+@signed_in
 def entry_spec(ctx: CTX) -> EntrySpecOut:
     """Everything a manual-entry form needs, taken from the registry the ingest pipeline uses."""
     categories = list(dict.fromkeys(m.category for m in METRICS))
@@ -497,6 +499,7 @@ def radiation_cumulative(db: DB, astronaut_id: int) -> RadiationCumulativeOut:
 
 # ---------------------------------------------------------------- missions
 @router.get("/missions/environments", response_model=list[MissionEnvironmentOut])
+@signed_in
 def mission_environments() -> list[MissionEnvironmentOut]:
     return [MissionEnvironmentOut(code=code, label=label, description=desc)
             for code, (label, desc) in ENVIRONMENTS.items()]
@@ -513,6 +516,7 @@ def list_missions(db: DB, astronaut_id: int) -> list[MissionDetailOut]:
 
 
 @router.post("/missions", response_model=MissionDetailOut, status_code=201)
+@doctor_only
 def create_mission(body: MissionCreateIn, db: DB) -> MissionDetailOut:
     """Create a mission; it becomes the astronaut's current mission (day 1 = start date, UTC).
 

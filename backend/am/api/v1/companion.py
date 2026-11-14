@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from am.ai.checkin import CHECKIN_ITEMS, submit_checkin, suggestions
 from am.ai.companion import CompanionService
 from am.ai.memory import MemoryService
+from am.auth.guard import signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.api.v1.symptoms import ProposalOut, proposal_out
 from am.db.models_ai import Conversation, Message, SelfReport
@@ -127,6 +128,7 @@ def _companion(db: Session, ctx: AppContext) -> CompanionService:
 
 
 @router.get("/ai/status", response_model=AIStatusOut)
+@signed_in
 def ai_status(db: DB, ctx: CTX):
     return AIStatusOut(**ctx.llm.status(effective_chat_model(db, ctx.settings)))
 
@@ -186,6 +188,7 @@ def list_memory(db: DB, astronaut_id: int, layer: str | None = None):
 
 
 @router.get("/checkins/items", response_model=list[CheckinItemOut])
+@signed_in
 def checkin_items():
     return [CheckinItemOut(key=k, label=v[0], low_anchor=v[1], high_anchor=v[2]) for k, v in CHECKIN_ITEMS.items()]
 

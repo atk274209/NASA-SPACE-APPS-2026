@@ -5,7 +5,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse
@@ -15,22 +15,28 @@ from am.api.deps import AppContext
 from am.ai.ollama import OllamaClient
 from am.api.v1 import (
     admin,
+    auth,
     companion,
     core,
     crew,
+    crewlog,
     guidance,
     journal_ext,
     monitoring,
-    network,
+    notes,
     research,
     streaks,
     symptoms,
+    testbench,
 )
+from am.auth.guard import authorize
+from am.clock import load_clock
 from am.config import Settings, get_settings
 from am.db.base import make_engine, make_session_factory
 from am.db.migrate import upgrade_to_head
 from am.health.metrics import seed_metric_registry
 from am.policy import load_baseline_policy, load_thresholds
+from am.simlive.ticker import start_ticker, stop_ticker
 
 
 def build_context(settings: Settings) -> AppContext:
@@ -42,6 +48,7 @@ def build_context(settings: Settings) -> AppContext:
     factory = make_session_factory(engine)
     with factory() as s:
         seed_metric_registry(s)
+        load_clock(s)  # continue on the persisted mission timeline (zero offset unless the test bench moved it)
         s.commit()
     return AppContext(
         settings=settings,
@@ -82,7 +89,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.ctx = build_context(settings)
+        ticker = start_ticker(app.state.ctx) if (settings.test_bench and settings.live_ticker) else None
         yield
+        stop_ticker(ticker)
         app.state.ctx.llm.close()
         app.state.ctx.engine.dispose()
 
@@ -94,18 +103,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.include_router(core.router, prefix="/api/v1")
-    app.include_router(monitoring.router, prefix="/api/v1")
-    app.include_router(companion.router, prefix="/api/v1")
-    app.include_router(research.router, prefix="/api/v1")
-    for module in (crew, symptoms, streaks, journal_ext, admin, guidance, network):
-        app.include_router(module.router, prefix="/api/v1")
+    if settings.cors_origins:
+        app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=True,
+                           allow_methods=["*"], allow_headers=["*"])
+    # Every API route passes through `authorize` (am.auth.guard): sign-in is required and a
+    # crew member can only reach their own records unless a route is explicitly marked otherwise.
+    for module in (auth, core, monitoring, companion, research, crew, symptoms, streaks, journal_ext, admin,
+                   guidance, notes, crewlog, testbench):
+        app.include_router(module.router, prefix="/api/v1", dependencies=[Depends(authorize)])
     mount_frontend(app, settings.frontend_dist)
     return app
 

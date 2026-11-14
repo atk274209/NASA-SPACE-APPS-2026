@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from am.auth.guard import signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.api.v1.research import JournalOut
 from am.db.models import Astronaut
@@ -74,6 +75,7 @@ class DayLevelRulesOut(BaseModel):
 
 
 @router.get("/journal/day-level-rules", response_model=DayLevelRulesOut)
+@signed_in
 def day_level_rules():
     cfg = load_day_level_rules()
     return DayLevelRulesOut(

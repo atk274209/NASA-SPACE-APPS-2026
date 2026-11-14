@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from am.auth.guard import signed_in
 from am.api.deps import get_db
 from am.db.models_ai import Message
 from am.db.models_m5 import SymptomProposal, SymptomReport
@@ -126,6 +127,7 @@ def _conversation_ids(db: Session, proposals: list[SymptomProposal]) -> dict[int
 
 # ------------------------------------------------------------------ catalog
 @router.get("/symptoms/catalog", response_model=CatalogOut)
+@signed_in
 def symptom_catalog():
     return CatalogOut(
         report_promptly_label=catalog.REPORT_PROMPTLY_LABEL,

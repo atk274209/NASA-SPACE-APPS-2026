@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 
 from am.admin import backup, diagnostics, outbox, privacy, settings_api
 from am.admin.crypto import MIN_PASSPHRASE_CHARS
+from am.auth.guard import doctor_only, signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.db.models import AuditLog
 from am.schemas import AuditOut
@@ -272,11 +273,13 @@ class MarkExportedIn(BaseModel):
 
 # ------------------------------------------------------------------ settings
 @router.get("/settings", response_model=list[SettingOut])
+@doctor_only
 def list_settings(db: DB, ctx: CTX):
     return settings_api.describe_all(db, ctx.settings)
 
 
 @router.put("/settings/{key}", response_model=SettingOut)
+@doctor_only
 def update_setting(key: str, body: SettingIn, db: DB, ctx: CTX):
     try:
         out = settings_api.update(db, ctx.settings, ctx.llm, key, body.value, body.actor)
@@ -292,11 +295,13 @@ def update_setting(key: str, body: SettingIn, db: DB, ctx: CTX):
 
 # ------------------------------------------------------------------ diagnostics and privacy
 @router.get("/admin/diagnostics", response_model=DiagnosticsOut)
+@doctor_only
 def get_diagnostics(request: Request, db: DB, ctx: CTX):
     return diagnostics.collect(db, ctx, request.app.version)
 
 
 @router.get("/admin/privacy", response_model=PrivacyOut)
+@signed_in
 def get_privacy(db: DB, ctx: CTX):
     return privacy.inventory(db, ctx.settings, ctx.engine)
 
@@ -305,6 +310,7 @@ ADMIN_AUDIT_PREFIXES = ("setting.", "backup.", "outbox.")
 
 
 @router.get("/admin/audit", response_model=list[AuditOut])
+@doctor_only
 def admin_audit(db: DB, limit: Annotated[int, Query(ge=1, le=500)] = 100):
     """Audit entries for settings, backups and ground-report packages (the data-handling trail)."""
     stmt = select(AuditLog).where(or_(*(AuditLog.action.startswith(p) for p in ADMIN_AUDIT_PREFIXES)))
@@ -313,6 +319,7 @@ def admin_audit(db: DB, limit: Annotated[int, Query(ge=1, le=500)] = 100):
 
 # ------------------------------------------------------------------ encrypted backups
 @router.post("/admin/backups", response_model=BackupOut, status_code=201)
+@doctor_only
 def create_backup(body: BackupIn, db: DB, ctx: CTX):
     try:
         result = backup.create_backup(db, ctx.engine, ctx.settings, passphrase=body.passphrase.get_secret_value(),
@@ -337,11 +344,13 @@ def create_backup(body: BackupIn, db: DB, ctx: CTX):
 
 
 @router.get("/admin/backups", response_model=list[BackupOut])
+@doctor_only
 def list_backups(db: DB, ctx: CTX):
     return [backup.backup_summary(ctx.settings, p) for p in backup.list_backups(db)]
 
 
 @router.post("/admin/backups/{backup_id}/verify", response_model=VerifyOut)
+@doctor_only
 def verify_backup(backup_id: int, body: VerifyIn, db: DB, ctx: CTX):
     try:
         result = backup.verify_backup(db, ctx.settings, backup_id, passphrase=body.passphrase.get_secret_value(),
@@ -356,6 +365,7 @@ def verify_backup(backup_id: int, body: VerifyIn, db: DB, ctx: CTX):
 
 # ------------------------------------------------------------------ ground-report outbox
 @router.post("/admin/outbox/ground-report", response_model=PackageOut, status_code=201)
+@doctor_only
 def create_ground_report(body: GroundReportIn, db: DB, ctx: CTX):
     req = outbox.ReportRequest(astronaut_id=body.astronaut_id, first_day=body.first_day, last_day=body.last_day,
                                sections=tuple(body.sections), authorized_by=body.authorized_by, reason=body.reason)
@@ -379,6 +389,7 @@ def create_ground_report(body: GroundReportIn, db: DB, ctx: CTX):
 
 
 @router.get("/admin/outbox", response_model=list[PackageOut])
+@doctor_only
 def list_outbox(db: DB, ctx: CTX, astronaut_id: int | None = None):
     packages = outbox.list_packages(db, astronaut_id)
     exported = outbox.export_records(db, [p.id for p in packages])
@@ -386,6 +397,7 @@ def list_outbox(db: DB, ctx: CTX, astronaut_id: int | None = None):
 
 
 @router.get("/admin/outbox/{package_id}/download", response_class=FileResponse)
+@doctor_only
 def download_package(
     package_id: int,
     db: DB,
@@ -412,6 +424,7 @@ def download_package(
 
 
 @router.post("/admin/outbox/{package_id}/mark-exported", response_model=PackageOut)
+@doctor_only
 def mark_exported(package_id: int, body: MarkExportedIn, db: DB, ctx: CTX):
     try:
         pkg = outbox.mark_exported(db, package_id, body.actor)

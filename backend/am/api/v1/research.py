@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from am.auth.guard import doctor_only, signed_in
 from am.api.deps import AppContext, get_ctx, get_db
 from am.config import REPO_ROOT
 from am.db.models_research import (
@@ -254,6 +255,7 @@ def list_observations(db: DB, astronaut_id: int):
 
 
 @router.post("/research/observations/{obs_id}/review", response_model=ObservationOut, tags=["research"])
+@doctor_only
 def review_observation(obs_id: int, body: ReviewIn, db: DB):
     from am.audit import audit
 
@@ -335,6 +337,7 @@ def missions_history(db: DB, astronaut_id: int):
 
 # ------------------------------------------------------------------ knowledge
 @router.post("/knowledge/ingest", response_model=KnowledgeIngestOut, tags=["knowledge"])
+@doctor_only
 def knowledge_ingest(db: DB, ctx: CTX):
     rep = ingest_directory(db, KNOWLEDGE_DIR, ctx.llm, effective_embed_model(db, ctx.settings))
     db.commit()
@@ -343,11 +346,13 @@ def knowledge_ingest(db: DB, ctx: CTX):
 
 
 @router.get("/knowledge/documents", response_model=list[DocumentOut], tags=["knowledge"])
+@signed_in
 def knowledge_documents(db: DB):
     return db.scalars(select(KnowledgeDocument).order_by(KnowledgeDocument.title)).all()
 
 
 @router.get("/knowledge/search", response_model=list[dict[str, Any]], tags=["knowledge"])
+@signed_in
 def knowledge_search(db: DB, ctx: CTX, q: str, k: int = 5):
     return [h.as_dict() for h in search(db, q, llm=ctx.llm, embed_model=effective_embed_model(db, ctx.settings),
                                         k=min(k, 20))]

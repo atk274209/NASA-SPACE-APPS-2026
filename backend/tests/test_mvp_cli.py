@@ -52,7 +52,9 @@ def test_built_console_is_served_with_spa_fallback(tmp_path):
         assert c.get("/favicon.svg").text == "<svg/>"
         assert "nope" not in c.get("/../secret.txt").text
         assert c.get("/api/v1/does-not-exist").status_code == 404
-        assert c.get("/api/v1/system/status").json()["database"] == "ok"
+        assert c.get("/api/v1/system/status").status_code == 401  # the API itself needs a sign-in
+        state = c.get("/api/v1/auth/state").json()
+        assert state["signed_in"] is False and state["accounts_exist"] is False and state["setup_allowed"] is True
 
 
 def test_resolving_an_alert_closes_its_escalations(client):
@@ -76,7 +78,7 @@ def test_status_and_overview_expose_new_fields(client):
     assert rad and rad[0]["baseline_enabled"] is False
     assert all("original_value" in r["measurement"] for r in ov["latest"])
     st = client.get("/api/v1/system/status").json()
-    assert st["ollama"]["configured_chat_model"] == "qwen2.5:7b-instruct"
+    assert st["ollama"]["configured_chat_model"] == "llama3.1:8b"
 
 
 def test_slow_model_is_reported_as_timeout_not_absent():

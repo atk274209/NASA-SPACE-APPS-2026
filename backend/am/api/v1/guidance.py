@@ -13,6 +13,7 @@ from typing import Annotated, TypeVar
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from am.auth.guard import doctor_only, signed_in
 from am.api.deps import get_db
 from am.guidance import bodymap, escalation
 from am.guidance.escalation import EscalationConfigError, EscalationStateError
@@ -43,6 +44,7 @@ def _serve(fn: Callable[[], T]) -> T:
 
 
 @router.get("/guidance/levels", response_model=GuidanceLevelsOut)
+@signed_in
 def guidance_levels() -> GuidanceLevelsOut:
     return _serve(lambda: escalation.levels_out(escalation.load_matrix()))
 
@@ -69,6 +71,7 @@ def list_escalations(db: DB, astronaut_id: int, status: str | None = None) -> li
 
 
 @router.post("/escalations/{event_id}/acknowledge", response_model=EscalationOut)
+@doctor_only
 def acknowledge_escalation(event_id: int, body: AcknowledgeIn, db: DB) -> EscalationOut:
     try:
         event = escalation.acknowledge_event(db, event_id, body.actor, body.note)
