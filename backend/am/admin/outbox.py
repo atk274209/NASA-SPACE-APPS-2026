@@ -19,6 +19,7 @@ deterministic in the same way.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from collections import defaultdict
 from collections.abc import Callable
@@ -353,9 +354,31 @@ def render_json(report: dict[str, Any]) -> bytes:
 
 
 # ------------------------------------------------------------------ markdown
+# Characters with Markdown meaning (CommonMark/GFM inline and block syntax, table pipes).
+_MD_SPECIAL = set("\\`*_{}[]()#+-.!|~")
+_HTML_ENTITIES = {"&": "&amp;", "<": "&lt;", ">": "&gt;"}
+_URL_SCHEME = re.compile(r"([A-Za-z][A-Za-z0-9+.\-]*):(?=//)")
+
+
 def _esc(value: Any) -> str:
-    """Plain text for Markdown: no raw HTML from free-text fields reaches a renderer."""
-    return str(value).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    """Render free text as inert Markdown.
+
+    Free-text fields (notes, symptom descriptions, explanations) are astronaut- or
+    model-written, and the Markdown file is opened on ground systems. Every Markdown control
+    character is backslash-escaped (no images, links, emphasis, headings or table breaks),
+    HTML is entity-encoded (no raw HTML), and URL schemes are defanged ("http[:]//") so
+    renderers cannot auto-link or auto-load them. The JSON file keeps the original text.
+    """
+    text = _URL_SCHEME.sub(r"\1[:]", str(value))
+    out = []
+    for ch in text:
+        if ch in _HTML_ENTITIES:
+            out.append(_HTML_ENTITIES[ch])
+        elif ch in _MD_SPECIAL:
+            out.append("\\" + ch)
+        else:
+            out.append(ch)
+    return "".join(out)
 
 
 def _cell(value: Any) -> str:
@@ -363,7 +386,8 @@ def _cell(value: Any) -> str:
         return "–"
     if isinstance(value, bool):
         return "yes" if value else "no"
-    return " ".join(_esc(value).replace("\\", "\\\\").replace("|", "\\|").split())
+    # _esc already escapes pipes and backslashes; only collapse whitespace/newlines here.
+    return " ".join(_esc(value).split())
 
 
 def _table(headers: list[str], rows: list[list[Any]]) -> list[str]:

@@ -475,3 +475,22 @@ def test_ground_report_requests_are_validated_before_anything_is_written(client,
     assert client.get("/api/v1/admin/outbox").json() == []
     outbox_root = settings.data_dir / "outbox"
     assert not outbox_root.exists() or not any(outbox_root.iterdir())
+
+
+def test_markdown_escaping_neutralises_injection():
+    """Free text cannot inject images, links, HTML or table breaks into the ground report."""
+    from am.admin import outbox
+
+    payload = ("![x](http://evil.example/p.png) <img src=x onerror=1> [click](javascript:alert(1)) "
+               "`code` *bold* | col # head\nsecond line \ end")
+    cell = outbox._cell(payload)
+    assert "![" not in cell and "](" not in cell
+    assert "<img" not in cell and "&lt;img" in cell
+    assert "http://" not in cell and "javascript:" in cell.replace("\\", "")  # scheme without // is inert text
+    assert "\n" not in cell
+    # every pipe is escaped, so table structure is preserved
+    assert all(cell[i - 1] == "\\" for i, ch in enumerate(cell) if ch == "|")
+    # backslash is escaped exactly once (not doubled again by _cell)
+    assert "\\ end" in cell and "\\\\\\\\" not in cell
+    quoted = outbox._quote("> [x](https://a.b) ok")
+    assert "https://" not in "".join(quoted) and "](" not in "".join(quoted)
