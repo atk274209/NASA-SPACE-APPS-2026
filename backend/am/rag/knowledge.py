@@ -46,15 +46,23 @@ class IngestReport:
     embed_error: str | None
 
 
+_UNCERTAIN = ("not stated", "not established", "not verified", "uncertain", "copyright", "unclear")
+
+
+def _passages_allowed(license_basis: str) -> bool:
+    """Verbatim text only for sources explicitly recorded as US federal government works."""
+    lb = license_basis.lower()
+    return "government work" in lb and not any(u in lb for u in _UNCERTAIN)
+
+
 def _validate(doc: dict[str, Any]) -> str | None:
     for k in REQUIRED:
         if not doc.get(k):
             return f"missing '{k}'"
     if not str(doc["url"]).startswith(("http://", "https://")):
         return "url must be http(s)"
-    if doc.get("passages") and "copyright" in str(doc.get("license_basis", "")).lower() \
-            and "public domain" not in str(doc.get("license_basis", "")).lower():
-        return "verbatim passages present for a copyrighted source"
+    if doc.get("passages") and not _passages_allowed(str(doc.get("license_basis", ""))):
+        return "verbatim passages require an explicit US-government-work license basis"
     return None
 
 

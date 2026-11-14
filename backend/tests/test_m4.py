@@ -167,3 +167,12 @@ def test_journal_alert_flags_use_peak_as_of_that_day(client, decline):
 
     crit_day = (datetime.fromisoformat(first_crit).date() - date.fromisoformat(start)).days + 1
     assert crit_days and min(crit_days) == crit_day
+
+
+def test_verbatim_passages_need_explicit_government_work_basis():
+    from am.rag.knowledge import _passages_allowed
+
+    assert _passages_allowed("NASA web page, US government work; generally public domain in the US.")
+    assert not _passages_allowed("NASA Technical Reports Server record. Public-domain status not stated.")
+    assert not _passages_allowed("Peer-reviewed journal article; copyright not verified")
+    assert not _passages_allowed("Contractor-authored report")

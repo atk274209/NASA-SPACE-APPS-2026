@@ -1,9 +1,7 @@
 {
   "id": "nasa-hhp-cardiovascular-and-vision",
   "title": "Cardiovascular and Vision",
-  "authors": [
-    "Robert E. Lewis"
-  ],
+  "authors": [],
   "organization": "NASA Human Health and Performance Directorate (Johnson Space Center), Cardiovascular and Vision Laboratory",
   "published_date": "2023-03-16",
   "url": "https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/",
@@ -45,5 +43,5 @@
     "Page states it is unknown whether similar effects occur with varying gravity levels during planetary descent/ascent."
   ],
   "retrieved_at": "2026-11-14",
-  "verification_notes": "Fetched with an HTTP client on 2026-11-14; passages extracted programmatically from fetched text. Title from page <h1>. Author 'Robert E. Lewis' and datePublished 2023-03-16 (dateModified 2025-03-11) taken from the page's embedded structured metadata (JSON-LD), not from a visible byline; the author is likely the page editor/publisher rather than a scientific author. The first passage is preceded on the page by the label 'Fun Fact:', which was omitted from the excerpt."
+  "verification_notes": "Fetched with an HTTP client on 2026-11-14; passages extracted programmatically from fetched text. Title from page <h1>. Author 'Robert E. Lewis' and datePublished 2023-03-16 (dateModified 2025-03-11) taken from the page's embedded structured metadata (JSON-LD), not from a visible byline; the author is likely the page editor/publisher rather than a scientific author. The first passage is preceded on the page by the label 'Fun Fact:', which was omitted from the excerpt. [AM review: removed 'Robert E. Lewis' (page publisher metadata, not a scientific author).]"
 }
