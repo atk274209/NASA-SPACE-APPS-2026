@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api, type AlertDetail } from '../api/client'
+import { invalidateGuidance } from '../api/guidance'
+import { AlertGuidance } from '../components/Guidance'
 import {
   Button,
   DemoThresholdNote,
@@ -35,6 +37,7 @@ function AlertActions({ alert }: { alert: AlertDetail }) {
     qc.invalidateQueries({ queryKey: ['alerts'] })
     qc.invalidateQueries({ queryKey: ['alert', alert.id] })
     qc.invalidateQueries({ queryKey: ['overview'] })
+    invalidateGuidance(qc) // review state changes the level an alert counts at
   }
   const ack = useMutation({ mutationFn: () => api.acknowledge(alert.id, operator.trim(), note.trim()), onSuccess: done })
   const resolve = useMutation({ mutationFn: () => api.resolve(alert.id, operator.trim(), note.trim()), onSuccess: done })
@@ -88,6 +91,8 @@ function AlertDetailView({ id }: { id: number }) {
           {titleCase(a.metric_code.replaceAll('_', ' '))}, {contextLabel(a.context).toLowerCase()}, {a.direction} deviation
         </h2>
       </div>
+
+      <AlertGuidance alertId={a.id} />
 
       <KeyValue
         items={[

@@ -1,0 +1,50 @@
+# AM "Is this serious?" escalation matrix
+#
+# !!! DEMONSTRATION CONTENT — NOT CLINICALLY VALIDATED !!!
+# Every entry below is a placeholder written for software demonstration. It is not a
+# medical procedure. Before any operational use, the mission's medical operations team
+# must replace the wording, the people to involve and the procedure IDs with the mission's
+# approved medical contact procedures.
+#
+# What the levels mean in AM:
+#   * Alert levels come from the deterministic anomaly engine (config/thresholds.demo.yaml):
+#     statistical deviations from the astronaut's OWN baseline, not clinical cut-offs.
+#     An unacknowledged alert counts at its peak severity until a person reviews it.
+#   * Symptom levels come from the astronaut's own severity rating and the catalog's DEMO
+#     report-promptly list (backend/am/symptoms/catalog.py).
+# The text is plain language on purpose: no diagnoses, no treatment, no doses, no
+# durations. AM only says who to involve and points to the mission's own procedures.
+
+version: "demo-esc-0.1"
+label: "DEMO — NOT CLINICALLY VALIDATED"
+
+levels:
+  WATCH:
+    procedure_id: AM-DEMO-ESC-01
+    plain_meaning: Keep an eye on it
+    who_to_involve: Yourself
+    guidance: Re-measure per protocol and mention it in your check-in
+    # Nobody else is involved at this level, so AM records no escalation event for it.
+    raises_event: false
+  WARNING:
+    procedure_id: AM-DEMO-ESC-02
+    plain_meaning: Tell the crew medical officer today
+    who_to_involve: Crew medical officer
+    guidance: Discuss at the next private medical conference
+    raises_event: true
+  CRITICAL:
+    procedure_id: AM-DEMO-ESC-03
+    plain_meaning: Contact now
+    who_to_involve: Crew medical officer or flight surgeon
+    guidance: Use the mission's medical contact procedure now
+    raises_event: true
+
+# How an ACTIVE self-reported symptom maps onto the levels above (DEMO).
+# Symptoms on the DEMO report-promptly list always map to CRITICAL, whatever the rating.
+# Reporting is never discouraged: every active symptom involves the crew medical officer.
+symptoms:
+  report_promptly: CRITICAL
+  by_severity:
+    severe: CRITICAL
+    moderate: WARNING
+    mild: WARNING

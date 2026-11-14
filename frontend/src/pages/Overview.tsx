@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api, type LatestReading, type ThresholdRule } from '../api/client'
+import { BodyMap } from '../components/BodyMap'
+import { CurrentGuidance, OpenEscalations } from '../components/Guidance'
 import { DeviationStrip } from '../components/deviation'
 import { DemoThresholdNote, Empty, ErrorNote, Loading, Section, SeverityTag, SimulatedMark } from '../components/ui'
 import { contextLabel, fmtAgo, fmtNum, fmtZ, severityColor, titleCase, unitLabel } from '../lib/format'
@@ -108,6 +110,17 @@ export function OverviewPage() {
         </div>
       </div>
 
+      {/* Where it is, and how serious: body systems beside the plain-language guidance */}
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <Section title="Body map" aside="Select a system for details">
+          <BodyMap astronautId={ov.astronaut.id} />
+        </Section>
+        <div className="flex min-w-0 flex-col gap-8">
+          <CurrentGuidance astronautId={ov.astronaut.id} />
+          <OpenEscalations astronautId={ov.astronaut.id} />
+        </div>
+      </div>
+
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_380px]">
         <Section
           title="Latest readings against personal baseline"
@@ -142,7 +155,7 @@ export function OverviewPage() {
 
         <Section title="Open alerts" aside={<Link to="/alerts" className="text-signal hover:underline">All alerts</Link>}>
           {ov.open_alerts.length === 0 ? (
-            <p className="text-sm text-ink-dim">Nothing needs attention.</p>
+            <p className="text-sm text-ink-dim">No open alerts.</p>
           ) : (
             <ul className="flex flex-col">
               {ov.open_alerts.map((a) => (
