@@ -1,7 +1,12 @@
-"""Measurement ingestion pipeline: validate -> store -> assess -> alert -> baseline."""
+"""Measurement ingestion pipeline: convert -> validate -> store -> assess -> alert -> baseline.
+
+The stored `value`/`unit` are always canonical. When the entered unit had to be converted,
+the value and unit as entered are stored too (`original_value`/`original_unit`).
+"""
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -74,6 +79,12 @@ class IngestService:
         spec = get_spec(inp.metric_code)
         if spec is None:
             raise ValueError(f"unknown metric '{inp.metric_code}'")
+        if inp.value is None or not math.isfinite(inp.value):
+            # Refused outright rather than stored as rejected: the value column cannot hold
+            # NaN (SQLite turns it into NULL), and there is no number worth keeping.
+            raise ValueError("value must be a finite number")
+        if inp.confidence is not None and not math.isfinite(inp.confidence):
+            raise ValueError("confidence must be a finite number")
         now = now or utcnow()
         recorded_at = to_naive_utc(inp.recorded_at)
         vr = validate_measurement(
@@ -90,8 +101,10 @@ class IngestService:
         m = Measurement(
             astronaut_id=inp.astronaut_id,
             metric_code=spec.code,
-            value=float(inp.value),
+            value=float(vr.value if vr.value is not None else inp.value),
             unit=vr.unit or inp.unit,
+            original_value=vr.original_value,
+            original_unit=vr.original_unit,
             context=inp.context,
             recorded_at=recorded_at,
             source_id=src.id,
@@ -105,7 +118,8 @@ class IngestService:
 
         if not vr.accepted:
             audit(self.s, actor="am-ingest", action="measurement.rejected", entity="measurement",
-                  entity_id=m.id, payload={"metric": spec.code, "value": inp.value, "notes": vr.notes})
+                  entity_id=m.id, payload={"metric": spec.code, "value": inp.value, "unit": inp.unit,
+                                           "notes": vr.notes})
             m.assessment_status = AssessmentStatus.SKIPPED_REJECTED.value
             return IngestResult(m, Assessment(AssessmentStatus.SKIPPED_REJECTED, reasons=vr.notes), None, None,
                                 vr.notes)
