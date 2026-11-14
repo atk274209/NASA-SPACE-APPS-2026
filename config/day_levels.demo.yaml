@@ -1,0 +1,98 @@
+# AM mission-journal day marking rules
+#
+# !!! DEMONSTRATION RULES — NOT CLINICALLY VALIDATED !!!
+# These rules choose the colour marker of a mission-journal day. They are placeholders for
+# prototype demonstration and must be reviewed and replaced by mission medical operations
+# before any operational use. A marker summarises which stored records exist for a day. It is
+# not a diagnosis, not a triage level and not a statement about how serious anything is.
+#
+# How the rules are evaluated (backend/am/journal/levels.py):
+#   * Only records up to the end of the day are used (no hindsight). An alert counts with the
+#     peak severity its evidence had reached by the end of that day, and only if it was still
+#     open then.
+#   * Each record (symptom report, alert, journal flag, check-in rating) gives at most one
+#     reason: the first rule below that it matches, in the order listed.
+#   * The day level is the highest level among the reasons (red above yellow).
+#   * With no reason, the day is green when it has any record (a non-rejected measurement, a
+#     check-in, a symptom report or a chat message from the astronaut) and "none" otherwise.
+#
+# Rule kinds (the matchers are fixed in code; the parameters below are configuration):
+#   symptom_reported     symptom reports made that day; optional severities, categories,
+#                        report_promptly filters (categories and the report-promptly list come
+#                        from backend/am/symptoms/catalog.py)
+#   symptom_ongoing      symptom reports from an earlier day not resolved before this day began
+#   alert_as_of_day      alerts open at the end of the day with the given severities
+#   journal_flag         journal flags whose text starts with flag_prefix
+#   self_report_extreme  check-in ratings equal to the given value for their item (1 to 5 scale)
+
+version: "day-levels-demo-0.1"
+label: "DEMO rules, not clinically validated"
+note: >-
+  Day markers summarise which stored records exist for a day under demonstration rules. They are
+  not a diagnosis or a triage level. Mission medical operations must review and replace the rules
+  before operational use.
+
+levels:
+  red:
+    label: Red
+    description: At least one red rule applies to this day.
+  yellow:
+    label: Yellow
+    description: At least one yellow rule applies to this day and no red rule does.
+  green:
+    label: Green
+    description: Records exist for this day and no rule applies. Green does not mean the astronaut is well.
+  none:
+    label: No data
+    description: No measurements, check-ins, symptom reports or chat messages were recorded for this day.
+
+rules:
+  - id: behavioral_symptom_severe
+    level: red
+    kind: symptom_reported
+    categories: [behavioral]
+    severities: [severe]
+    text: A behavioural symptom was reported as severe that day.
+  - id: symptom_severe
+    level: red
+    kind: symptom_reported
+    severities: [severe]
+    text: A symptom was reported as severe that day.
+  - id: symptom_report_promptly
+    level: red
+    kind: symptom_reported
+    report_promptly: true
+    text: A symptom on the DEMO report-promptly list was reported that day.
+  - id: alert_critical
+    level: red
+    kind: alert_as_of_day
+    severities: [CRITICAL]
+    text: An alert had reached CRITICAL by the end of the day and was still open.
+  - id: symptom_other
+    level: yellow
+    kind: symptom_reported
+    text: Any other symptom was reported that day.
+  - id: symptom_ongoing
+    level: yellow
+    kind: symptom_ongoing
+    text: A symptom reported on an earlier day had not been resolved before this day began.
+  - id: alert_warning
+    level: yellow
+    kind: alert_as_of_day
+    severities: [WARNING]
+    text: An alert had reached WARNING by the end of the day and was still open.
+  - id: persistent_change
+    level: yellow
+    kind: journal_flag
+    flag_prefix: "Persistent change"
+    text: The journal flagged a persistent change against the mission-start reference.
+  - id: self_report_scale_extreme
+    level: yellow
+    kind: self_report_extreme
+    extremes:
+      mood: 1
+      stress: 5
+      fatigue: 5
+      sleep_quality: 1
+      motivation: 1
+    text: A check-in rating was at the extreme end of its 1 to 5 scale.
