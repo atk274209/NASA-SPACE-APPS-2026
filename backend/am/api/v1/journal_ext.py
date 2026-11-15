@@ -94,7 +94,9 @@ def write_day_narrative(astronaut_id: int, day: int, db: DB, ctx: CTX, body: Nar
         raise HTTPException(404, str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
-    write_narrative(db, entry, llm=ctx.llm if use_llm else None, model=effective_chat_model(db, ctx.settings))
+    model = effective_chat_model(db, ctx.settings)
+    db.commit()  # review finding R03: no write transaction may be open while the model writes the narrative
+    write_narrative(db, entry, llm=ctx.llm if use_llm else None, model=model)
     db.commit()
     return entry
 

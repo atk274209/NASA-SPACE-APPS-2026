@@ -1,13 +1,20 @@
 import { expect, test, type Page } from '@playwright/test'
 
-// Every page must load without console errors, and the console must never contact a host
-// other than the AM server itself (offline-first: fonts and scripts are bundled).
+// End-to-end tests of the signed-in, role-based app. The local language model is deliberately
+// unreachable (see playwright.config.ts): this doubles as the offline-operation test, because
+// every safety path, the doctor feed and cabin control must work without it.
+
+// Every page must load without console errors, and the app must never contact a host other than
+// the AM server itself (offline-first: fonts and scripts are bundled).
 const problems: string[] = []
 test.beforeEach(async ({ page, baseURL }) => {
   problems.length = 0
   const origin = new URL(baseURL!).origin
   page.on('pageerror', (e) => problems.push(`page error: ${e.message}`))
-  page.on('console', (m) => { if (m.type() === 'error') problems.push(`console: ${m.text()}`) })
+  page.on('console', (m) => {
+    // a wrong password is answered with HTTP 401 by design; the browser logs that as a console error
+    if (m.type() === 'error' && !m.text().includes('401')) problems.push(`console: ${m.text()}`)
+  })
   page.on('request', (r) => {
     const u = new URL(r.url())
     if (!['http:', 'https:'].includes(u.protocol)) return
@@ -18,110 +25,144 @@ test.afterEach(() => {
   expect(problems, problems.join('\n')).toEqual([])
 })
 
-async function chooseCrew(page: Page, code: string) {
+async function signIn(page: Page, username: string) {
+  await page.context().clearCookies()
   await page.goto('/')
-  const picker = page.getByLabel('Crew member')
-  await expect(picker).toBeVisible()
-  const label = await picker.locator('option', { hasText: `(${code})` }).first().textContent()
-  await picker.selectOption({ label: label!.trim() })
+  await page.getByLabel('Username').fill(username)
+  await page.getByLabel('Password').fill(`${username}-test`)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible()
 }
 
-test('overview shows the simulated crew member, body map and guidance', async ({ page }) => {
-  await chooseCrew(page, 'SIM-ALPHA')
-  await expect(page.getByRole('heading', { name: 'Simulated astronaut Alpha' })).toBeVisible()
-  await expect(page.getByText('Simulated', { exact: true }).first()).toBeVisible()
-  const systems = page.getByRole('list', { name: 'Body systems' })
-  await expect(systems).toBeVisible()
-  await systems.getByRole('button').first().click()
-  await expect(page.getByText(/DEMO/).first()).toBeVisible()
-})
-
-test('a measurement can be recorded, including a converted unit', async ({ page }) => {
-  await chooseCrew(page, 'SIM-CHARLIE')
-  await page.goto('/record')
-  await expect(page.getByRole('heading', { name: 'Record a measurement' })).toBeVisible()
-  await page.getByLabel('Indicator', { exact: true }).selectOption('body_temperature')
-  await page.getByLabel('Unit', { exact: true }).selectOption('degF') // entered in Fahrenheit, stored in Celsius
-  await page.getByLabel('Value', { exact: true }).fill('98.6')
-  await page.getByRole('button', { name: 'Record measurement' }).click()
-  await expect(page.getByText('Accepted', { exact: true }).first()).toBeVisible()
-  await expect(page.getByText('Stored as', { exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Assessment' })).toBeVisible()
-})
-
-test('constipation mentioned in chat becomes personalised missions after confirmation', async ({ page }) => {
-  await chooseCrew(page, 'SIM-CHARLIE')
-  await page.goto('/companion')
-  await page.getByRole('button', { name: /New conversation|Start a conversation/ }).first().click()
+async function say(page: Page, text: string) {
+  const conversations = page.getByRole('button', { name: 'New conversation' })
+  await conversations.click()
   const box = page.getByLabel('Message', { exact: true })
-  await box.fill('Kabızlık sorunum var, iki gündür tuvalete çıkamadım.')
+  await box.fill(text)
   await box.press('Enter')
-  // the model is offline: AM answers with its rule-based summary and still notices the symptom
-  await expect(page.getByText(/AI conversation is unavailable/).first()).toBeVisible({ timeout: 30_000 })
-  const confirm = page.getByRole('button', { name: 'Confirm symptom' }).first()
-  await expect(confirm).toBeVisible()
-  // the proposal block that owns this button: symptom label, quoted sentence, severity picker
-  const proposal = confirm.locator('xpath=ancestor::div[.//input[@type="radio"]][1]')
-  await expect(proposal.getByText('Constipation', { exact: true })).toBeVisible()
-  await expect(proposal.getByText(/Kabızlık sorunum var/)).toBeVisible()
-  await expect(confirm).toBeDisabled() // nothing is recorded until the astronaut rates and confirms it
-  await proposal.locator('input[type="radio"][value="moderate"]').check({ force: true })
-  await confirm.click()
-  await expect(page.getByRole('button', { name: 'Confirm symptom' })).toHaveCount(0)
+}
 
-  await page.goto('/missions')
-  await expect(page.getByRole('heading', { name: 'Daily missions' })).toBeVisible()
-  await expect(page.getByText('Log bowel movements today').first()).toBeVisible()
-  await expect(page.getByText(/constipation/i).first()).toBeVisible()
+test('sign-in refuses a wrong password and each role gets its own simple menu', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel('Username').fill('ast001')
+  await page.getByLabel('Password').fill('wrong-password')
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  await expect(page.getByText('Wrong username or password.')).toBeVisible()
+
+  await signIn(page, 'ast001')
+  const astronautNav = page.getByRole('navigation', { name: 'Primary' }).getByRole('link')
+  await expect(astronautNav).toHaveText(['Companion', 'Diary', 'Health', 'Journal'])
+
+  await signIn(page, 'doctor')
+  const doctorNav = page.getByRole('navigation', { name: 'Primary' }).getByRole('link')
+  await expect(doctorNav).toHaveText(['Crew', 'AM Core', 'Environment', 'Alerts', 'Settings'])
 })
 
-test('streaks page shows adherence streaks', async ({ page }) => {
-  await chooseCrew(page, 'SIM-ALPHA')
-  await page.goto('/streaks')
-  await expect(page.getByRole('heading', { name: 'Streaks' })).toBeVisible()
-  await expect(page.getByText('Longest').first()).toBeVisible()
+test('an urgent symptom reaches the doctor at once and waits for approval', async ({ page }) => {
+  await signIn(page, 'ast001')
+  await say(page, 'Göğsümde sıkışma var')
+  // fixed safety words, in Turkish, without the language model
+  await expect(page.getByText(/ekip sağlık görevlisine veya uçuş cerrahına şimdi ulaş/).first()).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('Sent to the doctor: waiting for approval')).toBeVisible()
+
+  await signIn(page, 'doctor')
+  await expect(page.getByRole('heading', { name: /Awaiting doctor approval/ })).toBeVisible()
+  const card = page.getByRole('listitem').filter({ hasText: 'Göğsümde sıkışma var' }).first()
+  await expect(card.getByText('Red', { exact: true }).first()).toBeVisible()
+  await card.getByPlaceholder(/Your decision or advice/).fill('Call me on the private loop now.')
+  await card.getByRole('button', { name: 'Approve' }).click()
+  await expect(page.getByText(/Approved by doctor/).first()).toBeVisible()
+
+  await signIn(page, 'ast001')
+  await expect(page.getByText('From your doctor')).toBeVisible()
+  await expect(page.getByText('Call me on the private loop now.')).toBeVisible()
 })
 
-test('journal marks a severe-symptom day red and writes a labelled summary offline', async ({ page }) => {
-  await chooseCrew(page, 'SIM-ALPHA')
-  await page.goto('/journal')
-  await expect(page.getByRole('heading', { name: 'Mission journal' })).toBeVisible()
-  const days = page.getByRole('navigation', { name: 'Mission days' })
-  await days.getByRole('button', { name: /Day 27\b/ }).click()
-  await expect(page.getByRole('heading', { name: /Mission day 0?27/ })).toBeVisible()
-  await expect(page.getByText(/Red/).first()).toBeVisible()
-  await page.getByRole('button', { name: /Write AI summary/ }).click()
-  // offline: the summary is the labelled rule-based template, never presented as model-written
-  await expect(page.getByText(/Rule-based template from this day's records/).first()).toBeVisible({ timeout: 30_000 })
+test('a value said in conversation is recorded with one tap', async ({ page }) => {
+  await signIn(page, 'ast002')
+  await say(page, 'Dün gece 6 saat uyudum')
+  const value = page.getByRole('listitem').filter({ hasText: 'Sleep duration' })
+  await expect(value).toBeVisible({ timeout: 30_000 })
+  await value.getByRole('button', { name: 'Record' }).click()
+  await expect(value).toHaveCount(0)
 })
 
-test('alerts show "is this serious?" guidance', async ({ page }) => {
-  await chooseCrew(page, 'SIM-BRAVO')
-  await page.goto('/alerts')
-  await expect(page.getByRole('heading', { name: 'Alert center' })).toBeVisible()
-  await expect(page.getByText('Is this serious?').first()).toBeVisible()
+test('a comfort complaint adjusts the quarters and the doctor sees why', async ({ page }) => {
+  await signIn(page, 'ast003')
+  await say(page, "I'm cold tonight")
+  await expect(page.getByText(/It felt cold, so I raised your quarters from 22 to 23/).first()).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText(/AM changed temperature 22 → 23/)).toBeVisible()
+
+  await signIn(page, 'doctor')
+  await page.getByRole('link', { name: 'Environment' }).click()
+  await expect(page.getByText('SIMULATED DEMONSTRATION LIMITS').first()).toBeVisible()
+  await expect(page.getByText(/Signal: “I'm cold tonight”/)).toBeVisible()
 })
 
-test('science analysis and settings diagnostics work offline', async ({ page }) => {
-  await chooseCrew(page, 'SIM-ALPHA')
-  await page.goto('/science')
-  await page.getByRole('button', { name: 'Run analysis' }).click()
-  await expect(page.getByText(/patterns?/).first()).toBeVisible()
-  await page.goto('/settings')
-  await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible()
-  await expect(page.getByText(/Diagnostics/).first()).toBeVisible()
+test('water is logged with one tap and the crew board ranks adherence', async ({ page }) => {
+  await signIn(page, 'ast005')
+  await page.getByRole('button', { name: /\+250 mL/ }).click()
+  await expect(page.getByText(/0\.25\s*\/ 2\.5 L/)).toBeVisible()
+  await page.getByRole('button', { name: /Vitamin D/ }).click()
+  await expect(page.getByRole('button', { name: /✓ Vitamin D/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Crew hydration board/ })).toBeVisible()
+  await expect(page.getByText('earns nothing extra', { exact: false })).toBeVisible()
 })
 
-test('pages fit a 375 px phone screen without sideways scrolling', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 })
-  await chooseCrew(page, 'SIM-ALPHA')
-  const pages = ['/', '/record', '/companion', '/health', '/baselines', '/alerts', '/missions', '/streaks',
-    '/science', '/science?tab=observations', '/science?tab=series', '/science?tab=library', '/journal',
-    '/settings', '/system']
-  for (const path of pages) {
-    await page.goto(path)
-    await page.waitForLoadState('networkidle')
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
-    expect(overflow, `${path} overflows by ${overflow}px`).toBeLessThanOrEqual(1)
+test('AM Core is sealed, shows visible decisions, and opens only with a reason', async ({ page }) => {
+  await signIn(page, 'doctor')
+  const run = await page.request.post('/api/test/end-day', { data: {} })
+  expect(run.ok()).toBeTruthy()
+  await page.getByRole('link', { name: 'AM Core' }).click()
+  await expect(page.getByText('SEALED', { exact: true })).toBeVisible()
+  await expect(page.getByText(/Attention for .* tomorrow/).first()).toBeVisible()
+  const breakSeal = page.getByRole('button', { name: 'Break the seal for 2 hours' })
+  await expect(breakSeal).toBeDisabled()
+  await page.getByPlaceholder(/Emergency reason/).fill('E2E: crew member not answering the loop')
+  await breakSeal.click()
+  await expect(page.getByText(/OPEN · emergency/)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Crew report' })).toBeVisible()
+
+  await signIn(page, 'ast005')
+  await expect(page.getByText('AM Core was opened')).toBeVisible()
+})
+
+test('crew analytics bento shows live cards from stored records', async ({ page }) => {
+  await signIn(page, 'ast004')
+  await page.getByRole('button', { name: /\+500 mL/ }).click()
+  await signIn(page, 'doctor')
+  const water = page.getByRole('region', { name: 'Crew water today' })
+  await expect(water).toBeVisible()
+  await expect(water.getByText(/500 mL/).first()).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Written to AM today' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Reported problems by body system' })).toBeVisible()
+  const radar = page.getByRole('region', { name: /Wellbeing and adherence/ })
+  await radar.getByRole('tab', { name: 'AST-004' }).click()
+  await expect(radar.getByRole('img', { name: /Samuel Idowu/ })).toBeVisible()
+  await expect(radar.getByText(/Water/).first()).toBeVisible()
+})
+
+test('phone width: no sideways scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  for (const user of ['ast004', 'doctor']) {
+    await signIn(page, user)
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow, `${user}: page is wider than the screen`).toBeLessThanOrEqual(1)
   }
+})
+
+test('the private diary talks about the day and stays away from the doctor', async ({ page }) => {
+  await signIn(page, 'ast002')
+  await page.getByRole('link', { name: 'Diary' }).click()
+  await expect(page.getByRole('heading', { name: 'Diary', level: 1 })).toBeVisible()
+  const box = page.getByLabel('Write in your diary')
+  await box.fill('Bugün robot kolla çalıştım, biraz yoruldum ama güzeldi.')
+  await box.press('Enter')
+  await expect(page.getByText('Bugün robot kolla çalıştım, biraz yoruldum ama güzeldi.')).toBeVisible()
+  await expect(page.getByText('A good day').or(page.getByText('A difficult day'))).toBeVisible({ timeout: 30_000 })
+
+  await signIn(page, 'doctor')
+  await expect(page.getByText('Bugün robot kolla çalıştım')).toHaveCount(0)
+  const sealed = await page.request.get('/api/v1/doctor/diary/2')
+  expect(sealed.status()).toBe(423)
 })

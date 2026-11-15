@@ -12,8 +12,14 @@ import {
 } from '../api/symptoms'
 import { Button, Empty, ErrorNote, inputCls, Loading, Section, SimulatedMark } from '../components/ui'
 import { fmtAgo, fmtDateTime, fmtTime, titleCase } from '../lib/format'
+import { useAuth } from '../state/auth'
 import { useSession } from '../state/session'
 import { NoCrew } from './Overview'
+import { CareBanner } from '../components/CareBanner'
+import { NotesList, ValueProposals } from '../components/Capture'
+import { PointsBadge, RoutineExams } from '../components/Exams'
+import { ComfortStrip } from '../components/ComfortStrip'
+import { HydrationCard, HydrationLeaderboard, StreakChips } from '../components/Hydration'
 
 type Ref = { type: string; id?: number; unverified_numbers?: number[]; doc_slug?: string; title?: string; url?: string }
 
@@ -27,6 +33,10 @@ function Sources({ msg }: { msg: ChatMessage }) {
   const tools = (msg.tool_calls as { name: string; ok: boolean }[]) ?? []
   const docs = [...new Map(refs.filter((r) => r.type === 'knowledge' && r.url).map((r) => [r.doc_slug, r])).values()]
   const ruleAnswer = refs.some((r) => r.type === 'safety_rule')
+  const urgent = refs.some((r) => r.type === 'safety_rule' && (r as { rule?: string }).rule === 'report_promptly_contact_now')
+  const opener = refs.some((r) => r.type === 'persona')
+  const wording = refs.find((r) => r.type === 'wording_check') as { flags?: string[] } | undefined
+  const { isDoctor } = useAuth()
   const parts = [
     count('measurement') && `${count('measurement')} measurements`,
     count('baseline') && `${count('baseline')} baselines`,
@@ -35,11 +45,16 @@ function Sources({ msg }: { msg: ChatMessage }) {
   ].filter(Boolean)
   return (
     <div className="mt-2 space-y-1 text-xs text-ink-dim">
-      {msg.generated_by === 'deterministic' && (ruleAnswer ? (
+      {msg.generated_by === 'deterministic' && !opener && (urgent ? (
+        <p>Fixed safety answer: symptoms on the DEMO report-promptly list always get these words, not the language model.</p>
+      ) : ruleAnswer ? (
         <p>Fixed answer from AM&apos;s rules: questions about treating a symptom are not sent to the language model.</p>
       ) : (
         <p className="text-sev-watch">Written by AM&apos;s rule-based summary because the language model is unavailable.</p>
       ))}
+      {wording?.flags?.length ? (
+        <p className="text-sev-watch">Wording check: this AI answer uses words that need care ({wording.flags.join(', ')}). It is not medical advice.</p>
+      ) : null}
       {tools.length > 0 && (
         <p>Checked: {tools.map((t) => t.name.replace('get_', '').replaceAll('_', ' ')).join(', ')}</p>
       )}
@@ -52,7 +67,7 @@ function Sources({ msg }: { msg: ChatMessage }) {
               {alertIds.map((id, i) => (
                 <span key={id}>
                   {i > 0 && ', '}
-                  <Link to={`/alerts?id=${id}&filter=all`} className="num text-signal hover:underline">#{id}</Link>
+                  <Link to={isDoctor ? `/alerts?id=${id}&filter=all` : '/health'} className="num text-signal hover:underline">#{id}</Link>
                 </span>
               ))}
             </>
@@ -629,9 +644,19 @@ export function CompanionPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <CareBanner astronautId={astronaut.id} />
+      <ValueProposals astronautId={astronaut.id} />
+      <StreakChips astronautId={astronaut.id} />
+      <div className="grid gap-3 lg:grid-cols-2">
+        <HydrationCard astronautId={astronaut.id} />
+        <HydrationLeaderboard />
+      </div>
+      <RoutineExams astronautId={astronaut.id} compact />
+      <ComfortStrip astronautId={astronaut.id} />
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="mr-auto text-2xl font-semibold">AM companion</h1>
         {astronaut.is_simulated && <SimulatedMark />}
+        <PointsBadge astronautId={astronaut.id} />
         <span className="text-sm text-ink-dim">
           {ai.isLoading ? 'Checking model…' : aiReady
             ? <>Local model <span className="num text-ink">{ai.data!.model}</span></>
@@ -683,6 +708,11 @@ export function CompanionPage() {
           <MemoryPanel astronautId={astronaut.id} />
         </aside>
       </div>
+      <details className="rounded-md border border-seam bg-hull px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-ink">AM&apos;s notes about you</summary>
+        <p className="mb-2 mt-1 text-xs text-ink-faint">Only you and the medical officer can read these. Each note shows the words it came from.</p>
+        <NotesList astronautId={astronaut.id} />
+      </details>
     </div>
   )
 }

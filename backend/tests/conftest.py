@@ -39,6 +39,8 @@ def settings(tmp_path) -> Settings:
         allowed_hosts=["localhost", "127.0.0.1", "testserver"],
         password_hash_profile="fast",  # cheap hashing: tests create many accounts
         live_ticker=False,          # tests drive the test bench explicitly
+        ai_triage_worker=False,     # tests run am.triage.ai.process_pending explicitly
+        am_core_worker=False,       # tests run am.amcore.narrative.process_pending explicitly
         test_accounts_file=tmp_path / "TEST_CREDENTIALS.txt",
         test_mode=True,             # mount /api/test (the Test Console router)
     )

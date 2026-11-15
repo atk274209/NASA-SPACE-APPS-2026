@@ -110,8 +110,9 @@ export const api = {
   aiStatus: () => request<AIStatus>('GET', '/ai/status'),
   conversations: (astronaut_id: number) =>
     request<Conversation[]>('GET', '/companion/conversations', undefined, { astronaut_id }),
-  createConversation: (astronaut_id: number) =>
-    request<Conversation>('POST', '/companion/conversations', { astronaut_id }),
+  // opener: AM starts the check-in with a short greeting (persona, Module O)
+  createConversation: (astronaut_id: number, opener = true) =>
+    request<Conversation>('POST', '/companion/conversations', { astronaut_id, opener }),
   messages: (conversationId: number) => request<ChatMessage[]>('GET', `/companion/conversations/${conversationId}/messages`),
   send: (conversationId: number, content: string) =>
     request<Turn>('POST', `/companion/conversations/${conversationId}/messages`, { content }),

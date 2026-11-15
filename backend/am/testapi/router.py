@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from am.ai.checkin import submit_checkin
 from am.api.deps import AppContext, get_ctx, get_db
 from am.api.v1.core import _to_out
-from am.auth.guard import CurrentUser, signed_in
+from am.auth.guard import CurrentUser, doctor_only, signed_in
 from am.db.base import clock_offset, to_naive_utc, utcnow
 from am.db.enums import SourceKind
 from am.db.models import Astronaut
@@ -301,3 +301,130 @@ def end_day_route(body: EndDayIn, db: DB, ctx: CTX, principal: CurrentUser):
 def list_runs(db: DB, principal: CurrentUser, limit: int = 20):
     runs = db.scalars(select(DayCloseRun).order_by(DayCloseRun.close_date.desc()).limit(max(1, min(limit, 100))))
     return [_end_day_out(r, False, principal) for r in runs]
+
+
+# ------------------------------------------------------------------ simulated wearable feed (Module N)
+WEARABLE_SOURCE = "simulated wearable (smart shirt)"
+WEARABLE_PRESETS = ("nominal", "elevated_heart_rate", "fever")
+
+
+class WearableIn(BaseModel):
+    astronaut_id: int
+    hours: int = Field(default=2, ge=1, le=12)
+    preset: str = Field(default="nominal", description="nominal | elevated_heart_rate | fever (SIMULATED)")
+
+
+class WearableOut(BaseModel):
+    astronaut_id: int
+    readings: int
+    alerts_touched: list[int]
+    window_start: datetime
+    window_end: datetime
+    data_origin: str = DataOrigin.SIMULATED_GENERATOR.value
+
+
+@router.post("/wearable", response_model=WearableOut, status_code=201)
+def wearable_feed(body: WearableIn, db: DB, ctx: CTX):
+    """Generate SIMULATED wearable readings for the last few hours of the open mission day.
+
+    Values are arbitrary demonstration draws (see am.simulation.generator), not physiological norms.
+    """
+    import numpy as np
+
+    from datetime import timedelta
+
+    if body.preset not in WEARABLE_PRESETS:
+        raise HTTPException(422, f"preset must be one of {list(WEARABLE_PRESETS)}")
+    end = utcnow()
+    start = end - timedelta(hours=body.hours)
+    lock = day_lock_through(db)
+    if lock is not None and start < lock:
+        start = lock
+    if start >= end:
+        raise HTTPException(409, "The mission day has just started; there is no time window to fill yet.")
+    rng = np.random.default_rng(int(end.timestamp()) % 100000 + body.astronaut_id)
+    hr_shift = 25.0 if body.preset == "elevated_heart_rate" else 12.0 if body.preset == "fever" else 0.0
+    temp_shift = 1.2 if body.preset == "fever" else 0.0
+    svc = IngestService(db, ctx.thresholds, ctx.policy)
+    readings, alerts = 0, set()
+    t = start + timedelta(minutes=10)
+    try:
+        while t <= end:
+            for metric, unit, mean, sd, dec in (("heart_rate", "bpm", 68 + hr_shift, 2.5, 0),
+                                                ("spo2", "%", 97.5, 0.5, 1),
+                                                ("body_temperature", "degC", 36.7 + temp_shift, 0.1, 2)):
+                if metric != "heart_rate" and t.minute >= 20:  # SpO2 and temperature a few times per hour
+                    continue
+                value = round(float(rng.normal(mean, sd)), dec) if dec else float(round(rng.normal(mean, sd)))
+                res = svc.ingest(MeasurementInput(astronaut_id=body.astronaut_id, metric_code=metric, value=value,
+                                                  unit=unit, context="rest", recorded_at=t, source_name=WEARABLE_SOURCE,
+                                                  source_kind=SourceKind.SIMULATED, confidence=0.9))
+                readings += 1
+                if res.alert_id:
+                    alerts.add(res.alert_id)
+            t += timedelta(minutes=10)
+    except LookupError as exc:
+        db.rollback()
+        raise HTTPException(404, str(exc)) from exc
+    db.commit()
+    return WearableOut(astronaut_id=body.astronaut_id, readings=readings, alerts_touched=sorted(alerts),
+                       window_start=start, window_end=end)
+
+
+# ------------------------------------------------------------------ cabin simulator controls (Module P)
+class CabinFaultIn(BaseModel):
+    control_id: int
+    fault: str = Field(description="none | sensor | actuator (SIMULATED)")
+
+
+class CabinDriftIn(BaseModel):
+    control_id: int
+    offset: float = Field(ge=-10, le=10, description="added to the SIMULATED reading")
+
+
+class CabinSenseOut(BaseModel):
+    alerts_raised: list[int]
+
+
+@router.post("/cabin/fault", response_model=CabinSenseOut)
+def cabin_fault(body: CabinFaultIn, db: DB, principal: CurrentUser):
+    from am.cabin import controller as cab
+    from am.db.models_cabin import EnvControl
+
+    if body.fault not in ("none", "sensor", "actuator"):
+        raise HTTPException(422, "fault must be none, sensor or actuator")
+    c = db.get(EnvControl, body.control_id)
+    if c is None:
+        raise HTTPException(404, "Control not found.")
+    c.fault = body.fault
+    cab._log(db, c, "FAULT", "P-TEST-FAULT", principal.username, reason=f"Test Console: fault set to {body.fault}")
+    alerts = cab.sense(db)
+    db.commit()
+    return CabinSenseOut(alerts_raised=[a.id for a in alerts])
+
+
+@router.post("/cabin/drift", response_model=CabinSenseOut)
+def cabin_drift(body: CabinDriftIn, db: DB, principal: CurrentUser):
+    from am.cabin import controller as cab
+    from am.db.models_cabin import EnvControl
+
+    c = db.get(EnvControl, body.control_id)
+    if c is None:
+        raise HTTPException(404, "Control not found.")
+    c.drift = body.offset
+    cab._log(db, c, "FAULT", "P-TEST-DRIFT", principal.username, reason=f"Test Console: drift set to {body.offset:+g}")
+    alerts = cab.sense(db)
+    db.commit()
+    return CabinSenseOut(alerts_raised=[a.id for a in alerts])
+
+
+# ------------------------------------------------------------------ mission return (AM Core opens for good)
+@router.post("/mission/return", response_model=dict)
+@doctor_only
+def mission_return(db: DB, principal: CurrentUser):
+    """TEST: mark the mission as returned to Earth. AM Core then stays open to the doctor."""
+    from am.amcore import access
+
+    access.mark_mission_returned(db, principal.username)
+    db.commit()
+    return access.state(db)

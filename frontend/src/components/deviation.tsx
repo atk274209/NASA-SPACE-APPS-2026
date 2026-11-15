@@ -125,7 +125,7 @@ export function BaselineBandChart({
           <YAxis
             domain={[lo - pad, hi + pad]}
             stroke="var(--color-ink-faint)"
-            tick={{ fill: 'var(--color-ink-dim)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
+            tick={{ fill: 'var(--color-ink-dim)', fontSize: 12, fontFamily: 'var(--font-sans)' }}
             tickFormatter={(v: number) => fmtNum(v, 0)}
             width={48}
           />

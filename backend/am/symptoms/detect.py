@@ -241,6 +241,25 @@ def asks_for_advice(message: str) -> bool:
     return any(p in text for p in ADVICE_REQUEST_PHRASES)
 
 
+# Review finding R02: questions about medication or treatment always get AM's fixed no-advice reply,
+# even when no symptom word is in the same message ("What should I take for it?").
+TREATMENT_REQUEST_PHRASES = (
+    "what medicine", "what medication", "which medicine", "which medication", "what should i take",
+    "what can i take", "how do i treat", "how can i treat", "how to treat", "any remedy", "any remedies",
+    "home remedy", "hangi ilac", "ilac alayim", "ilac almali", "nasil tedavi", "ne icmeliyim", "ne almaliyim",
+)
+_MEDICATION_NOUNS = re.compile(r"\b(medicine|medication|meds|pills?|drugs?|painkillers?|doses?|dosage|ilac\w*|hap\w*)\b")
+_QUESTION = re.compile(r"\?|\b(should|can|may|could|which|what|how|hangi|ne|nasil|(?:mi|mu)(?:yim|yiz|sin|siniz)?)\b")
+
+
+def asks_for_treatment(message: str) -> bool:
+    """True for a medication or treatment question, in English or Turkish."""
+    text = " ".join(_ascii(message).split())
+    if any(p in text for p in TREATMENT_REQUEST_PHRASES):
+        return True
+    return bool(_MEDICATION_NOUNS.search(text)) and bool(_QUESTION.search(text))
+
+
 def detect_keywords(message: str) -> list[Detection]:
     """One detection per symptom code: its first match that is not negated."""
     out: list[Detection] = []

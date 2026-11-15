@@ -3,18 +3,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { ErrorNote, Section } from '../components/ui'
-import { tc, type CrewDay, type EndDayRun, type TestState, type User } from './api'
+import { tc, type CabinControl, type CrewDay, type EndDayRun, type TestState, type User } from './api'
 
 const STEP_LABELS: Record<string, string> = {
+  hydration: 'Daily water total and points',
   check_logs: 'Check daily logs',
   lock_day: 'Lock the closed day',
   baselines: 'Update personal baselines',
   anomaly_persistence: 'Anomaly and persistence check',
   correlation: 'Historical correlation',
   journal: 'Daily journal',
+  am_core: 'AM Core: sealed reports and decisions',
   advance_clock: 'Advance mission clock',
   missions: "Plan next day's missions",
   streaks: 'Update streaks',
+  exams_points: 'Routine exams and points',
 }
 
 function fmtTime(iso: string | null | undefined): string {
@@ -46,7 +49,7 @@ function Field({ label, children, hint }: { label: string; children: ReactNode; 
 
 const input = 'h-9 rounded-md border border-seam-strong bg-deck px-2 text-ink outline-none focus:border-signal'
 const button =
-  'h-9 rounded-md bg-signal px-4 font-semibold text-void hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
+  'h-9 rounded-md bg-ink px-4 font-semibold text-void hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
 
 // ------------------------------------------------------------------ sign-in
 function SignIn({ fileHint }: { fileHint: string | null }) {
@@ -243,6 +246,34 @@ function SymptomForm({ astronautId }: { astronautId: number }) {
   )
 }
 
+function WearableForm({ astronautId }: { astronautId: number }) {
+  const [hours, setHours] = useState(2)
+  const [preset, setPreset] = useState('nominal')
+  const run = useMutation({ mutationFn: () => tc.wearable(astronautId, hours, preset) })
+  return (
+    <Section title="Simulated wearable feed" aside="SIMULATED_GENERATOR">
+      <p className="mb-3 text-sm text-ink-dim">
+        Fills the last hours of the open mission day with SIMULATED smart-shirt readings (heart rate, SpO2,
+        temperature). Values are arbitrary demonstration draws, not physiological norms.
+      </p>
+      <form className="flex flex-wrap items-end gap-3" onSubmit={(e) => { e.preventDefault(); run.mutate() }}>
+        <Field label="Hours"><input className={`${input} num w-20`} type="number" min={1} max={12} value={hours}
+          onChange={(e) => setHours(Number(e.target.value))} /></Field>
+        <Field label="Preset">
+          <select className={input} value={preset} onChange={(e) => setPreset(e.target.value)}>
+            <option value="nominal">nominal</option>
+            <option value="elevated_heart_rate">elevated heart rate</option>
+            <option value="fever">fever-like temperature</option>
+          </select>
+        </Field>
+        <button className={button} disabled={run.isPending}>{run.isPending ? 'Generating…' : 'Generate'}</button>
+      </form>
+      {run.error && <div className="mt-2"><ErrorNote error={run.error} /></div>}
+      {run.data && <p className="mt-2 text-sm text-sev-normal">{run.data.readings} readings stored ({run.data.data_origin}){run.data.alerts_touched.length ? `, alerts touched: ${run.data.alerts_touched.map((a) => '#' + a).join(', ')}` : ''}.</p>}
+    </Section>
+  )
+}
+
 // ------------------------------------------------------------------ End Day
 function RunView({ run }: { run: EndDayRun }) {
   return (
@@ -316,7 +347,20 @@ function EndDayPanel({ state }: { state: TestState }) {
       )}
       {end.error && <div className="mt-3"><ErrorNote error={end.error} /></div>}
       {latest && <div className="mt-4"><RunView run={latest} /></div>}
+      <MissionReturn />
     </Section>
+  )
+}
+
+function MissionReturn() {
+  const m = useMutation({ mutationFn: tc.missionReturn })
+  return (
+    <div className="mt-6 rounded-md border border-seam p-3 text-sm">
+      <p className="text-ink-dim">Mission return (doctor account): AM Core opens for good so the full mission log can be read.</p>
+      <button className="mt-2 h-8 rounded border border-seam-strong px-3 hover:border-signal" disabled={m.isPending} onClick={() => m.mutate()}>Mark mission returned</button>
+      {m.error && <div className="mt-2"><ErrorNote error={m.error} /></div>}
+      {m.data && <p className="mt-2 text-sev-normal">Mission returned: AM Core is open.</p>}
+    </div>
   )
 }
 
@@ -365,8 +409,52 @@ function ScenarioPanel({ crew, user }: { crew: CrewDay[]; user: User }) {
   )
 }
 
+// ------------------------------------------------------------------ cabin simulator
+function CabinRow({ c }: { c: CabinControl }) {
+  const qc = useQueryClient()
+  const [drift, setDrift] = useState(String(c.drift))
+  const done = () => qc.invalidateQueries({ queryKey: ['cabin'] })
+  const fault = useMutation({ mutationFn: (f: string) => tc.cabinFault(c.id, f), onSuccess: done })
+  const drifted = useMutation({ mutationFn: () => tc.cabinDrift(c.id, Number(drift)), onSuccess: done })
+  const result = fault.data ?? drifted.data
+  return (
+    <li className="grid gap-2 rounded-md border border-seam p-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-end">
+      <div>
+        <p className="font-medium">{c.zone_name} · {c.variable}</p>
+        <p className="num text-xs text-ink-dim">reading {c.reading ?? '—'} {c.unit} · setpoint {c.setpoint} · {c.mode}</p>
+      </div>
+      <Field label="Fault">
+        <select className={input} value={c.fault} onChange={(e) => fault.mutate(e.target.value)}>
+          <option value="none">none</option><option value="sensor">sensor</option><option value="actuator">actuator</option>
+        </select>
+      </Field>
+      <form className="flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); drifted.mutate() }}>
+        <Field label="Drift"><input className={`${input} num w-20`} value={drift} onChange={(e) => setDrift(e.target.value)} /></Field>
+        <button className={button} disabled={drifted.isPending || Number.isNaN(Number(drift))}>Apply</button>
+      </form>
+      {(fault.error || drifted.error) && <div className="sm:col-span-3"><ErrorNote error={fault.error ?? drifted.error} /></div>}
+      {result && <p className="text-xs text-sev-watch sm:col-span-3">{result.alerts_raised.length ? `Environment alerts raised: ${result.alerts_raised.map((a) => '#' + a).join(', ')}` : 'No alert raised.'}</p>}
+    </li>
+  )
+}
+
+function CabinPanel({ user }: { user: User }) {
+  const q = useQuery({ queryKey: ['cabin', user.astronaut_id], queryFn: () => tc.cabinState(user.role === 'doctor' ? null : user.astronaut_id), refetchInterval: 5_000 })
+  const controls = (q.data?.controls ?? []).filter((c) => user.role === 'doctor' || c.astronaut_id === user.astronaut_id)
+  return (
+    <Section title="Cabin simulator" aside="SIMULATED cabin">
+      <p className="mb-3 text-sm text-ink-dim">
+        Inject sensor or actuator faults and drift readings. AM pauses autonomy for that variable and raises an
+        environment alert when a reading leaves the envelope or a fault occurs. Cabin pressure is doctor-only.
+      </p>
+      {q.error && <ErrorNote error={q.error} />}
+      <ul className="grid gap-2">{controls.map((c) => <CabinRow key={c.id} c={c} />)}</ul>
+    </Section>
+  )
+}
+
 // ------------------------------------------------------------------ shell
-type Tab = 'log' | 'endday' | 'scenarios'
+type Tab = 'log' | 'endday' | 'scenarios' | 'cabin'
 
 function Console({ user }: { user: User }) {
   const qc = useQueryClient()
@@ -374,7 +462,7 @@ function Console({ user }: { user: User }) {
   const state = useQuery({ queryKey: ['state'], queryFn: tc.state, refetchInterval: 30_000 })
   const logout = useMutation({ mutationFn: tc.logout, onSuccess: () => qc.invalidateQueries() })
   const me = state.data?.crew.find((c) => c.astronaut_id === user.astronaut_id)
-  const tabs: [Tab, string][] = [['log', 'Live log'], ['endday', 'End Day'], ['scenarios', 'Scenarios']]
+  const tabs: [Tab, string][] = [['log', 'Live log'], ['endday', 'End Day'], ['scenarios', 'Scenarios'], ['cabin', 'Cabin']]
   return (
     <div className="mx-auto grid max-w-5xl gap-6 px-4 py-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -410,12 +498,14 @@ function Console({ user }: { user: User }) {
           <MeasurementForm astronautId={user.astronaut_id} />
           <CheckinForm astronautId={user.astronaut_id} />
           <SymptomForm astronautId={user.astronaut_id} />
+          <WearableForm astronautId={user.astronaut_id} />
         </div>
       ) : (
         <p className="text-sm text-ink-dim">Live logs are entered by astronaut accounts. Sign out and sign in as a crew member.</p>
       ))}
       {tab === 'endday' && state.data && <EndDayPanel state={state.data} />}
       {tab === 'scenarios' && state.data && <ScenarioPanel crew={state.data.crew} user={user} />}
+      {tab === 'cabin' && <CabinPanel user={user} />}
       {state.data && (
         <Section title="Crew mission days" aside={state.data.day_lock_through ? `closed through ${fmtTime(state.data.day_lock_through)}` : 'no day closed yet'}>
           <ul className="grid gap-1 text-sm">

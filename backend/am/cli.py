@@ -3,7 +3,7 @@
     uv run python -m am.cli migrate
     uv run python -m am.cli ingest-knowledge
     uv run python -m am.cli seed-demo [--narratives]
-    uv run python -m am.cli seed-crew [--reset-passwords] [--fresh-db]
+    uv run python -m am.cli seed-crew [--reset-passwords] [--simple-passwords] [--fresh-db]
     uv run python -m am.cli status
 
 The demo crew is SIMULATED data: every astronaut, mission, measurement, self-report and
@@ -215,7 +215,7 @@ def cmd_seed_crew(args) -> int:
     with ctx.session_factory() as s:
         try:
             rep = seed_crew(s, credentials_file=settings.test_accounts_file, reset_passwords=args.reset_passwords,
-                            profile=settings.password_hash_profile)
+                            simple_passwords=args.simple_passwords, profile=settings.password_hash_profile)
         except SeedError as exc:
             print(f"Not seeded: {exc}")
             return 2
@@ -254,6 +254,8 @@ def main(argv: list[str] | None = None) -> int:
     sd.set_defaults(fn=cmd_seed_demo)
     sc = sub.add_parser("seed-crew", help="create the FICTIONAL test crew (5 astronauts + doctor)")
     sc.add_argument("--reset-passwords", action="store_true", help="issue new passwords and rewrite the file")
+    sc.add_argument("--simple-passwords", action="store_true",
+                    help='easy TEST passwords "<username>-test" instead of random ones')
     sc.add_argument("--fresh-db", action="store_true",
                     help="first rename the current database file (kept, not deleted) and start a new one")
     sc.set_defaults(fn=cmd_seed_crew)

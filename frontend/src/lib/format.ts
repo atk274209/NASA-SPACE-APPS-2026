@@ -30,7 +30,15 @@ const tf = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digi
 export const fmtDateTime = (ts: string) => dtf.format(parseUtc(ts))
 export const fmtTime = (ts: string) => tf.format(parseUtc(ts))
 
-export function fmtAgo(ts: string, now = Date.now()): string {
+// Mission time = real time + an offset that only the test bench's End Day changes. "x min ago" must
+// be measured on the mission clock, not on this computer's clock, or it turns negative.
+let missionOffsetMs = 0
+export function syncMissionClock(missionNowIso: string) {
+  missionOffsetMs = parseUtc(missionNowIso).getTime() - Date.now()
+}
+export const missionNow = () => Date.now() + missionOffsetMs
+
+export function fmtAgo(ts: string, now = missionNow()): string {
   const s = Math.round((now - parseUtc(ts).getTime()) / 1000)
   if (s < 60) return `${s}s ago`
   if (s < 3600) return `${Math.round(s / 60)} min ago`

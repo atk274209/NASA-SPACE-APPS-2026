@@ -2,22 +2,25 @@ import { useQuery } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { api } from '../api/client'
+import { doctorApi } from '../api/doctor'
+import { useAuth } from '../state/auth'
 import { useSession } from '../state/session'
-import { SimulatedMark } from './ui'
+import { AmMark, SimulatedMark } from './ui'
 
-const NAV = [
-  { to: '/', label: 'Overview', icon: 'M3 12h4l3-8 4 16 3-8h4' },
-  { to: '/record', label: 'Record', icon: 'M12 5v14M5 12h14' },
-  { to: '/companion', label: 'Companion', icon: 'M4 5h16v11H9l-5 4V5zm4 5h8m-8 3h5' },
+// Simple role-based navigation: 3 items for an astronaut, doctor items for the medical officer.
+// Every earlier page is still reachable: grouped as tabs inside Health and Settings.
+const ASTRONAUT_NAV = [
+  { to: '/', label: 'Companion', icon: 'M4 5h16v11H9l-5 4V5zm4 5h8m-8 3h5' },
+  { to: '/diary', label: 'Diary', icon: 'M7 3h10a2 2 0 012 2v16l-7-4-7 4V5a2 2 0 012-2z' },
   { to: '/health', label: 'Health', icon: 'M4 19V9m6 10V5m6 14v-7m4 7H2' },
-  { to: '/baselines', label: 'Baselines', icon: 'M3 12h18M3 7h18M3 17h18' },
-  { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
-  { to: '/missions', label: 'Missions', icon: 'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2' },
-  { to: '/streaks', label: 'Streaks', icon: 'M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-3 2-4 2-7 1 1 2 2 3 4 0-3 0-5 0-7z' },
-  { to: '/science', label: 'Science', icon: 'M9 3v6L4 19a1 1 0 001 2h14a1 1 0 001-2l-5-10V3M8 3h8M7 14h10' },
   { to: '/journal', label: 'Journal', icon: 'M6 3h11a2 2 0 012 2v16H8a2 2 0 01-2-2V3zm0 16a2 2 0 012-2h11M10 7h6M10 11h6' },
+]
+const DOCTOR_NAV = [
+  { to: '/', label: 'Crew', icon: 'M9 11a4 4 0 100-8 4 4 0 000 8zm-7 10v-1a6 6 0 0112 0v1m3-10a3 3 0 100-6m4 16v-1a5 5 0 00-3-4.6' },
+  { to: '/am', label: 'AM Core', icon: 'M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 100 8 4 4 0 000-8zm0 3v2' },
+  { to: '/environment', label: 'Environment', icon: 'M12 3v10m0 0a4 4 0 104 4M8 7h2m-2 3h2M3 21h18' },
+  { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
   { to: '/settings', label: 'Settings', icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4' },
-  { to: '/system', label: 'System', icon: 'M12 8a4 4 0 100 8 4 4 0 000-8zm0-5v3m0 12v3M3 12h3m12 0h3' },
 ]
 
 function Icon({ d }: { d: string }) {
@@ -29,12 +32,21 @@ function Icon({ d }: { d: string }) {
   )
 }
 
+function UnseenRedCount() {
+  const { data } = useQuery({ queryKey: ['doctor', 'crew'], queryFn: doctorApi.crew, refetchInterval: 5_000 })
+  const n = data?.reduce((s, c) => s + c.unseen_red, 0) ?? 0
+  if (!n) return null
+  return <span className="num ml-auto rounded-sm bg-sev-critical/20 px-1.5 text-xs text-sev-critical" title="Unseen red flags">{n}</span>
+}
+
 function OpenAlertCount() {
+  const { isDoctor } = useAuth()
   const { astronaut } = useSession()
+  const scope = isDoctor ? undefined : astronaut?.id
   const { data } = useQuery({
-    queryKey: ['alerts', astronaut?.id, 'open'],
-    queryFn: () => api.alerts({ astronaut_id: astronaut!.id, open_only: true }),
-    enabled: !!astronaut,
+    queryKey: ['alerts', scope ?? 'crew', 'open'],
+    queryFn: () => api.alerts({ astronaut_id: scope, open_only: true }),
+    enabled: isDoctor || !!astronaut,
     refetchInterval: 15_000,
   })
   if (!data?.length) return null
@@ -62,42 +74,33 @@ function ServiceLights() {
   )
 }
 
-function AstronautPicker() {
-  const { astronauts, astronaut, selectAstronaut } = useSession()
-  if (!astronauts.length) return <span className="text-sm text-ink-faint">No crew records</span>
+function UserMenu() {
+  const { user } = useAuth()
+  const { astronaut } = useSession()
+  const initials = user.display_name.split(' ').filter((w) => /^[A-Za-z]/.test(w)).slice(0, 2).map((w) => w[0]).join('')
   return (
-    <div className="flex min-w-0 items-center gap-2">
-      <label htmlFor="crew" className="sr-only">Crew member</label>
-      <select
-        id="crew"
-        value={astronaut?.id ?? ''}
-        onChange={(e) => selectAstronaut(Number(e.target.value))}
-        className="min-w-0 max-w-full truncate rounded-md border border-seam-strong bg-deck px-2 py-1 text-sm text-ink focus:border-signal focus:outline-none"
-      >
-        {astronauts.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.display_name} ({a.code})
-          </option>
-        ))}
-      </select>
-      {astronaut?.is_simulated && <SimulatedMark />}
+    <div className="flex min-w-0 items-center gap-3">
+      {user.role === 'astronaut' && astronaut?.is_simulated && <SimulatedMark title="Your records in this prototype are SIMULATED test data." />}
+      <NavLink to="/profile" className="flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 hover:bg-deck" title="Profile and sign out">
+        <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-signal-dim text-sm font-semibold text-ink">{initials || '?'}</span>
+        <span className="hidden min-w-0 truncate text-sm sm:inline">{user.display_name}</span>
+      </NavLink>
     </div>
   )
 }
 
 export function Shell({ children }: { children: ReactNode }) {
+  const { isDoctor } = useAuth()
+  const nav = isDoctor ? DOCTOR_NAV : ASTRONAUT_NAV
   return (
     <div className="flex min-h-screen">
       <nav aria-label="Primary" className="sticky top-0 flex h-screen w-14 shrink-0 flex-col border-r border-seam bg-hull md:w-48">
         <div className="flex h-14 items-center gap-2 border-b border-seam px-4">
-          <svg viewBox="0 0 32 32" className="size-6 shrink-0" aria-hidden>
-            <path d="M4 20h5l2.5-7 4 12 3-9 1.5 4H28" fill="none" stroke="var(--color-signal)" strokeWidth="2.4"
-              strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="hidden text-lg font-semibold tracking-wide md:inline">AM</span>
+          <AmMark className="size-6 shrink-0" />
+          <span className="hidden text-lg font-bold md:inline" style={{ fontStretch: '125%' }}>AM</span>
         </div>
         <ul className="flex flex-col gap-0.5 p-2">
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <li key={n.to}>
               <NavLink
                 to={n.to}
@@ -111,6 +114,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <Icon d={n.icon} />
                 <span className="hidden md:inline">{n.label}</span>
                 {n.to === '/alerts' && <span className="hidden md:contents"><OpenAlertCount /></span>}
+                {isDoctor && n.to === '/' && <span className="hidden md:contents"><UnseenRedCount /></span>}
               </NavLink>
             </li>
           ))}
@@ -121,8 +125,8 @@ export function Shell({ children }: { children: ReactNode }) {
       </nav>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b border-seam bg-void/95 px-4 backdrop-blur md:px-6">
-          <AstronautPicker />
           <ServiceLights />
+          <UserMenu />
         </header>
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 md:px-6">{children}</main>
       </div>

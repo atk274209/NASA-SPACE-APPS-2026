@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, type Astronaut } from '../api/client'
+import { useAuth } from './auth'
 
 function readLocal(key: string): string | null {
   try {
@@ -30,12 +31,14 @@ interface SessionValue {
 const SessionContext = createContext<SessionValue | null>(null)
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const { data: astronauts = [], isLoading } = useQuery({ queryKey: ['astronauts'], queryFn: api.astronauts })
+  const { user } = useAuth()
+  const { data: astronauts = [], isLoading } = useQuery({ queryKey: ['astronauts', user.id], queryFn: api.astronauts })
   const [selectedId, setSelectedId] = useState<number | null>(() => {
     const v = readLocal('am.astronaut')
     return v ? Number(v) : null
   })
-  const [operator, setOperatorState] = useState(() => readLocal('am.operator') ?? '')
+  // The signed-in person acts; the name defaults to their account name (still editable for notes).
+  const [operator, setOperatorState] = useState(() => readLocal(`am.operator.${user.id}`) ?? user.display_name)
 
   // Fall back to the most recently created astronaut when the stored one no longer exists.
   useEffect(() => {
@@ -50,7 +53,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [])
   const setOperator = useCallback((name: string) => {
     setOperatorState(name)
-    writeLocal('am.operator', name || null)
+    writeLocal(`am.operator.${user.id}`, name || null)
   }, [])
 
   const value = useMemo<SessionValue>(

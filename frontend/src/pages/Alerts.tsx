@@ -19,6 +19,7 @@ import {
   SimulatedMark,
 } from '../components/ui'
 import { contextLabel, fmtAgo, fmtDateTime, fmtNum, fmtZ, severityColor, titleCase, unitLabel } from '../lib/format'
+import { useAuth } from '../state/auth'
 import { useSession } from '../state/session'
 import { NoCrew } from './Overview'
 
@@ -161,23 +162,26 @@ function AlertDetailView({ id }: { id: number }) {
 
 export function AlertsPage() {
   const { astronaut } = useSession()
+  const { isDoctor } = useAuth()
+  // The doctor's Alert center covers the whole crew; an astronaut sees only their own alerts.
+  const scope = isDoctor ? undefined : astronaut?.id
   const [params, setParams] = useSearchParams()
   const filter = FILTERS.find((f) => f.key === params.get('filter'))?.key ?? 'open'
   const selected = params.get('id') ? Number(params.get('id')) : null
 
   const list = useQuery({
-    queryKey: ['alerts', astronaut?.id, filter],
+    queryKey: ['alerts', scope ?? 'crew', filter],
     queryFn: () =>
       api.alerts({
-        astronaut_id: astronaut!.id,
+        astronaut_id: scope,
         open_only: filter === 'open' ? true : undefined,
         status: filter === 'resolved' ? 'resolved' : undefined,
       }),
-    enabled: !!astronaut,
+    enabled: isDoctor || !!astronaut,
     refetchInterval: 15_000,
   })
 
-  if (!astronaut) return <NoCrew />
+  if (!isDoctor && !astronaut) return <NoCrew />
   const set = (k: string, v: string | null) => {
     const next = new URLSearchParams(params)
     if (v === null) next.delete(k)

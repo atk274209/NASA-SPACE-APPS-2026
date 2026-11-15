@@ -142,6 +142,19 @@ export interface FixtureLoad {
   data_origin: string
 }
 
+export interface CabinControl {
+  id: number
+  zone_name: string
+  astronaut_id: number | null
+  variable: string
+  unit: string
+  mode: string
+  setpoint: number
+  reading: number | null
+  fault: string
+  drift: number
+}
+
 export const tc = {
   authState: () => call<AuthState>('GET', '/v1/auth/state'),
   login: (username: string, password: string) =>
@@ -160,6 +173,15 @@ export const tc = {
   endDay: (close_date: string) => call<EndDayRun>('POST', '/test/end-day', { close_date }),
   runs: () => call<EndDayRun[]>('GET', '/test/end-day/runs', undefined, { limit: 10 }),
   fixtures: () => call<Fixture[]>('GET', '/test/scenarios'),
+  missionReturn: () => call<{ open: boolean }>('POST', '/test/mission/return'),
+  cabinState: (astronautId: number | null) =>
+    astronautId == null
+      ? call<{ controls: CabinControl[] }>('GET', '/v1/cabin/overview')
+      : call<{ controls: CabinControl[] }>('GET', '/v1/cabin/state', undefined, { astronaut_id: astronautId }),
+  cabinFault: (control_id: number, fault: string) => call<{ alerts_raised: number[] }>('POST', '/test/cabin/fault', { control_id, fault }),
+  cabinDrift: (control_id: number, offset: number) => call<{ alerts_raised: number[] }>('POST', '/test/cabin/drift', { control_id, offset }),
+  wearable: (astronaut_id: number, hours: number, preset: string) =>
+    call<{ readings: number; alerts_touched: number[]; data_origin: string }>('POST', '/test/wearable', { astronaut_id, hours, preset }),
   loadFixture: (astronaut_id: number, scenario: string) =>
     call<FixtureLoad>('POST', '/test/scenarios/load', { astronaut_id, scenario }),
 }

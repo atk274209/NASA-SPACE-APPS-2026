@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { SystemMap } from '../components/SystemMap'
 import { useState, type FormEvent } from 'react'
 import { api } from '../api/client'
 import { crewApi } from '../api/crew'
@@ -301,19 +302,25 @@ export function SystemPage() {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">System</h1>
+      <SystemMap />
       <div className="grid gap-8 lg:grid-cols-2">
-        <Section title="Local services">
+        <Section title="Service details">
           {status.isError ? <ErrorNote error={status.error} /> : !status.data ? <Loading /> : (
-            <KeyValue
-              items={[
-                ['Database', status.data.database === 'ok' ? <span className="text-sev-normal">Online</span> : status.data.database],
-                ['Data folder', <span className="num break-all text-sm">{status.data.data_dir}</span>],
-                ['Language model service', o?.reachable ? <span className="text-sev-normal">Reachable at {o.url}</span> : <span className="text-ink-dim">Not running. Monitoring and alerts do not need it.</span>],
-                ['Installed models', o?.reachable ? (o.models.length ? o.models.join(', ') : <span className="text-sev-watch">None installed yet</span>) : '–'],
-                ['Configured chat model', <span className="num">{o?.configured_chat_model}</span>],
-                ['Baseline policy', <span className="num">{status.data.baseline_policy_version}</span>],
-              ]}
-            />
+            <details className="group">
+              <summary className="cursor-pointer text-sm text-ink-dim hover:text-ink">Show addresses, models and versions</summary>
+              <div className="mt-3">
+                <KeyValue
+                  items={[
+                    ['Database', status.data.database === 'ok' ? <span className="text-sev-normal">Online</span> : status.data.database],
+                    ['Data folder', <span className="num break-all text-sm">{status.data.data_dir}</span>],
+                    ['Language model service', o?.reachable ? <span className="text-sev-normal">Reachable at {o.url}</span> : <span className="text-ink-dim">Not running. Monitoring and alerts do not need it.</span>],
+                    ['Installed models', o?.reachable ? (o.models.length ? o.models.join(', ') : <span className="text-sev-watch">None installed yet</span>) : '–'],
+                    ['Configured chat model', <span className="num">{o?.configured_chat_model}</span>],
+                    ['Baseline policy', <span className="num">{status.data.baseline_policy_version}</span>],
+                  ]}
+                />
+              </div>
+            </details>
           )}
         </Section>
         <Section title="Alert thresholds" aside={thresholds.data && <span className="text-sev-watch">{thresholds.data.label}</span>}>

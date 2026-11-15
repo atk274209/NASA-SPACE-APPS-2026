@@ -73,7 +73,9 @@ def make_engine(url: str) -> Engine:
         def _sqlite_pragmas(dbapi_conn, _record):  # pragma: no cover - trivial
             cur = dbapi_conn.cursor()
             cur.execute("PRAGMA foreign_keys=ON")
-            cur.execute("PRAGMA busy_timeout=15000")  # ms; several writers (requests, live ticker) share the file
+            # ms; several writers (requests, live ticker, AI triage) share the file. Model calls never hold a
+            # write transaction (review findings R01/R03), so short writes only wait for each other.
+            cur.execute("PRAGMA busy_timeout=30000")
             if ":memory:" not in url:
                 cur.execute("PRAGMA journal_mode=WAL")
             cur.close()

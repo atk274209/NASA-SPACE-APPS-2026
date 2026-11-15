@@ -104,7 +104,7 @@ export function Button({
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'quiet' }) {
   const cls =
     variant === 'primary'
-      ? 'bg-signal text-void hover:bg-signal/90 disabled:bg-seam-strong disabled:text-ink-faint'
+      ? 'bg-ink text-void hover:bg-white disabled:bg-seam-strong disabled:text-ink-faint'
       : 'border border-seam-strong text-ink hover:border-signal disabled:text-ink-faint'
   return (
     <button
@@ -126,5 +126,15 @@ export function KeyValue({ items }: { items: [ReactNode, ReactNode][] }) {
         </div>
       ))}
     </dl>
+  )
+}
+
+/** The AM mark: a ring (the station) around a core (the mind at its centre). */
+export function AmMark({ className = 'size-6' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden>
+      <circle cx="16" cy="16" r="12" fill="none" stroke="var(--color-ink)" strokeWidth="2.4" />
+      <circle cx="16" cy="16" r="4.5" fill="var(--color-signal)" />
+    </svg>
   )
 }

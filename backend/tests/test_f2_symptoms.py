@@ -195,7 +195,9 @@ def test_constipation_mentioned_in_chat_becomes_personalised_missions_once_confi
     assert [(p["symptom_code"], p["status"], p["detector"]) for p in props] == [("constipation", "pending", "keyword")]
     assert props[0]["quote"] == quote and quote in turn["user_message"]["content"]
     assert (props[0]["message_id"], props[0]["conversation_id"]) == (turn["user_message"]["id"], cid)
-    assert "possible symptom in your message: constipation" in turn["assistant_message"]["content"]
+    reply = turn["assistant_message"]["content"]
+    assert ("possible symptom in your message: constipation" in reply
+            or "olası bir belirti fark ettim: kabızlık" in reply)
 
     # nothing is recorded or planned before the astronaut confirms
     assert client.get("/api/v1/symptoms", params={"astronaut_id": sim}).json() == []
@@ -214,9 +216,13 @@ def test_constipation_mentioned_in_chat_becomes_personalised_missions_once_confi
 
     tasks = _today(client, sim)
     ref = {"type": "symptom_report", "id": report["id"]}
-    for code in ("bowel_log", "hydration_log", "meal_log", "exercise_session", "symptom_followup_cmo"):
+    for code in ("bowel_log", "hydration_log", "meal_log", "symptom_followup_cmo"):
         assert ref in tasks[code]["reason_refs"], code
         assert "Symptom: constipation, self-rated mild, reported on mission day" in tasks[code]["reason"], code
+    # R05: a symptom never adds, links or prioritises an action task such as exercise
+    if "exercise_session" in tasks:
+        assert ref not in tasks["exercise_session"]["reason_refs"]
+        assert "Symptom" not in tasks["exercise_session"]["reason"]
     assert "symptom_contact_now" not in tasks  # mild, and not on the report-promptly list
     assert tasks["bowel_log"]["priority"] == 2 and tasks["symptom_followup_cmo"]["category"] == "medical"
     assert "nutrition plan" in tasks["meal_log"]["detail"]
@@ -348,19 +354,21 @@ def test_companion_sees_active_symptoms_and_uses_read_only_symptom_and_knowledge
     assert {"get_symptom_reports", "search_knowledge"} <= offered
 
 
-@pytest.mark.parametrize("text, codes", [
-    ("I can't sleep and my head hurts. What should I do?", ["insomnia", "headache"]),
-    ("Başım ağrıyor, ne yapmalıyım?", ["headache"]),
+@pytest.mark.parametrize("text, codes, intro", [
+    ("I can't sleep and my head hurts. What should I do?", ["insomnia", "headache"],
+     "AM does not give treatment or self-care advice"),
+    # M6c: the companion answers in the astronaut's language (master prompt Module L)
+    ("Başım ağrıyor, ne yapmalıyım?", ["headache"], "AM tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez"),
 ])
-def test_asking_what_to_do_about_a_symptom_gets_a_fixed_answer_not_the_model(client, sim, text, codes):
+def test_asking_what_to_do_about_a_symptom_gets_a_fixed_answer_not_the_model(client, sim, text, codes, intro):
     fake = FakeOllama([])
     client.app.state.ctx.llm = fake.client()
     turn = _say(client, _conv(client, sim), text)
     assert fake.requests == []  # the question never reaches the model
     msg = turn["assistant_message"]
     assert msg["generated_by"] == "deterministic"
-    assert msg["content"].startswith("AM does not give treatment or self-care advice")
-    assert "crew medical officer or flight surgeon" in msg["content"]
+    assert msg["content"].startswith(intro)
+    assert "crew medical officer or flight surgeon" in msg["content"] or "uçuş cerrah" in msg["content"]
     assert not any(w in msg["content"].lower() for w in TREATMENT_WORDS)
     assert {"type": "safety_rule", "rule": "no_treatment_advice"} in msg["refs"]
     assert [p["symptom_code"] for p in turn["proposals"]] == codes  # still proposed for confirmation

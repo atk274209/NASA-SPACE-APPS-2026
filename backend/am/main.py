@@ -20,6 +20,12 @@ from am.api.v1 import (
     core,
     crew,
     crewlog,
+    doctor,
+    exams,
+    cabin,
+    diary,
+    nutrition,
+    amcore,
     guidance,
     journal_ext,
     monitoring,
@@ -72,6 +78,11 @@ def mount_frontend(app: FastAPI, dist: Path | None) -> None:
     if (root / "assets").is_dir():
         app.mount("/assets", StaticFiles(directory=root / "assets"), name="assets")
 
+    # Unknown API paths answer 404 for every method (not 405 from the console's GET fallback below).
+    @app.api_route("/api/{rest:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"], include_in_schema=False)
+    def unknown_api(rest: str):
+        raise HTTPException(404, "not found")
+
     @app.get("/{path:path}", include_in_schema=False)
     def spa(path: str):
         if path == "api" or path.startswith("api/"):
@@ -90,7 +101,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         app.state.ctx = build_context(settings)
         ticker = start_ticker(app.state.ctx) if (settings.test_bench and settings.live_ticker) else None
+        triage = None
+        if settings.ai_triage_worker:
+            from am.triage.ai import TriageWorker
+
+            triage = TriageWorker(app.state.ctx).start()
+        core = None
+        if settings.am_core_worker:
+            from am.amcore.narrative import CoreWorker
+
+            core = CoreWorker(app.state.ctx).start()
         yield
+        if core is not None:
+            core.stop()
+        if triage is not None:
+            triage.stop()
         stop_ticker(ticker)
         app.state.ctx.llm.close()
         app.state.ctx.engine.dispose()
@@ -109,7 +134,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Every API route passes through `authorize` (am.auth.guard): sign-in is required and a
     # crew member can only reach their own records unless a route is explicitly marked otherwise.
     for module in (auth, core, monitoring, companion, research, crew, symptoms, streaks, journal_ext, admin,
-                   guidance, notes, crewlog, testbench):
+                   guidance, notes, crewlog, testbench, doctor, exams, cabin, nutrition, amcore, diary):
         app.include_router(module.router, prefix="/api/v1", dependencies=[Depends(authorize)])
     if settings.test_mode:
         # Test Console controls (/api/test/*): only with AM_TEST_MODE=1, same guard as /api/v1.

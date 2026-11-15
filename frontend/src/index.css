@@ -1,31 +1,34 @@
-@import '@fontsource/barlow-semi-condensed/400.css';
-@import '@fontsource/barlow-semi-condensed/500.css';
-@import '@fontsource/barlow-semi-condensed/600.css';
+@import '@fontsource-variable/archivo/wdth.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
 
-/* AM design tokens. Severity colours are reserved for severity; teal is the only accent. */
+/* AM design tokens, taken from the cabin it serves:
+   graphite panels (the station's anodised walls), Nomex white for text (crew-suit fabric),
+   and one cool accent, Earthlight blue, for focus and the current place. Green, amber, orange
+   and red belong to health severity and are never used for anything else.
+   Type is one family, Archivo: extended width for page titles, like hull lettering;
+   normal width for reading. Monospace is kept for identifiers and code only. */
 @theme {
-  --font-sans: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-sans: 'Archivo Variable', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --color-void: #08111f;      /* app background */
-  --color-hull: #0e1a2b;      /* panels */
-  --color-deck: #142338;      /* raised rows, inputs */
-  --color-seam: #1f3049;      /* hairlines */
-  --color-seam-strong: #2c4363;
-  --color-ink: #d3deec;       /* primary text */
-  --color-ink-dim: #8ea2bd;   /* secondary text */
-  --color-ink-faint: #5d7190; /* tertiary */
-  --color-signal: #3fc1c9;    /* accent */
-  --color-signal-dim: #1d5d66;
+  --color-void: #141a1f;      /* cabin: app background */
+  --color-hull: #1a2127;      /* panels */
+  --color-deck: #222b32;      /* raised rows, inputs */
+  --color-seam: #2b353d;      /* hairlines */
+  --color-seam-strong: #3a4650;
+  --color-ink: #ebe7df;       /* Nomex white: primary text */
+  --color-ink-dim: #a8afb3;   /* secondary text */
+  --color-ink-faint: #727c84; /* tertiary */
+  --color-signal: #86aef0;    /* Earthlight blue: focus, links, current place */
+  --color-signal-dim: #2f4566;
 
-  --color-sev-normal: #4fb286;
-  --color-sev-watch: #d9b44a;
-  --color-sev-warning: #e8863a;
-  --color-sev-critical: #ef4f5a;
-  --color-sim: #9d8cf0;       /* simulated-data marker */
+  --color-sev-normal: #5cb98b;
+  --color-sev-watch: #e0b64a;
+  --color-sev-warning: #ec8a3d;
+  --color-sev-critical: #ef5560;
+  --color-sim: #a99cf0;       /* simulated-data marker */
 }
 
 html {
@@ -33,6 +36,8 @@ html {
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 15px;
+  font-stretch: 100%;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   color-scheme: dark;
 }
@@ -49,11 +54,35 @@ body {
   .grid {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* Page titles: extended width, tight tracking. The one bold typographic move in the app. */
+  h1 {
+    font-stretch: 125%;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  h2,
+  h3 {
+    font-stretch: 108%;
+    letter-spacing: -0.005em;
+  }
+
+  ::selection {
+    background: var(--color-signal-dim);
+    color: var(--color-ink);
+  }
 }
 
+/* Readings: same family as the text, tabular figures so columns of numbers line up. */
 .num {
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: 'tnum' 1;
+}
+
+.mono {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
 }
 
 :focus-visible {

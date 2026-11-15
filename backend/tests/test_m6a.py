@@ -77,6 +77,12 @@ def test_seed_crew_creates_fictional_crew_and_credentials_file(client, crew, tmp
             seed_crew(s, credentials_file=path, profile="fast")
         rep = seed_crew(s, credentials_file=path, reset_passwords=True, profile="fast")
         assert rep.created_accounts == ["ast005"] and len(rep.reset_accounts) == 5
+        # easy test passwords: "<username>-test", still stored only as argon2id hashes
+        rep = seed_crew(s, credentials_file=path, reset_passwords=True, simple_passwords=True, profile="fast")
+        assert ("ast001", "ast001-test") in [(u, pw) for u, pw, _, _ in rep.credentials]
+        s.flush()
+        stored = s.scalars(select(UserAccount).where(UserAccount.username == "doctor")).one().password_hash
+        assert stored.startswith("$argon2id$") and verify_password("doctor-test", stored)
 
 
 # ------------------------------------------------------------------ data origin
@@ -291,3 +297,16 @@ def test_ai_tools_cannot_reach_another_astronaut(client, crew):
 
 def test_settings_default_keeps_test_mode_off():
     assert Settings().test_mode is False
+
+
+def test_default_data_dir_is_not_under_appdata():
+    """Packaged (MSIX) apps virtualize AppData; a database there can be split across two views."""
+    import os
+    from pathlib import Path
+
+    from am.config import _default_data_dir
+
+    d = _default_data_dir()
+    assert "appdata" not in str(d).lower()
+    if os.name == "nt":
+        assert d == Path.home() / ".am" / "data"

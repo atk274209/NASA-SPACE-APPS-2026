@@ -125,8 +125,9 @@ def test_unreachable_model_falls_back_to_deterministic_summary(client, sim):
     assert t["fallback_reason"] == "service_unreachable"
     msg = t["assistant_message"]
     assert msg["generated_by"] == "deterministic"
-    assert "Open alert: heart rate (rest)" in msg["content"]
-    assert "DEMO" in msg["content"]
+    assert "open alert" in msg["content"] and "heart rate" in msg["content"]
+    # the astronaut gets the gist: no timestamps, scores or threshold labels
+    assert "UTC" not in msg["content"] and "robust z" not in msg["content"] and "Thresholds" not in msg["content"]
     assert any(r["type"] == "alert" for r in msg["refs"])
 
 

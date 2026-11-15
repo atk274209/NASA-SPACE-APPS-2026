@@ -68,9 +68,8 @@ _LOG_SYMPTOM = TaskTemplate(
     "checkin", "AM-DEMO-SYM-03")
 _HYDRATION = TaskTemplate("hydration_log", "Log water intake", "Record today's total water intake.",
                           "measurement:water_intake:daily", "AM-DEMO-NUT-01")
-_EXERCISE = TaskTemplate("exercise_session", "Complete today's scheduled exercise session",
-                         "Follow the exercise prescription in your mission protocol; AM does not change it.",
-                         "measurement:exercise_duration:daily", "AM-DEMO-EX-01")
+# No symptom adds the exercise task (review finding R05): it would be an activity recommendation in
+# response to a symptom. The daily planner keeps its own routine exercise task.
 _SLEEP_LOG = TaskTemplate("sleep_log", "Log last night's sleep", "Make sure last night's sleep duration is recorded.",
                           "measurement:sleep_duration:daily", "AM-DEMO-SLP-02")
 _SLEEP_PREP = TaskTemplate("sleep_prep", "Sleep preparation routine",
@@ -97,7 +96,7 @@ SYMPTOMS: tuple[Symptom, ...] = (
                    TaskTemplate("meal_log", "Log today's meals",
                                 "Record what you ate, following your mission nutrition plan; AM does not change it.",
                                 "manual", "AM-DEMO-NUT-02"),
-                   _EXERCISE, _CMO_IF_CONTINUES)),
+                   _CMO_IF_CONTINUES)),
     Symptom("diarrhea", "Diarrhea", "gastrointestinal", "gastrointestinal",
             ("diarrh", "loose stool"), ("ishal",),
             tasks=(_HYDRATION, TaskTemplate("bowel_log", "Log bowel movements today",
@@ -126,11 +125,11 @@ SYMPTOMS: tuple[Symptom, ...] = (
     Symptom("back_pain", "Back pain", "pain", "musculoskeletal",
             ("back pain", "backache", "back ache", "lower back", "back hurts", "back is sore", "sore back"),
             ("bel ağrı", "belim ağrı", "sırt ağrı", "sırtım ağrı"),
-            tasks=(_LOG_SYMPTOM, _EXERCISE, _CMO_IF_CONTINUES)),
+            tasks=(_LOG_SYMPTOM, _CMO_IF_CONTINUES)),
     Symptom("muscle_soreness", "Muscle soreness", "pain", "musculoskeletal",
             ("sore muscle", "muscle pain", "muscles hurt", "muscle soreness", "muscles ache", "aching muscles"),
             ("kas ağrı", "kaslarım ağrı"),
-            tasks=(_LOG_SYMPTOM, _EXERCISE)),
+            tasks=(_LOG_SYMPTOM,)),
     Symptom("nasal_congestion", "Nasal congestion", "respiratory", "respiratory",
             ("congest", "stuffy nose", "blocked nose"), ("burnum tıkalı", "burun tıkan", "tıkanıklık"),
             tasks=(_LOG_SYMPTOM, _SLEEP_LOG)),
@@ -184,6 +183,12 @@ SYMPTOMS: tuple[Symptom, ...] = (
     Symptom("loneliness", "Feeling isolated or lonely", "behavioral", "neuro_behavioral",
             ("lonely", "isolated", "homesick", "miss my family", "miss home"), ("yalnız", "özledim", "izole"),
             tasks=(_BEHAVIORAL,)),
+    # Review finding R04: self-harm disclosures must escalate, never stay "green".
+    Symptom("self_harm_thoughts", "Thoughts of self-harm or suicide", "behavioral", "neuro_behavioral",
+            ("kill myself", "end my life", "suicid", "hurt myself", "harm myself", "self-harm", "self harm",
+             "want to die"),
+            ("intihar", "kendimi öldür", "kendime zarar", "ölmek istiyorum", "yaşamak istemiyorum"),
+            report_promptly=True, tasks=(_CONTACT_NOW, _BEHAVIORAL)),
 )
 
 BY_CODE: dict[str, Symptom] = {s.code: s for s in SYMPTOMS}

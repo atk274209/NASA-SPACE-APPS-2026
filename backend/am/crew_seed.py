@@ -142,9 +142,17 @@ def write_credentials(path: Path, rows: list[tuple[str, str, str, str]]) -> None
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def simple_password(username: str) -> str:
+    """Easy-to-type TEST password ("ast001-test"). Only for the fictional local test crew."""
+    return f"{username}-test"
+
+
 def seed_crew(s: Session, *, credentials_file: Path, reset_passwords: bool = False,
-              profile: str = "standard", actor: str = "am-cli") -> SeedReport:
+              simple_passwords: bool = False, profile: str = "standard", actor: str = "am-cli") -> SeedReport:
     """Create the fictional test crew and the doctor account.
+
+    simple_passwords: use "<username>-test" instead of random passwords, so testers can type
+    them from memory. They are still stored only as argon2id hashes.
 
     - No test account exists yet: create everything and write the credentials file.
     - All exist: do nothing unless reset_passwords, which issues new passwords and rewrites the file.
@@ -170,7 +178,7 @@ def seed_crew(s: Session, *, credentials_file: Path, reset_passwords: bool = Fal
         members.append((m.username, m.name, ROLE_ASTRONAUT, _astronaut(s, m).id))
     members.append((DOCTOR_USERNAME, DOCTOR_NAME, ROLE_DOCTOR, None))
     for username, name, role, astronaut_id in members:
-        pw = generate_password()
+        pw = simple_password(username) if simple_passwords else generate_password()
         user = existing.get(username)
         if user is None:
             create_account(s, username=username, display_name=name, role=role, password=pw,

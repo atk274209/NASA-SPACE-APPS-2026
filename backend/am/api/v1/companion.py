@@ -38,6 +38,7 @@ class AIStatusOut(BaseModel):
 
 class ConversationIn(BaseModel):
     astronaut_id: int
+    opener: bool = False  # AM starts the check-in with a short greeting (persona, Module O)
 
 
 class ConversationOut(ORM):
@@ -142,7 +143,7 @@ def list_conversations(db: DB, astronaut_id: int):
 @router.post("/companion/conversations", response_model=ConversationOut, status_code=201)
 def create_conversation(body: ConversationIn, db: DB, ctx: CTX):
     try:
-        c = _companion(db, ctx).create_conversation(body.astronaut_id)
+        c = _companion(db, ctx).create_conversation(body.astronaut_id, opener=body.opener)
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     db.commit()

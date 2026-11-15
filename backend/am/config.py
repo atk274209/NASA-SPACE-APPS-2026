@@ -1,8 +1,14 @@
 """Application settings.
 
 All runtime data (database, backups, vector index) lives OUTSIDE the source tree by
-default, under %LOCALAPPDATA%/AM/data (or ~/.local/share/am on other systems). The
-source tree sits in a cloud-synced folder; health data must never be synced implicitly.
+default: health data must never be synced implicitly with the code.
+
+Windows: %USERPROFILE%\\.am\\data. NOT under %LOCALAPPDATA%: packaged (MSIX) apps, such as the
+Claude desktop app, see a virtualized copy of AppData. Processes started from such an app write
+new files into a private package folder, while other processes see only the real folder. A
+SQLite database and its -wal/-shm files then end up split across the two views, which corrupts
+the database (this happened on 2026-11-14). The user profile root is not virtualized.
+Other systems: ~/.local/share/am. Override with AM_DATA_DIR or AM_DATABASE_URL.
 """
 
 from __future__ import annotations
@@ -18,9 +24,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _default_data_dir() -> Path:
-    local = os.environ.get("LOCALAPPDATA")
-    if local:
-        return Path(local) / "AM" / "data"
+    if os.name == "nt":
+        return Path.home() / ".am" / "data"  # not AppData: see the module docstring
     return Path.home() / ".local" / "share" / "am"
 
 
@@ -57,6 +62,10 @@ class Settings(BaseSettings):
     test_bench: bool = True
     # Background generation of simulated live telemetry while the test bench is on.
     live_ticker: bool = True
+    # Background AI triage of the doctor's live feed (am.triage.ai). The rule level never depends on it.
+    ai_triage_worker: bool = True
+    # Background writer of AM Core report narratives (am.amcore.narrative).
+    am_core_worker: bool = True
 
     @property
     def resolved_database_url(self) -> str:

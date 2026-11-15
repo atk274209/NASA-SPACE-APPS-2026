@@ -6,7 +6,7 @@ import { defineConfig } from '@playwright/test'
 const here = path.dirname(fileURLToPath(import.meta.url))
 
 // End-to-end tests run against a throwaway AM instance:
-//  - fresh temporary database seeded with the SIMULATED demo crew
+//  - fresh temporary database seeded with the FICTIONAL test crew (5 astronauts + doctor)
 //  - the API serving the built console (run `npm run build` first; `npm run e2e` does)
 //  - the local language model deliberately unreachable, so every AI path uses its
 //    deterministic fallback (this is also the offline-operation test)
@@ -29,7 +29,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: `uv run python -m am.cli seed-demo && uv run uvicorn am.main:app --host 127.0.0.1 --port ${PORT}`,
+    // The fictional test crew with easy passwords ("<username>-test"), in a throwaway database.
+    command: `uv run python -m am.cli seed-crew --simple-passwords && uv run uvicorn am.main:app --host 127.0.0.1 --port ${PORT}`,
     cwd: path.resolve(here, '..', 'backend'),
     url: `http://127.0.0.1:${PORT}/api/v1/system/status`,
     timeout: 240_000,
@@ -38,6 +39,9 @@ export default defineConfig({
       AM_DATA_DIR: dataDir,
       AM_DATABASE_URL: `sqlite:///${path.join(dataDir, 'e2e.sqlite3').replaceAll('\\', '/')}`,
       AM_OLLAMA_URL: 'http://127.0.0.1:9',
+      AM_TEST_ACCOUNTS_FILE: path.join(dataDir, 'TEST_CREDENTIALS.txt'), // never the developer's own file
+      AM_PASSWORD_HASH_PROFILE: 'fast',
+      AM_TEST_MODE: '1',
     },
   },
 })

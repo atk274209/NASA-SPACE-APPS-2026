@@ -1,0 +1,53 @@
+# Cabin comfort control safety envelope (master prompt Module P).
+#
+# !!! SIMULATED DEMONSTRATION LIMITS: NOT ENGINEERING OR CLINICAL LIMITS !!!
+# Every number below is a placeholder for exercising the control software against a SIMULATED cabin.
+# They are not taken from any habitability standard and must be replaced by the vehicle's approved
+# environmental limits before any real use.
+
+version: "demo-cabin-0.1"
+label: "SIMULATED DEMONSTRATION LIMITS"
+
+variables:
+  temperature:
+    unit: "degC"
+    scope: zone            # per crew quarters
+    default: 22.0
+    min: 18.0              # hard limits: nobody, not even manual control, goes outside these
+    max: 27.0
+    step: 1.0              # one autonomous adjustment
+    max_change_per_hour: 2.0
+    noise: 0.1             # simulated sensor noise (standard deviation)
+    verify_tolerance: 0.5
+  lighting:
+    unit: "%"
+    scope: zone
+    default: 60.0
+    min: 5.0
+    max: 100.0
+    step: 15.0
+    max_change_per_hour: 45.0
+    noise: 1.0
+    verify_tolerance: 5.0
+  pressure:
+    unit: "kPa"
+    scope: cabin           # cabin-wide and safety-critical
+    default: 101.3
+    min: 99.0              # hard limits for doctor-approved exceptions
+    max: 103.0
+    autonomous_min: 101.0  # the narrow band where AM may correct drift on its own
+    autonomous_max: 101.6
+    step: 0.1
+    max_change_per_hour: 0.3
+    noise: 0.02
+    verify_tolerance: 0.1
+
+# Comfort context by mission-time hour (for the per-astronaut comfort profile).
+contexts:
+  sleep: [22, 7]   # 22:00 to 07:00
+  work: [7, 22]
+
+# Repeated discomfort: this many "did not help" answers for the same variable within the window
+# raise a WATCH environment alert for the doctor.
+unresolved_feedback_count: 2
+unresolved_window_hours: 24

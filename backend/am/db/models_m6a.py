@@ -64,6 +64,8 @@ class AstronautProfile(Base):
     chronic_conditions: Mapped[list[str]] = mapped_column(JSON, default=list)
     allergies: Mapped[list[str]] = mapped_column(JSON, default=list)
     is_fictional: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Crew hydration leaderboard (adherence only, never amounts). The astronaut can leave it any time.
+    leaderboard_opt_in: Mapped[bool] = mapped_column(Boolean, default=True, server_default="1")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
 
 

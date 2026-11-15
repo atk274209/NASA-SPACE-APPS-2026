@@ -107,3 +107,98 @@ The main app's dev server returns 404 for `/testconsole/*` and `/src/testconsole
 - Main-app sign-in screen, role-based navigation (3 astronaut / 4 doctor items), doctor console: M6b.
   Until then the main app's dev UI has no sign-in screen and its API calls get 401.
 - Doctor READ audit events: M6b.
+
+---
+
+# M6b–M6e (built 2026-11-14, after "complete the app")
+
+## Decisions added by the user
+
+- **AI flag (yellow/red):** deterministic rules set the floor; the local model adds a suggestion that
+  must quote the astronaut's text and can only RAISE the level shown, never lower it. Only a rule-level
+  red waits for doctor approval (Engineering Rule 8).
+- **Commits:** none until the user asks at the end.
+
+## M6b: live doctor feed, sign-in, roles
+
+- `report_flag` (am/db/models_m6b.py): one row per thing an astronaut writes (chat message, symptom
+  report, check-in note), created by ORM events the moment it is stored. Rules in `am/triage/rules.py`
+  (R-TEXT-SELFHARM, R-TEXT-PROMPTLY, R-TEXT-SYMPTOM, R-SYM-LEVEL); AI suggestion by a background worker
+  (`am/triage/ai.py`) with no database transaction open during the model call.
+- Doctor: `/doctor/feed` (poll with `after_id`), `/doctor/crew`, `/doctor/approvals`,
+  `/doctor/feed/{id}/seen|approve`. Astronaut: `/care/status` (awaiting approval + DEMO protocol).
+- Doctor reads of crew records are audited (`doctor.read`), once per session, astronaut and route per
+  10 minutes.
+- Main app: sign-in page; astronaut menu Companion / Health / Journal (+ Profile); doctor menu Crew /
+  Environment / Alerts / Settings. Earlier pages regrouped as tabs (Health: Today, Trends, Baselines,
+  Insights, Missions, Streaks; Settings: Settings, System and audit). Manual entry lives in the Test Console.
+
+## M6c: companion safety, persona, conversation capture
+
+- Review findings fixed: R01/R03 (no write lock during model calls; busy timeout 30 s), R02 (medication
+  and treatment questions always get the fixed no-advice reply, also as follow-ups; wording check on
+  model answers), R04 (self-harm catalog entry, red), R05 (symptoms never add action tasks such as
+  exercise), R06 (report-promptly symptoms get fixed contact-now words, online or offline).
+- Replies follow the astronaut's language (Turkish/English); fixed safety texts exist in both.
+- Persona (Module O): `config/persona/am_companion.v1.yaml`, after the safety rules in the prompt;
+  one open question per reply (post-check); deterministic opener for a new conversation.
+- Module L: stated values (heart rate, sleep, water, temperature, SpO2, blood pressure) become
+  `measurement_proposal` rows; one tap records them through the normal ingest pipeline
+  (source "AM conversation (CONVERSATION_EXTRACTED)"). AM writes `ai_note` rows with exact quotes.
+
+## M6d: routine exams, points, wearable feed, explanation
+
+- `config/routine_exams.demo.yaml` (DEMO intervals): blood, urine, reflex, eye exams; due/overdue;
+  results are what the astronaut enters. Points reward adherence only (End Day step `exams_points`).
+- Test Console: simulated wearable feed (`/api/test/wearable`, presets nominal / elevated heart rate / fever).
+- `/explain`: deterministic factors behind the DEMO risk level (alerts with rule ids and evidence,
+  flagged reports, 3-day trend vs baseline). No probability is shown.
+
+## M6e: cabin comfort control (Module P)
+
+- `config/cabin_envelope.demo.yaml`: SIMULATED DEMONSTRATION LIMITS (temperature, lighting per quarters;
+  pressure cabin-wide with a narrow autonomous band).
+- `am/cabin`: comfort extraction (EN/TR, negation-aware), SimulatedCabin behind the CabinActuator
+  protocol, deterministic controller with rule ids P-*. Pressure complaints are reported, never acted on.
+- Manual control always wins (mode MANUAL until someone re-enables autonomy); pressure outside the band
+  needs the doctor and a logged reason; faults and out-of-envelope readings pause autonomy and raise
+  environment alerts.
+- Astronaut comfort strip (Companion), doctor Environment screen, Test Console cabin fault/drift tab.
+
+## Not done
+
+- The five official challenge resources are not yet in the knowledge base (decision 10): each source
+  needs fetching and a licence check first.
+- Voice-tone and facial-expression analysis: not built, no UI (roadmap).
+
+# M6f–M6g (2026-11-14)
+
+## M6f: water, vitamins, crew board, streaks
+
+- `config/nutrition.demo.yaml`: DEMO daily water target, quick-add sizes, the protocol's supplement list.
+  AM records what was drunk or taken; it never suggests a supplement or a dose.
+- `hydration_log` (each drink; water said in chat goes here too) and `supplement_log` (taken today).
+  End Day step `hydration` stores the day's total once as a `water_intake` measurement and awards
+  adherence points (target met: once a day; supplements logged: once a day).
+- Crew hydration board (user decisions): ranked by days the target was met and adherence capped at
+  100 % (drinking more earns nothing extra); no amounts shown; opt-in, default on, leave any time in
+  Profile (audited).
+- Companion shows the mission-completion, check-in and hydration streaks.
+
+## M6g: AM Core (user design)
+
+- AM Core is the station intelligence's own back end. The crew has no access. The doctor always sees
+  the decisions marked visible (attention level, doctor notices, mission focus, crew recommendations).
+  The full core (daily astronaut and crew reports, behaviour, crew attitude, mission log, summary)
+  opens only (a) in an emergency: the doctor breaks the seal with a logged reason for 2 hours and the
+  crew is told who opened it and why, or (b) after mission return (Test Console button), for good.
+- End Day step `am_core` (after `journal`): deterministic facts and assessment per astronaut and for
+  the crew, and AM's own decisions (rules A-*). Behaviour = self-rating trends (DEMO rule: 3-day mean
+  moved by >= 1.0) and topics the astronaut raised; observations, not clinical assessments.
+- Narratives: background worker; the local model writes each report from its stored facts only, with
+  grounding and wording checks kept on the report; template text when the model is offline.
+- Safety: nothing safety-relevant is sealed (alerts, red flags and approvals keep reaching the doctor
+  through the live feed), and AM Core never decides medical or emergency status.
+- Transparency trade-off (master prompt Module O says the astronaut can read what AM notes about them):
+  the astronaut can still read AM's notes and journal; they are told the sealed log exists (Profile)
+  and are notified whenever it is opened, but not its content.

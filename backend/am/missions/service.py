@@ -89,6 +89,12 @@ for _s in symptom_catalog.SYMPTOMS:
         _CATALOG_TASKS.setdefault(_t.code, _t)
 
 
+# Action tasks (exercise, sleep routine, behavioural support) are never added or prioritised because of a
+# symptom: that would be an activity recommendation in response to a symptom, i.e. treatment advice
+# (review finding R05). A symptom only adds logging and reporting prompts.
+_SYMPTOM_ACTION_TASKS = frozenset({"exercise_session", "sleep_prep", "behavioral_support"})
+
+
 def _from_catalog(t: symptom_catalog.TaskTemplate) -> Template:
     """Reuse the generic mission template when the code exists; otherwise build it from the catalog."""
     if t.code in T:
@@ -225,6 +231,8 @@ class MissionService:
             if (sym.report_promptly or r.severity == "severe") and all(t.code != CONTACT_NOW for t in templates):
                 templates.append(_CATALOG_TASKS[CONTACT_NOW])
             for t in templates:
+                if t.code in _SYMPTOM_ACTION_TASKS:  # review finding R05: a symptom never prompts an action
+                    continue
                 out.append(Plan(t.code, 1 if t.code == CONTACT_NOW else priority, reason,
                                 [{"type": "symptom_report", "id": r.id}], _from_catalog(t)))
         return out

@@ -75,6 +75,21 @@ The tools reject ambiguous calls (for example, a missing context) instead of gue
 
 The backend has 64 pytest tests in total.
 
+**M6 is done: a signed-in, role-based app** (see [docs/M6_SPEC.md](docs/M6_SPEC.md)).
+
+- Sign-in with five FICTIONAL test astronauts and one doctor (`seed-crew --simple-passwords`
+  gives passwords like `ast001-test`). Astronaut menu: Companion, Health, Journal. Doctor menu:
+  Crew, Environment, Alerts, Settings.
+- Whatever an astronaut writes reaches the doctor's live feed at once, flagged yellow or red: the
+  deterministic rules set the floor, the local model may only raise it, and rule-level red waits
+  for the doctor's approval.
+- Companion: replies in Turkish or English, a versioned persona, fixed safety answers for urgent
+  symptoms and medication questions, one-tap recording of values said in conversation, AM's notes.
+- Routine exams with DEMO intervals and adherence points; explainable risk factors.
+- Comfort-aware cabin control against a SIMULATED cabin, inside SIMULATED DEMONSTRATION LIMITS,
+  with manual override and an Environment screen.
+- Separate Test Console (port 5174): live test entries, End Day, scenarios, wearable feed, cabin faults.
+
 ## Layout
 
 ```
@@ -101,8 +116,14 @@ To use a different chat model, set `AM_CHAT_MODEL`.
 
 ## Data location
 
-The database lives **outside** this (OneDrive-synced) folder:
-`%LOCALAPPDATA%\AM\data\am.sqlite3`.
+The database lives **outside** the source tree, so health data is never synced with the code:
+
+- Windows: `%USERPROFILE%\.am\data\am.sqlite3`
+- Other systems: `~/.local/share/am/am.sqlite3`
+
+On Windows it is deliberately **not** under `%LOCALAPPDATA%`. Packaged (MSIX) apps such as the
+Claude desktop app see a virtualized copy of AppData. A SQLite file and its `-wal`/`-shm` files
+can then be split between the real folder and the app's private copy, which corrupts the database.
 
 To use a different location, set `AM_DATA_DIR` or `AM_DATABASE_URL`.
 

@@ -30,6 +30,8 @@ astronaut's request for it is refused (403) rather than served unchecked.
 
 from __future__ import annotations
 
+import threading
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Annotated, Any
@@ -38,7 +40,7 @@ from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
-from am.audit import set_audit_user
+from am.audit import audit, set_audit_user
 from am.auth.service import ROLE_ASTRONAUT, ROLE_DOCTOR, resolve_session, session_cookie_name, touch_session
 
 PUBLIC = "public"
@@ -179,8 +181,31 @@ def _same_origin(request: Request) -> bool:
     return origin.split("://", 1)[-1].lower() == host.lower()
 
 
+# Doctor reads of crew records are audited (master prompt Module J). Polling screens read every few
+# seconds, so one entry per (doctor session, astronaut, route) per READ_AUDIT_WINDOW is enough.
+READ_AUDIT_WINDOW_S = 600
+_read_seen: dict[tuple[int, int | None, str], float] = {}
+_read_lock = threading.Lock()
+
+
+def _audit_doctor_read(s: Session, principal: Principal, route: str, owners: set[int] | None) -> bool:
+    now = time.monotonic()
+    targets: list[int | None] = sorted(owners) if owners else [None]  # None: a crew-wide doctor screen
+    fresh = []
+    with _read_lock:
+        for owner in targets:
+            key = (principal.session_id, owner, route)
+            if now - _read_seen.get(key, -1e9) >= READ_AUDIT_WINDOW_S:
+                _read_seen[key] = now
+                fresh.append(owner)
+    for owner in fresh:
+        audit(s, actor=principal.username, action="doctor.read", entity="astronaut" if owner else "crew",
+              entity_id=owner, payload={"route": route})
+    return bool(fresh)
+
+
 def _evaluate(ctx: Any, token: str | None, policy: str, path_params: dict[str, Any], query_ids: list[str],
-              body: Any, client_host: str | None) -> Principal | None:
+              body: Any, client_host: str | None, method: str = "GET", route: str = "") -> Principal | None:
     """Runs in a worker thread with its own short database session."""
     with ctx.session_factory() as s:
         found = resolve_session(s, token)
@@ -195,6 +220,13 @@ def _evaluate(ctx: Any, token: str | None, policy: str, path_params: dict[str, A
                               role=user.role, astronaut_id=user.astronaut_id, session_id=row.id,
                               device_name=row.device_name, client_host=client_host,
                               is_test_account=user.is_test_account)
+        if principal.is_doctor and method == "GET" and policy in (SCOPED, DOCTOR) and route:
+            try:
+                owners = referenced_astronauts(s, path_params, query_ids, None) if policy == SCOPED else None
+            except _Deny:
+                owners = None
+            if _audit_doctor_read(s, principal, route, owners):
+                s.commit()
         if policy in (PUBLIC, SIGNED_IN) or principal.is_doctor:
             return principal
         if policy == DOCTOR:
@@ -225,7 +257,8 @@ async def authorize(request: Request) -> None:
     try:
         principal = await run_in_threadpool(
             _evaluate, request.app.state.ctx, _token_from(request), policy, dict(request.path_params),
-            request.query_params.getlist("astronaut_id"), body, client_host)
+            request.query_params.getlist("astronaut_id"), body, client_host, request.method,
+            getattr(request.scope.get("route"), "path", ""))
     except _Deny as deny:
         raise HTTPException(deny.status, deny.detail) from None
     request.state.principal = principal

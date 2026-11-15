@@ -35,8 +35,8 @@ from am.db.models_research import DailyTask
 WAKE_HOUR = 7  # End Day moves mission time to 07:00 of the next day (crew wake-up)
 DAY_LOCK_KEY = "day_lock_through"
 
-STEP_ORDER = ("check_logs", "lock_day", "baselines", "anomaly_persistence", "correlation", "journal",
-              "advance_clock", "missions", "streaks")
+STEP_ORDER = ("hydration", "check_logs", "lock_day", "baselines", "anomaly_persistence", "correlation", "journal",
+              "am_core", "advance_clock", "missions", "streaks", "exams_points")
 
 _run_lock = threading.Lock()  # one End Day at a time in this process
 
@@ -89,6 +89,13 @@ StepFn = Callable[[Session, Any, DayCloseRun, list[CrewMemberDay]], dict[str, An
 
 def _per(member: CrewMemberDay) -> str:
     return str(member.astronaut_id)
+
+
+def step_hydration(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
+    """Store each astronaut's logged drinks as one water_intake daily total; adherence points."""
+    from am.nutrition.service import close_day
+
+    return {_per(m): close_day(s, ctx, m.astronaut_id, m.mission_day) for m in crew}
 
 
 def step_check_logs(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
@@ -182,6 +189,13 @@ def step_journal(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDa
     return out
 
 
+def step_am_core(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
+    """AM Core: sealed daily reports and AM's own (non-medical) decisions for the closed date."""
+    from am.amcore.engine import run_cycle
+
+    return run_cycle(s, run.close_date, crew)
+
+
 def step_advance_clock(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
     target = datetime.combine(run.close_date + timedelta(days=1), time(WAKE_HOUR))
     before = utcnow()
@@ -211,16 +225,33 @@ def step_streaks(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDa
     return out
 
 
+def step_exams_points(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
+    """Adherence points for the closed day (Module M) and routine exams now overdue."""
+    from am.exams.service import award_day, exams_for
+
+    out: dict[str, Any] = {}
+    for m in crew:
+        added = award_day(s, m.astronaut_id, m.mission_day)
+        _, views = exams_for(s, m.astronaut_id)
+        out[_per(m)] = {"points_added": added,
+                        "overdue_exams": [{"id": v.exam.id, "exam": v.exam.exam_code, "due_day": v.exam.due_day}
+                                          for v in views if v.state == "overdue"]}
+    return out
+
+
 STEPS: dict[str, StepFn] = {
+    "hydration": step_hydration,
     "check_logs": step_check_logs,
     "lock_day": step_lock_day,
     "baselines": step_baselines,
     "anomaly_persistence": step_anomaly_persistence,
     "correlation": step_correlation,
     "journal": step_journal,
+    "am_core": step_am_core,
     "advance_clock": step_advance_clock,
     "missions": step_missions,
     "streaks": step_streaks,
+    "exams_points": step_exams_points,
 }
 assert tuple(STEPS) == STEP_ORDER
 

@@ -38,7 +38,7 @@ MAX_NOTE_CHARS = 1000
 MEMORY_NOTE_CHARS = 200  # memory notes stay short; the full note lives on the report
 REPORT_STATUSES = ("active", "resolved")
 PROPOSAL_STATUSES = ("pending", "confirmed", "dismissed")
-SOURCES = ("manual", "chat_confirmed", "checkin", "simulated")
+SOURCES = ("manual", "chat_confirmed", "checkin", "simulated", "diary")
 
 
 class DecisionConflict(Exception):
@@ -91,7 +91,7 @@ class SymptomService:
         audit(self.s, actor=self._actor(a), action="symptom.reported", entity="symptom_report", entity_id=r.id,
               payload={"astronaut_id": a.id, "symptom_code": sym.code, "severity": severity, "source": source,
                        "proposal_id": proposal_id, "onset_at": onset.isoformat() if onset else None})
-        how = "confirmed from chat" if source == "chat_confirmed" else "reported"
+        how = {"chat_confirmed": "confirmed from chat", "diary": "sent from the private diary"}.get(source, "reported")
         text = f"Symptom {how}: {sym.label.lower()}, self-rated {severity}."
         if note:
             text += f' Note: "{note[:MEMORY_NOTE_CHARS]}"'

@@ -1,0 +1,27 @@
+# Hydration and supplement logging (master prompt Modules B, G, M).
+#
+# !!! DEMONSTRATION CONTENT: NOT A NUTRITION PROTOCOL !!!
+# The daily water target and the supplement list are placeholders so logging, the crew leaderboard
+# and the points can be exercised. The mission's nutrition protocol must supply the real target and
+# the real supplement schedule. AM only records what the astronaut says they drank or took; it never
+# recommends a supplement, a dose or a change.
+
+version: "demo-nutrition-0.1"
+label: "DEMO target and list: not a nutrition protocol"
+
+hydration:
+  daily_target_ml: 2500        # DEMO placeholder; the leaderboard caps adherence at 100 % of it
+  quick_add_ml: [150, 250, 500]
+  max_single_entry_ml: 1500    # engineering sanity bound for one entry (typing errors), not a limit on drinking
+
+supplements:                   # what the mission protocol lists; AM records "taken", nothing else
+  - code: vitamin_d
+    label: "Vitamin D (as in your mission protocol)"
+  - code: multivitamin
+    label: "Multivitamin (as in your mission protocol)"
+  - code: omega_3
+    label: "Omega-3 (as in your mission protocol)"
+
+points:
+  hydration_target_met: 10     # once per day, for meeting the target; nothing extra above it
+  supplements_logged: 5        # once per day
