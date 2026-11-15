@@ -88,7 +88,7 @@ def duties_today(db: DB, ctx: CTX, principal: CurrentUser) -> RosterOut:
         raise HTTPException(403, "No crew record for this account.")
     r = db.scalar(select(DutyReadiness).where(DutyReadiness.plan_id == plan.id,
                                               DutyReadiness.astronaut_id == principal.astronaut_id))
-    if r is not None and r.note_by == "template":  # AM writes the note in their shoes, once, when they look
+    if r is not None and r.note_by == "template":  # AMC writes the note in their shoes, once, when they look
         write_note(db, r, ctx.llm, effective_chat_model(db, ctx.settings))
         db.commit()
     return _roster(db, plan, only=principal.astronaut_id)

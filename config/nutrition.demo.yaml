@@ -3,7 +3,7 @@
 # !!! DEMONSTRATION CONTENT: NOT A NUTRITION PROTOCOL !!!
 # The daily water target and the supplement list are placeholders so logging, the crew leaderboard
 # and the points can be exercised. The mission's nutrition protocol must supply the real target and
-# the real supplement schedule. AM only records what the astronaut says they drank or took; it never
+# the real supplement schedule. AMC only records what the astronaut says they drank or took; it never
 # recommends a supplement, a dose or a change.
 
 version: "demo-nutrition-0.1"
@@ -14,7 +14,7 @@ hydration:
   quick_add_ml: [150, 250, 500]
   max_single_entry_ml: 1500    # engineering sanity bound for one entry (typing errors), not a limit on drinking
 
-supplements:                   # what the mission protocol lists; AM records "taken", nothing else
+supplements:                   # what the mission protocol lists; AMC records "taken", nothing else
   - code: vitamin_d
     label: "Vitamin D (as in your mission protocol)"
   - code: multivitamin

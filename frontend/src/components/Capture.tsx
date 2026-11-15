@@ -1,4 +1,4 @@
-// Module L: values the astronaut said in conversation (one tap to record) and AM's notes about them.
+// Module L: values the astronaut said in conversation (one tap to record) and AMC's notes about them.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { notesApi, type ValueProposal } from '../api/notes'
@@ -45,23 +45,23 @@ function ValueCard({ p }: { p: ValueProposal }) {
   )
 }
 
-/** Values AM heard in the conversation; nothing is recorded until the astronaut taps Record. */
+/** Values AMC heard in the conversation; nothing is recorded until the astronaut taps Record. */
 export function ValueProposals({ astronautId }: { astronautId: number }) {
   const q = useQuery({ queryKey: ['values', astronautId], queryFn: () => notesApi.values(astronautId), refetchInterval: 5_000 })
   if (!q.data?.length) return null
   return (
     <section className="grid gap-2">
-      <h2 className="text-sm font-semibold text-ink">Values AM heard you say</h2>
+      <h2 className="text-sm font-semibold text-ink">Values AMC heard you say</h2>
       <ul className="grid gap-2">{q.data.map((p) => <ValueCard key={p.id} p={p} />)}</ul>
     </section>
   )
 }
 
-/** AM's notes about the astronaut: always with the exact words they came from. */
+/** AMC's notes about the astronaut: always with the exact words they came from. */
 export function NotesList({ astronautId }: { astronautId: number }) {
   const q = useQuery({ queryKey: ['notes', astronautId], queryFn: () => notesApi.notes(astronautId), refetchInterval: 10_000 })
   if (q.error) return <ErrorNote error={q.error} />
-  if (!q.data?.length) return <Empty title="No notes yet">AM writes a note when you mention a symptom or a value in conversation.</Empty>
+  if (!q.data?.length) return <Empty title="No notes yet">AMC writes a note when you mention a symptom or a value in conversation.</Empty>
   return (
     <ul className="grid gap-1.5 text-sm">
       {q.data.map((n) => (

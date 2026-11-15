@@ -1,5 +1,5 @@
-// Intercom: text loops between the crew, the flight surgeon and AM. The crew loop is shared by
-// everyone; each astronaut also has a private loop with the flight surgeon. AM speaks on the crew
+// Intercom: text loops between the crew, the flight surgeon and AMC. The crew loop is shared by
+// everyone; each astronaut also has a private loop with the flight surgeon. AMC speaks on the crew
 // loop for crew-wide events and on a private loop for anything about one person.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
@@ -11,7 +11,7 @@ import { useAuth } from '../state/auth'
 const ROLE_LABEL: Record<IntercomMessage['sender_role'], string> = {
   doctor: 'Flight surgeon',
   astronaut: 'Crew',
-  am: 'AM',
+  am: 'AMC',
 }
 
 function ChannelList({ channels, current, onPick }: { channels: IntercomChannel[]; current: string; onPick: (id: string) => void }) {
@@ -77,8 +77,8 @@ function Thread({ channel, myId, isDoctor }: { channel: IntercomChannel; myId: n
         <h2 className="text-lg font-semibold">{channel.kind === 'crew' ? 'Crew loop' : channel.title}</h2>
         <p className="text-sm text-ink-dim">
           {channel.kind === 'crew'
-            ? 'Everyone on the mission hears this loop. AM announces crew-wide events here.'
-            : 'Only this astronaut and the flight surgeon hear this loop. AM posts here when something concerns only them.'}
+            ? 'Everyone on the mission hears this loop. AMC announces crew-wide events here.'
+            : 'Only this astronaut and the flight surgeon hear this loop. AMC posts here when something concerns only them.'}
         </p>
       </header>
       {q.error && <ErrorNote error={q.error} />}

@@ -1,4 +1,4 @@
-"""M6j: SIMULATED demo space events act on AM's real subsystems and record AM's reaction."""
+"""M6j: SIMULATED demo space events act on AMC's real subsystems and record AMC's reaction."""
 
 from __future__ import annotations
 

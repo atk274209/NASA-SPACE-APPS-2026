@@ -1,6 +1,6 @@
 """Small local models sometimes write a tool call as text, or ask the astronaut to "call the X tool".
 
-The astronaut must never be asked to run a tool: tools are AM's to call. This module finds both
+The astronaut must never be asked to run a tool: tools are AMC's to call. This module finds both
 patterns so the companion can (a) run a tool call written as JSON text itself, (b) tell the model to
 call the tool properly and try again, or (c) fall back to a deterministic status summary.
 """

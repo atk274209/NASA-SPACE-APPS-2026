@@ -5,7 +5,7 @@ import { defineConfig } from '@playwright/test'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
-// End-to-end tests run against a throwaway AM instance:
+// End-to-end tests run against a throwaway AMC instance:
 //  - fresh temporary database seeded with the FICTIONAL test crew (5 astronauts + doctor)
 //  - the API serving the built console (run `npm run build` first; `npm run e2e` does)
 //  - the local language model deliberately unreachable, so every AI path uses its

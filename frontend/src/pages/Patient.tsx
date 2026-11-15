@@ -19,7 +19,7 @@ export function PatientPage() {
   useEffect(() => {
     if (astronautId && astronaut?.id !== astronautId) selectAstronaut(astronautId)
   }, [astronautId, astronaut?.id, selectAstronaut])
-  const tabs: [Tab, string][] = [['problems', 'Reported problems'], ['notes', "AM's notes"], ['exams', 'Exams'], ['health', 'Health'], ['journal', 'Journal']]
+  const tabs: [Tab, string][] = [['problems', 'Reported problems'], ['notes', "AMC's notes"], ['exams', 'Exams'], ['health', 'Health'], ['journal', 'Journal']]
   return (
     <div className="grid gap-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

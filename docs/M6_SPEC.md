@@ -144,7 +144,7 @@ The main app's dev server returns 404 for `/testconsole/*` and `/src/testconsole
   one open question per reply (post-check); deterministic opener for a new conversation.
 - Module L: stated values (heart rate, sleep, water, temperature, SpO2, blood pressure) become
   `measurement_proposal` rows; one tap records them through the normal ingest pipeline
-  (source "AM conversation (CONVERSATION_EXTRACTED)"). AM writes `ai_note` rows with exact quotes.
+  (source "AMC conversation (CONVERSATION_EXTRACTED)"). AMC writes `ai_note` rows with exact quotes.
 
 ## M6d: routine exams, points, wearable feed, explanation
 
@@ -176,7 +176,7 @@ The main app's dev server returns 404 for `/testconsole/*` and `/src/testconsole
 ## M6f: water, vitamins, crew board, streaks
 
 - `config/nutrition.demo.yaml`: DEMO daily water target, quick-add sizes, the protocol's supplement list.
-  AM records what was drunk or taken; it never suggests a supplement or a dose.
+  AMC records what was drunk or taken; it never suggests a supplement or a dose.
 - `hydration_log` (each drink; water said in chat goes here too) and `supplement_log` (taken today).
   End Day step `hydration` stores the day's total once as a `water_intake` measurement and awards
   adherence points (target met: once a day; supplements logged: once a day).
@@ -185,20 +185,20 @@ The main app's dev server returns 404 for `/testconsole/*` and `/src/testconsole
   Profile (audited).
 - Companion shows the mission-completion, check-in and hydration streaks.
 
-## M6g: AM Core (user design)
+## M6g: AMC Core (user design)
 
-- AM Core is the station intelligence's own back end. The crew has no access. The doctor always sees
+- AMC Core is the station intelligence's own back end. The crew has no access. The doctor always sees
   the decisions marked visible (attention level, doctor notices, mission focus, crew recommendations).
   The full core (daily astronaut and crew reports, behaviour, crew attitude, mission log, summary)
   opens only (a) in an emergency: the doctor breaks the seal with a logged reason for 2 hours and the
   crew is told who opened it and why, or (b) after mission return (Test Console button), for good.
 - End Day step `am_core` (after `journal`): deterministic facts and assessment per astronaut and for
-  the crew, and AM's own decisions (rules A-*). Behaviour = self-rating trends (DEMO rule: 3-day mean
+  the crew, and AMC's own decisions (rules A-*). Behaviour = self-rating trends (DEMO rule: 3-day mean
   moved by >= 1.0) and topics the astronaut raised; observations, not clinical assessments.
 - Narratives: background worker; the local model writes each report from its stored facts only, with
   grounding and wording checks kept on the report; template text when the model is offline.
 - Safety: nothing safety-relevant is sealed (alerts, red flags and approvals keep reaching the doctor
-  through the live feed), and AM Core never decides medical or emergency status.
-- Transparency trade-off (master prompt Module O says the astronaut can read what AM notes about them):
-  the astronaut can still read AM's notes and journal; they are told the sealed log exists (Profile)
+  through the live feed), and AMC Core never decides medical or emergency status.
+- Transparency trade-off (master prompt Module O says the astronaut can read what AMC notes about them):
+  the astronaut can still read AMC's notes and journal; they are told the sealed log exists (Profile)
   and are notified whenever it is opened, but not its content.

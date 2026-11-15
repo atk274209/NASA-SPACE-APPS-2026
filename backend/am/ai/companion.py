@@ -1,15 +1,15 @@
-"""AM companion: conversation orchestration over a local LLM with read-only tools.
+"""AMC companion: conversation orchestration over a local LLM with read-only tools.
 
 Safety properties:
   * The LLM reaches data only through read-only tools (am/ai/tools.py).
   * It cannot change alerts, baselines or memory; alert status is deterministic.
   * Every assistant message stores the tool calls and record refs it relied on.
   * A grounding check flags numbers in the answer that do not appear in the retrieved data.
-  * If the model is unavailable, AM answers with a deterministic status summary instead.
+  * If the model is unavailable, AMC answers with a deterministic status summary instead.
   * Every user message is scanned for symptoms. A match only becomes a pending proposal that
     the astronaut confirms or dismisses; the model never records a symptom.
   * Asking what to do about a mentioned symptom gets a fixed, rule-based answer (who can advise,
-    what AM records) and never reaches the model, which tends to answer with self-care advice.
+    what AMC records) and never reaches the model, which tends to answer with self-care advice.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ HISTORY_MESSAGES = 12
 PROMPT_ACTIVE_SYMPTOMS = 10
 PROMPT_PENDING_PROPOSALS = 5
 
-SYSTEM_PROMPT = """You are AM, the onboard health companion of a long-duration space mission.
+SYSTEM_PROMPT = """You are AMC, the onboard health companion of a long-duration space mission.
 You talk with one astronaut about their own health data.
 
 Rules you must follow:
@@ -85,7 +85,7 @@ Rules you must follow:
       astronaut explicitly asks why; then follow rule 6.
     - Do not give self-care advice: nothing about drinking, eating, resting, sleeping,
       exercising, remedies, medication or doses.
-    - A symptom AM only noticed in chat is NOT recorded. You may say that AM noticed it and ask
+    - A symptom AMC only noticed in chat is NOT recorded. You may say that AMC noticed it and ask
       the astronaut to confirm or dismiss it in the companion; only a confirmed symptom is
       recorded for the medical team and adds follow-up tasks to the daily missions.
     - For a symptom rated severe or on the DEMO report-promptly list, recommend contacting the
@@ -158,7 +158,7 @@ class CompanionService:
 
     # -------------------------------------------------------------- conversations
     def create_conversation(self, astronaut_id: int, *, opener: bool = False) -> Conversation:
-        """opener: AM starts the check-in itself with a short, deterministic greeting (Module O)."""
+        """opener: AMC starts the check-in itself with a short, deterministic greeting (Module O)."""
         if self.s.get(Astronaut, astronaut_id) is None:
             raise LookupError("astronaut not found")
         c = Conversation(astronaut_id=astronaut_id, title="New conversation")
@@ -209,7 +209,7 @@ class CompanionService:
                              f"{r.reported_at:%Y-%m-%d %H:%M} UTC (symptom report {r.id}){flag}")
         pending = self.symptoms.proposals(astronaut_id, "pending")
         if pending:
-            lines += ["", "Possible symptoms AM noticed in chat, NOT confirmed (the astronaut can confirm or "
+            lines += ["", "Possible symptoms AMC noticed in chat, NOT confirmed (the astronaut can confirm or "
                           "dismiss them in the companion):"]
             for p in pending[:PROMPT_PENDING_PROPOSALS]:
                 sym = symptom_catalog.get(p.symptom_code)
@@ -238,7 +238,7 @@ class CompanionService:
 
         # Deterministic, model-independent: proposals exist even when the model is offline.
         proposals = self.symptoms.detect_keywords(conv.astronaut_id, user_msg)
-        capture(self.s, conv.astronaut_id, user_msg)  # Module L: AM's notes and stated values, with quotes
+        capture(self.s, conv.astronaut_id, user_msg)  # Module L: AMC's notes and stated values, with quotes
         lang = detect_language(content)
         # Module P: comfort wishes go through the deterministic cabin controller (never the model).
         comfort = [line for hit in extract_comfort(content)
@@ -301,7 +301,7 @@ class CompanionService:
                 reply = self.llm.chat(self.model, messages, tools=tools)
                 calls = list(reply.tool_calls)
                 if not calls and round_no < MAX_TOOL_ROUNDS:
-                    # Small models sometimes write the call as text: AM runs it itself.
+                    # Small models sometimes write the call as text: AMC runs it itself.
                     calls = parse_text_tool_calls(reply.content, known)
                     if not calls and asks_user_to_run_tool(reply.content):
                         # ...or ask the astronaut to "call the X tool": never. Correct the model, try again.
@@ -381,7 +381,7 @@ class CompanionService:
         """Fixed answer when the astronaut asks what to do or what to take (English or Turkish).
 
         A 7B model slips into self-care advice when asked directly, whatever the prompt says, so
-        AM states what it can do (record, follow-up missions) and who can advise. The wording comes
+        AMC states what it can do (record, follow-up missions) and who can advise. The wording comes
         from the catalog's DEMO procedures; nothing here suggests treatment. `mentioned` may be empty
         (a medication question with no symptom named): the reply is then the generic no-advice text.
         """

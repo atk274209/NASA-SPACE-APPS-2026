@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     live_ticker: bool = True
     # Background AI triage of the doctor's live feed (am.triage.ai). The rule level never depends on it.
     ai_triage_worker: bool = True
-    # Background writer of AM Core report narratives (am.amcore.narrative).
+    # Background writer of AMC Core report narratives (am.amcore.narrative).
     am_core_worker: bool = True
     # SIMULATED demo space events (jury demonstrations): only in test mode (AM_TEST_MODE=1).
     demo_events: bool = True

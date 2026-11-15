@@ -4,7 +4,7 @@ Every number comes from stored records; nothing is estimated. Self-ratings are 1
 not clinical scales; the water target is the DEMO target from config/nutrition.demo.yaml.
 
   A. water:      crew water per mission date (hydration log), last 14 dates
-  B. activity:   per hour, what the crew wrote to AM (up) and what was flagged yellow/red (down),
+  B. activity:   per hour, what the crew wrote to AMC (up) and what was flagged yellow/red (down),
                  today and the two days before
   C. problems:   symptom reports by body system and symptom: today / 7 days / mission, per astronaut
   D. wellbeing:  per astronaut, 8 axes on 0-100 (5 self-ratings, water, missions, check-ins), last 7
@@ -82,10 +82,10 @@ def activity(s: Session) -> dict[str, Any]:
                 flagged[k][f.created_at.hour] += 1
     now, before = sum(written[0]), sum(written[1])
     return {
-        "label": "Written to AM today", "value": now, "delta": _pct_delta(now, before),
+        "label": "Written to AMC today", "value": now, "delta": _pct_delta(now, before),
         "note": f"{sum(flagged[0])} flagged yellow or red today",
         "written": written, "flagged": flagged,
-        "labels": {"written": "Written to AM", "flagged": "Flagged yellow/red", "prior": "Prior days", "current": "today"},
+        "labels": {"written": "Written to AMC", "flagged": "Flagged yellow/red", "prior": "Prior days", "current": "today"},
     }
 
 

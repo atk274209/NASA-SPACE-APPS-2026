@@ -14,7 +14,7 @@ export const LEVEL_COLOR: Record<FlagLevel, string> = {
 }
 const LEVEL_LABEL: Record<FlagLevel, string> = { red: 'Red', yellow: 'Yellow', none: 'No flag' }
 const SOURCE_LABEL: Record<FeedItem['source_type'], string> = {
-  message: 'Message to AM',
+  message: 'Message to AMC',
   symptom_report: 'Symptom report',
   checkin_note: 'Check-in note',
   diary: 'From the private diary',

@@ -49,7 +49,7 @@ class EnvControl(Base):
 
 
 class ComfortSignal(Base):
-    """A comfort wish or complaint AM heard in conversation, with the exact quote.
+    """A comfort wish or complaint AMC heard in conversation, with the exact quote.
 
     direction: up | down | report (pressure: never adjusted from a complaint, reviewed by a person)
     status: acted | refused | review

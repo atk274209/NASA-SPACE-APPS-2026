@@ -3,7 +3,7 @@
 Manual entries run through the same pipeline as sensor data (convert, validate, assess,
 alert). This module adds what a person entering their own data needs: an entry
 specification for the form, a result that shows the unit conversion, and their recent
-entries. Missions carry an environment code; AM attaches no physiological numbers to it.
+entries. Missions carry an environment code; AMC attaches no physiological numbers to it.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ CTX = Annotated[AppContext, Depends(get_ctx)]
 DEFAULT_SOURCE_NAME = "manual entry"
 RADIATION_METRIC = "radiation_dose"
 RADIATION_UNIT = next(m.unit for m in METRICS if m.code == RADIATION_METRIC)  # fails fast if unregistered
-RADIATION_NOTE = "AM does not evaluate exposure limits."
+RADIATION_NOTE = "AMC does not evaluate exposure limits."
 # Dose sums are rounded to 6 decimals (1 nSv) only to strip floating-point noise from the
 # addition; dosimeter readings are far coarser than that.
 DOSE_DECIMALS = 6
@@ -221,7 +221,7 @@ class MissionDetailOut(BaseModel):
     environment_label: str
     is_simulated: bool
     created_at: datetime
-    is_current: bool  # the newest mission: AM counts mission days from its start date
+    is_current: bool  # the newest mission: AMC counts mission days from its start date
 
 
 class MissionEnvironmentOut(BaseModel):
@@ -453,7 +453,7 @@ def list_manual_entries(
 def radiation_cumulative(db: DB, astronaut_id: int) -> RadiationCumulativeOut:
     """Daily and running sums of logged dosimeter doses.
 
-    Arithmetic only: AM records what the dosimeter reported and adds it up. It does not
+    Arithmetic only: AMC records what the dosimeter reported and adds it up. It does not
     compare doses with any exposure limit.
     """
     _astronaut(db, astronaut_id)
@@ -530,7 +530,7 @@ def create_mission(body: MissionCreateIn, db: DB) -> MissionDetailOut:
     if body.start_date > utcnow().date():
         # The newest mission becomes the current one, so a future start would give
         # mission day 0 or less to every view that counts days.
-        raise HTTPException(422, "start_date is in the future; AM counts mission days from the start date (UTC)")
+        raise HTTPException(422, "start_date is in the future; AMC counts mission days from the start date (UTC)")
     mission = Mission(
         name=name,
         astronaut_id=astronaut.id,

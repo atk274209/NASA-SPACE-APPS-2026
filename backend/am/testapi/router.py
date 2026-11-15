@@ -392,11 +392,11 @@ def cabin_drift(body: CabinDriftIn, db: DB, principal: CurrentUser):
     return CabinSenseOut(alerts_raised=[a.id for a in alerts])
 
 
-# ------------------------------------------------------------------ mission return (AM Core opens for good)
+# ------------------------------------------------------------------ mission return (AMC Core opens for good)
 @router.post("/mission/return", response_model=dict)
 @doctor_only
 def mission_return(db: DB, principal: CurrentUser):
-    """TEST: mark the mission as returned to Earth. AM Core then stays open to the doctor."""
+    """TEST: mark the mission as returned to Earth. AMC Core then stays open to the doctor."""
     from am.amcore import access
 
     access.mark_mission_returned(db, principal.username)

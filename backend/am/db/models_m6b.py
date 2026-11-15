@@ -1,6 +1,6 @@
 """ORM models for M6b: the doctor's live feed of what astronauts write, with triage flags.
 
-See am.triage. Every message an astronaut writes to AM, every symptom report and every check-in
+See am.triage. Every message an astronaut writes to AMC, every symptom report and every check-in
 note gets one ReportFlag row as soon as it is stored. The deterministic rule level is set at once;
 the local model's suggestion arrives later and can only raise the level shown, never lower it.
 """
@@ -81,7 +81,7 @@ class MeasurementProposal(Base):
     """A value the astronaut stated in conversation (Module L), waiting for one-tap confirmation.
 
     status: pending | confirmed | dismissed. On confirmation it becomes a Measurement from the source
-    "AM conversation (CONVERSATION_EXTRACTED)", linked back here (measurement_id) and to the message.
+    "AMC conversation (CONVERSATION_EXTRACTED)", linked back here (measurement_id) and to the message.
     context is None when the astronaut did not say it (they pick it when confirming).
     """
 

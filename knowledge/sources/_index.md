@@ -1,4 +1,4 @@
-# AM knowledge base - source index
+# AMC knowledge base - source index
 
 Retrieved: 2026-11-14. One JSON file per source in this folder. Verbatim passages appear only for NASA / US-government pages; the peer-reviewed article is metadata and paraphrase only.
 

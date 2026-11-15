@@ -38,7 +38,7 @@ class AIStatusOut(BaseModel):
 
 class ConversationIn(BaseModel):
     astronaut_id: int
-    opener: bool = False  # AM starts the check-in with a short greeting (persona, Module O)
+    opener: bool = False  # AMC starts the check-in with a short greeting (persona, Module O)
 
 
 class ConversationOut(ORM):
@@ -79,7 +79,7 @@ class TurnOut(BaseModel):
     trace: list[TraceOut]
     ai_available: bool
     fallback_reason: str | None
-    proposals: list[ProposalOut] = []  # symptoms AM noticed in this user message, pending confirmation
+    proposals: list[ProposalOut] = []  # symptoms AMC noticed in this user message, pending confirmation
 
 
 class SuggestionOut(BaseModel):

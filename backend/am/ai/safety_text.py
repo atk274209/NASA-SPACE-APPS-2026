@@ -70,7 +70,7 @@ def safety_reply(lang: str, items: list[tuple[str, str]], awaiting: bool) -> str
             lines.append("- " + CONTACT_NOW["tr"].format(label=label(code, eng, "tr")))
         if awaiting:
             lines.append("- Yazdıkların uçuş cerrahına hemen iletildi ve doktor onayı bekliyor.")
-        lines.append("- Kaydedilmesi için semptomu Companion'da onayla. AM teşhis koymaz ve tedavi önermez.")
+        lines.append("- Kaydedilmesi için semptomu Companion'da onayla. AMC teşhis koymaz ve tedavi önermez.")
         return "\n".join(lines)
     lines = ["I'm taking this seriously, so I'll be direct:"]
     if self_harm:
@@ -80,13 +80,13 @@ def safety_reply(lang: str, items: list[tuple[str, str]], awaiting: bool) -> str
         lines.append("- " + CONTACT_NOW["en"].format(label=eng))
     if awaiting:
         lines.append("- What you wrote went to the flight surgeon at once and is waiting for the doctor's approval.")
-    lines.append("- Confirm the symptom in the companion so it is recorded. AM does not diagnose or suggest treatment.")
+    lines.append("- Confirm the symptom in the companion so it is recorded. AMC does not diagnose or suggest treatment.")
     return "\n".join(lines)
 
 
 NO_ADVICE_INTRO = {
-    "en": "AM does not give treatment or self-care advice, and it does not guess what causes a symptom.",
-    "tr": "AM tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez ve bir semptomun nedenini tahmin etmez.",
+    "en": "AMC does not give treatment or self-care advice, and it does not guess what causes a symptom.",
+    "tr": "AMC tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez ve bir semptomun nedenini tahmin etmez.",
 }
 NO_ADVICE_WHO = {
     "en": "- For advice, talk to the crew medical officer or flight surgeon at your next private medical conference, "

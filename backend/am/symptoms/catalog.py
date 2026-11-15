@@ -1,7 +1,7 @@
 """Symptom catalog shared by symptom reporting, personalised missions, the journal and the body map.
 
 Safety rules encoded here:
-  * Tasks are monitoring, logging, protocol-adherence and reporting prompts only. AM never
+  * Tasks are monitoring, logging, protocol-adherence and reporting prompts only. AMC never
     suggests medication, treatment, doses or diagnosis.
   * No durations or numeric thresholds are invented ("if it continues, per protocol").
   * `report_promptly` marks symptoms for which the DEMO escalation procedure says to contact
@@ -94,7 +94,7 @@ SYMPTOMS: tuple[Symptom, ...] = (
                                 "manual", "AM-DEMO-GI-01"),
                    _HYDRATION,
                    TaskTemplate("meal_log", "Log today's meals",
-                                "Record what you ate, following your mission nutrition plan; AM does not change it.",
+                                "Record what you ate, following your mission nutrition plan; AMC does not change it.",
                                 "manual", "AM-DEMO-NUT-02"),
                    _CMO_IF_CONTINUES)),
     Symptom("diarrhea", "Diarrhea", "gastrointestinal", "gastrointestinal",
@@ -116,7 +116,7 @@ SYMPTOMS: tuple[Symptom, ...] = (
     Symptom("loss_of_appetite", "Loss of appetite", "gastrointestinal", "metabolic",
             ("no appetite", "loss of appetite", "not hungry"), ("iştahsız", "iştahım yok"),
             tasks=(TaskTemplate("meal_log", "Log today's meals",
-                                "Record what you ate, following your mission nutrition plan; AM does not change it.",
+                                "Record what you ate, following your mission nutrition plan; AMC does not change it.",
                                 "manual", "AM-DEMO-NUT-02"), _HYDRATION, _CMO_IF_CONTINUES)),
     Symptom("headache", "Headache", "pain", "neuro_behavioral",
             ("headache", "head ache", "migraine", "my head hurts", "head is pounding"),

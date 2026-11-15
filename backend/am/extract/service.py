@@ -1,9 +1,9 @@
-"""Conversation capture (Module L): AM keeps the notes and proposes the values the astronaut said.
+"""Conversation capture (Module L): AMC keeps the notes and proposes the values the astronaut said.
 
   * Values: each number the astronaut states becomes a pending MeasurementProposal. One tap confirms
     it into a Measurement through the normal ingest pipeline (validation, baseline, anomaly engine).
     Nothing is recorded without confirmation; a missing activity context is asked for, never guessed.
-  * Notes: AM writes an AiNote for each symptom word and each stated value, always with the exact
+  * Notes: AMC writes an AiNote for each symptom word and each stated value, always with the exact
     quote and a link to the message. Notes never contain a diagnosis. The astronaut and the doctor
     can read them; nobody else.
 """
@@ -26,7 +26,7 @@ from am.health.metrics import get_spec
 from am.symptoms import catalog
 from am.symptoms.detect import detect_keywords
 
-SOURCE_NAME = "AM conversation (CONVERSATION_EXTRACTED)"
+SOURCE_NAME = "AMC conversation (CONVERSATION_EXTRACTED)"
 
 
 class ProposalError(Exception):

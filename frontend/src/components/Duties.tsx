@@ -1,5 +1,5 @@
-// Today's duties: AM shares the station's work out by each astronaut's energy and morale.
-// The astronaut sees their own duties and AM's note to them; the doctor sees the whole roster.
+// Today's duties: AMC shares the station's work out by each astronaut's energy and morale.
+// The astronaut sees their own duties and AMC's note to them; the doctor sees the whole roster.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { BAND_LABEL, dutiesApi, KIND_LABEL, type DutyAssignment, type DutyMember } from '../api/duties'
 import { ErrorNote, Section } from './ui'
@@ -40,7 +40,7 @@ function Duty({ t, canTick }: { t: DutyAssignment; canTick: boolean }) {
   )
 }
 
-/** The astronaut's own duties, with AM's note written from their side. */
+/** The astronaut's own duties, with AMC's note written from their side. */
 export function TodayDuties() {
   const q = useQuery({ queryKey: ['duties', 'today'], queryFn: dutiesApi.today, refetchInterval: 30_000 })
   const me = q.data?.crew[0]
@@ -88,7 +88,7 @@ export function DutyRosterPanel() {
         className="h-8 rounded border border-seam-strong px-3 text-sm text-ink hover:border-signal disabled:opacity-50">
         {replan.isPending ? 'Planning…' : 'Plan again from the latest check-ins'}</button>}>
       <p className="mb-3 max-w-[76ch] text-sm text-ink-dim">
-        AM shares out the station&apos;s work by each person&apos;s energy and morale from check-ins, recorded sleep,
+        AMC shares out the station&apos;s work by each person&apos;s energy and morale from check-ins, recorded sleep,
         active symptoms and open alerts. Private diaries are never read for this. {q.data?.label}.
       </p>
       {q.error && <ErrorNote error={q.error} />}
@@ -96,7 +96,7 @@ export function DutyRosterPanel() {
       {!!q.data?.postponed.length && (
         <p className="mb-3 rounded-md border border-sev-watch/40 bg-sev-watch/10 px-3 py-2 text-sm text-ink">
           Postponed: {q.data.postponed.map((t) => t.title).join(', ')}. Everyone who could take them is on a light day,
-          so AM did not push them on anyone.
+          so AMC did not push them on anyone.
         </p>
       )}
       <ul className="grid gap-3">{q.data?.crew.map((m) => <MemberRow key={m.astronaut_id} m={m} />)}</ul>

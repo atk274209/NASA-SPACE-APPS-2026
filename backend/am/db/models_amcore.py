@@ -1,11 +1,11 @@
-"""AM Core: the station intelligence's own reports and decisions (user design, 2026-11-14).
+"""AMC Core: the station intelligence's own reports and decisions (user design, 2026-11-14).
 
   * The crew has no access. The doctor always sees the decisions marked visible_to_doctor.
   * The full core (daily astronaut and crew reports, behavioural evaluation, crew attitude, the
     mission log) opens only in an emergency (a doctor breaks the seal with a logged reason, for a
     limited time, and the crew is told) or after mission return.
   * Safety information is never sealed: alerts, red flags and approvals keep flowing to the doctor
-    through the live feed. AM Core never decides medical or emergency status (Engineering Rule 8).
+    through the live feed. AMC Core never decides medical or emergency status (Engineering Rule 8).
 """
 
 from __future__ import annotations
@@ -45,8 +45,8 @@ class AmReport(Base):
 
 
 class AmDecision(Base):
-    """A decision AM took inside its own remit (never medical). category: attention | checkin |
-    mission_focus | doctor_notice | habitat | crew. executed: AM applied it itself (False: a plan or a
+    """A decision AMC took inside its own remit (never medical). category: attention | checkin |
+    mission_focus | doctor_notice | habitat | crew. executed: AMC applied it itself (False: a plan or a
     recommendation for a person)."""
 
     __tablename__ = "am_decision"

@@ -1,6 +1,6 @@
 // The crew quarters around the body map: a cylindrical cabin module drawn with CSS 3D (ribbed wall
 // panels, a porthole, a floor grid and a ceiling light ring). The body turns slowly inside it, to
-// show that everything AM watches happens in the cabin. Turning stops while the pointer or keyboard
+// show that everything AMC watches happens in the cabin. Turning stops while the pointer or keyboard
 // focus is on the figure, so every body system stays easy to pick, and for reduced motion.
 // Decoration only: hidden from assistive technology; the figure inside keeps its own semantics.
 import type { CSSProperties, ReactNode } from 'react'

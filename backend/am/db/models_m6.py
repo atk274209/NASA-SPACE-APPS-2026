@@ -74,7 +74,7 @@ class SimProfile(Base):
 
 
 class AiNote(Base):
-    """A note AM keeps about what a crew member said or did, always tied to its source.
+    """A note AMC keeps about what a crew member said or did, always tied to its source.
 
     category: symptom | mood | sleep | nutrition | exercise | interpersonal | workload | checkin | other
     detector: keyword (deterministic) | llm (model-proposed, quote verified) | system (from stored records)
@@ -102,7 +102,7 @@ class AiNote(Base):
 
 
 class CrewLogEntry(Base):
-    """One day of the crew log, kept by AM for the medical officer.
+    """One day of the crew log, kept by AMC for the medical officer.
 
     `facts` is the deterministic per-astronaut digest the summary was written from; `summary`
     is drafted by the local model from those facts (or a template when no model is available).

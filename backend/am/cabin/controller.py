@@ -280,7 +280,7 @@ def feedback(s: Session, action_id: int, helped: bool, *, actor: str) -> EnvActi
     if a is None:
         raise LookupError("action not found")
     if a.kind != "AUTO":
-        raise CabinError("feedback applies to AM's own adjustments")
+        raise CabinError("feedback applies to AMC's own adjustments")
     a.feedback = "helped" if helped else "not_helped"
     sig = s.get(ComfortSignal, a.signal_id) if a.signal_id else None
     env = load_envelope()

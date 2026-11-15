@@ -48,7 +48,7 @@ Then read the code you integrate with.
    - Add `backend/tests/test_<feature>.py`. Use the fixtures in `tests/conftest.py`
      (`client`, `ctx`, `db`), and the simulator (`POST /api/v1/simulation/run`) for data.
    - The full suite must stay green: `cd backend && uv run pytest -q`.
-   - Never touch the live database in `%LOCALAPPDATA%\AM\data`.
+   - Never touch the live database in `%LOCALAPPDATA%\AMC\data`.
    - Do not start servers on ports 8000 or 5173; they are already running.
 7. **Frontend conventions.**
    - Typecheck with `cd frontend && npx tsc -p tsconfig.app.json --noEmit`.
@@ -149,7 +149,7 @@ Rules:
   - category `radiation`, unit `mSv`, context `daily` (personal dosimeter daily dose)
   - `baseline_enabled` false; no alert rule
   - `GET /radiation/cumulative?astronaut_id=` returns the daily and cumulative sum.
-    Include the note "AM does not evaluate exposure limits."
+    Include the note "AMC does not evaluate exposure limits."
 
 **Simulator:** add a fasting `blood_glucose` stream (1/day) and a `radiation_dose` daily
 stream. Both are labelled simulated, with arbitrary demo parameters. Existing tests must
@@ -217,7 +217,7 @@ keep passing.
   is available. It uses structured output restricted to catalog codes and an exact quote.
   Quotes that are not exact substrings are dropped.
 - De-duplicate by `(message, code)`. The result is a `SymptomProposal` with status
-  `pending`. AM never creates a report from chat on its own.
+  `pending`. AMC never creates a report from chat on its own.
 - `TurnOut` gains `proposals` (a list).
 - Endpoints:
   - `GET /symptoms/proposals?astronaut_id&status=pending`
@@ -400,7 +400,7 @@ reasons that include refs):
 - `GET /admin/outbox`
 - `GET /admin/outbox/{id}/download` returns the file.
 - `POST /admin/outbox/{id}/mark-exported` takes `{actor}`.
-- AM never transmits anything itself.
+- AMC never transmits anything itself.
 
 **UI (Settings page) sections:**
 - Local AI model

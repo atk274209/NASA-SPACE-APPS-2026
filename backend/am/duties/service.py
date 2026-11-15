@@ -192,30 +192,30 @@ def allocate(people: list[Person], postponed: list[Task] | None = None) -> list[
         best.left -= t.load
         best.tasks.append(t)
         out.append((best, t, reason))
-    for p in people:  # personal time AM protects, from the astronaut's side
+    for p in people:  # personal time AMC protects, from the astronaut's side
         if p.morale is not None and p.morale < 55:
-            out.append((p, PERSONAL["call_home"], "Morale is lower today: AM kept a call-home window free."))
+            out.append((p, PERSONAL["call_home"], "Morale is lower today: AMC kept a call-home window free."))
         if p.band == "light":
-            out.append((p, PERSONAL["rest_block"], "A light day: AM protected a rest block."))
+            out.append((p, PERSONAL["rest_block"], "A light day: AMC protected a rest block."))
     return out
 
 
 # ------------------------------------------------------------------ notes in the astronaut's shoes
 NOTE_PROMPT = """Put yourself in this astronaut's place on a long space mission. In 2 or 3 short sentences,
-second person, warm and motivating, tell them how AM shared out today's duties around how they feel,
+second person, warm and motivating, tell them how AMC shared out today's duties around how they feel,
 and what to look forward to. Use only the facts given. No medical advice, no diagnosis, no numbers
 that are not given. Reply in {language}."""
 
 TEMPLATES = {
-    "full": {"en": "You came into today with energy to spare, so AM gave you the meatier work. Pace yourself and "
+    "full": {"en": "You came into today with energy to spare, so AMC gave you the meatier work. Pace yourself and "
                    "enjoy getting real things done up here.",
-             "tr": "Bugüne enerjin yerinde başladın, bu yüzden AM sana daha dolu işleri verdi. Temponu koru ve "
+             "tr": "Bugüne enerjin yerinde başladın, bu yüzden AMC sana daha dolu işleri verdi. Temponu koru ve "
                    "burada gerçek işler başarmanın tadını çıkar."},
-    "steady": {"en": "A steady day: AM kept your load balanced so you can do it well without running on empty.",
-               "tr": "Dengeli bir gün: AM yükünü dengede tuttu; kendini tüketmeden iyi iş çıkarabilesin diye."},
-    "light": {"en": "Today AM kept things light for you, with time protected for yourself. Rest is part of the "
+    "steady": {"en": "A steady day: AMC kept your load balanced so you can do it well without running on empty.",
+               "tr": "Dengeli bir gün: AMC yükünü dengede tuttu; kendini tüketmeden iyi iş çıkarabilesin diye."},
+    "light": {"en": "Today AMC kept things light for you, with time protected for yourself. Rest is part of the "
                     "mission too, and the crew has the rest covered.",
-              "tr": "Bugün AM işleri senin için hafif tuttu ve kendine zaman ayırdı. Dinlenmek de görevin bir "
+              "tr": "Bugün AMC işleri senin için hafif tuttu ve kendine zaman ayırdı. Dinlenmek de görevin bir "
                     "parçası; gerisini ekip hallediyor."},
 }
 

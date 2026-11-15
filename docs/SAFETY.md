@@ -1,6 +1,6 @@
-# AM Safety Principles
+# AMC Safety Principles
 
-AM is a research prototype. It is **not** a medical device and its outputs are not
+AMC is a research prototype. It is **not** a medical device and its outputs are not
 clinical diagnoses.
 
 ## 1. Thresholds are demonstration values

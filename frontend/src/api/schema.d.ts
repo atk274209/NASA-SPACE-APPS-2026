@@ -748,7 +748,7 @@ export interface paths {
          * Radiation Cumulative
          * @description Daily and running sums of logged dosimeter doses.
          *
-         *     Arithmetic only: AM records what the dosimeter reported and adds it up. It does not
+         *     Arithmetic only: AMC records what the dosimeter reported and adds it up. It does not
          *     compare doses with any exposure limit.
          */
         get: operations["radiation_cumulative_api_v1_radiation_cumulative_get"];

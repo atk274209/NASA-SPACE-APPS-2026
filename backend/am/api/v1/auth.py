@@ -105,7 +105,7 @@ def _client(request: Request) -> str:
 
 def _set_cookie(request: Request, response: Response, token: str) -> None:
     # HttpOnly: page scripts cannot read it. SameSite=Strict: never sent on cross-site requests.
-    # Not marked Secure because AM is served over plain HTTP on this computer / the habitat LAN.
+    # Not marked Secure because AMC is served over plain HTTP on this computer / the habitat LAN.
     # The Test Console gets its own cookie name (see am.auth.service.session_cookie_name).
     response.set_cookie(session_cookie_name(request.headers), token, max_age=int(SESSION_TTL.total_seconds()), httponly=True,
                         samesite="strict", path="/")
@@ -175,7 +175,7 @@ def first_run_setup(body: SetupIn, request: Request, response: Response, db: DB,
     if count_accounts(db) > 0:
         raise HTTPException(409, "Setup is already complete. Sign in instead.")
     if not is_loopback(request):
-        raise HTTPException(403, "First-run setup must be done on the computer that runs AM.")
+        raise HTTPException(403, "First-run setup must be done on the computer that runs AMC.")
     try:
         user = create_account(db, username=body.username, display_name=body.display_name, role=ROLE_DOCTOR,
                               password=body.password, profile=ctx.settings.password_hash_profile,

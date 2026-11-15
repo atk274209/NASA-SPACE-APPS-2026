@@ -1,4 +1,4 @@
-"""Alembic environment for AM."""
+"""Alembic environment for AMC."""
 
 from logging.config import fileConfig
 

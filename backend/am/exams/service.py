@@ -1,6 +1,6 @@
 """Routine examinations and adherence points (master prompt Module M).
 
-DEMO intervals from config/routine_exams.demo.yaml. AM schedules, reminds and stores what the
+DEMO intervals from config/routine_exams.demo.yaml. AMC schedules, reminds and stores what the
 astronaut enters; it never fabricates or interprets a result. Points reward adherence only (logging,
 check-ins, exams on time) and never depend on a health value.
 """

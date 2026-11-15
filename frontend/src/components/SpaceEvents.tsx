@@ -1,5 +1,5 @@
 // SIMULATED space events, as they happen: a card slides in for each new event with what happened
-// and what AM did about it. For the doctor, the System page also has the controls and the history.
+// and what AMC did about it. For the doctor, the System page also has the controls and the history.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
@@ -99,7 +99,7 @@ export function SpaceEventsPanel() {
       <div className="grid gap-4">
         <p className="max-w-[72ch] text-sm text-ink-dim">
           Each event changes one real input (a cabin sensor, wearable readings, a symptom report). What follows
-          is AM&apos;s own reaction, not a script. Everything an event creates is marked simulated.
+          is AMC&apos;s own reaction, not a script. Everything an event creates is marked simulated.
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={() => trigger.mutate(undefined)} disabled={trigger.isPending}
@@ -127,7 +127,7 @@ export function SpaceEventsPanel() {
               <EventBody e={e} />
             </li>
           ))}
-          {!d.events.length && <li className="text-sm text-ink-faint">No events yet. The first one starts a few seconds after AM starts.</li>}
+          {!d.events.length && <li className="text-sm text-ink-faint">No events yet. The first one starts a few seconds after AMC starts.</li>}
         </ol>
       </div>
     </Section>

@@ -1,4 +1,4 @@
-# AM "Is this serious?" escalation matrix
+# AMC "Is this serious?" escalation matrix
 #
 # !!! DEMONSTRATION CONTENT — NOT CLINICALLY VALIDATED !!!
 # Every entry below is a placeholder written for software demonstration. It is not a
@@ -6,14 +6,14 @@
 # must replace the wording, the people to involve and the procedure IDs with the mission's
 # approved medical contact procedures.
 #
-# What the levels mean in AM:
+# What the levels mean in AMC:
 #   * Alert levels come from the deterministic anomaly engine (config/thresholds.demo.yaml):
 #     statistical deviations from the astronaut's OWN baseline, not clinical cut-offs.
 #     An unacknowledged alert counts at its peak severity until a person reviews it.
 #   * Symptom levels come from the astronaut's own severity rating and the catalog's DEMO
 #     report-promptly list (backend/am/symptoms/catalog.py).
 # The text is plain language on purpose: no diagnoses, no treatment, no doses, no
-# durations. AM only says who to involve and points to the mission's own procedures.
+# durations. AMC only says who to involve and points to the mission's own procedures.
 
 version: "demo-esc-0.1"
 label: "DEMO — NOT CLINICALLY VALIDATED"
@@ -24,7 +24,7 @@ levels:
     plain_meaning: Keep an eye on it
     who_to_involve: Yourself
     guidance: Re-measure per protocol and mention it in your check-in
-    # Nobody else is involved at this level, so AM records no escalation event for it.
+    # Nobody else is involved at this level, so AMC records no escalation event for it.
     raises_event: false
   WARNING:
     procedure_id: AM-DEMO-ESC-02

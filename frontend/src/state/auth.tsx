@@ -31,7 +31,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     mutationFn: authApi.logout,
     onSettled: () => qc.resetQueries(), // never show the previous user's data to the next one
   })
-  if (state.isLoading) return <p className="p-6 text-ink-dim">Connecting to AM…</p>
+  if (state.isLoading) return <p className="p-6 text-ink-dim">Connecting to AMC…</p>
   if (state.error) return <div className="p-6"><ErrorNote error={state.error} /></div>
   if (!state.data?.signed_in || !state.data.user) return <LoginPage state={state.data!} />
   const user = state.data.user

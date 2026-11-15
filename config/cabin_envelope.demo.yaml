@@ -35,7 +35,7 @@ variables:
     default: 101.3
     min: 99.0              # hard limits for doctor-approved exceptions
     max: 103.0
-    autonomous_min: 101.0  # the narrow band where AM may correct drift on its own
+    autonomous_min: 101.0  # the narrow band where AMC may correct drift on its own
     autonomous_max: 101.6
     step: 0.1
     max_change_per_hour: 0.3

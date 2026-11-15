@@ -227,7 +227,7 @@ class CareStatusOut(BaseModel):
     recently_approved: list[CareItemOut]
     protocol_label: str
     protocol: dict  # the DEMO escalation matrix's CRITICAL entry: who to involve and what to do meanwhile
-    am_core_notices: list[dict] = []  # when AM Core's sealed log was opened, by whom and why (never its content)
+    am_core_notices: list[dict] = []  # when AMC Core's sealed log was opened, by whom and why (never its content)
 
 
 @router.get("/care/status", response_model=CareStatusOut)

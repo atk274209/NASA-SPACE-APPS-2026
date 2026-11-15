@@ -1,4 +1,4 @@
-# Start AM locally (Windows PowerShell): one process, one address, no internet needed.
+# Start AMC locally (Windows PowerShell): one process, one address, no internet needed.
 #   powershell -ExecutionPolicy Bypass -File scripts\run.ps1 [-Demo] [-Lan] [-Port 8000] [-NoBrowser]
 # The API serves the built console. By default it listens on 127.0.0.1 only (this computer).
 # -Demo turns on test mode: SIMULATED space events (one shortly after start, then every few
@@ -32,7 +32,7 @@ if ($Lan) {
     Write-Host ""
 }
 $url = "http://localhost:$Port"
-Write-Host "AM is starting at $url (Ctrl+C to stop)"
+Write-Host "AMC is starting at $url (Ctrl+C to stop)"
 if (-not $NoBrowser) { Start-Job -ScriptBlock { param($u) Start-Sleep 3; Start-Process $u } -ArgumentList $url | Out-Null }
 Push-Location "$root\backend"
 try { uv run uvicorn am.main:app --host $bind --port $Port }

@@ -1,4 +1,4 @@
-# AM personal baseline policy (engineering parameters, prototype values).
+# AMC personal baseline policy (engineering parameters, prototype values).
 #
 # Safety principle: a baseline must never silently absorb a persistent deterioration.
 # Adaptation uses only NORMAL-classified, good-quality data, is rate-limited, freezes on
@@ -23,6 +23,6 @@ adaptation:
   # the current median, treat it as drift: FREEZE instead of adapting.
   drift_freeze_scale: 1.0
   # Total movement allowed away from the anchor profile (initial or operator-rebuilt
-  # baseline) before AM freezes and requires manual review. Prevents slow creep.
+  # baseline) before AMC freezes and requires manual review. Prevents slow creep.
   max_cumulative_shift_scale: 2.0
   freeze_on_active_alert_severity: WARNING  # freeze while an alert >= this is active

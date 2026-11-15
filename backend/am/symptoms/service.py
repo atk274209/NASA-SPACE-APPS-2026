@@ -1,7 +1,7 @@
 """Symptom reports and chat-detected symptom proposals.
 
 Safety properties:
-  * AM never records a symptom from chat by itself. Detection (keyword or LLM) only creates a
+  * AMC never records a symptom from chat by itself. Detection (keyword or LLM) only creates a
     pending SymptomProposal; a SymptomReport exists only after the astronaut confirms the
     proposal or reports the symptom manually.
   * Severity is the astronaut's own rating (mild | moderate | severe). Nothing here
@@ -175,7 +175,7 @@ class SymptomService:
         except LLMUnavailable as exc:
             log.info("LLM symptom detection skipped: %s", exc.reason)
             return []
-        except Exception:  # optional detection must never lose the astronaut's message or AM's reply
+        except Exception:  # optional detection must never lose the astronaut's message or AMC's reply
             log.warning("LLM symptom detection failed", exc_info=True)
             return []
         return self.propose(astronaut_id, message, found, "llm")

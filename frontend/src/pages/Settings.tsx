@@ -220,9 +220,9 @@ function ModelSection({ settings, diag }: { settings: UseQueryResult<Setting[]>;
       aside={o && (o.reachable ? <span className="text-sev-normal">Model service reachable</span> : <span>Model service offline</span>)}
     >
       <p className="mb-5 max-w-[80ch] text-sm text-ink-dim">
-        AM uses a language model only through the Ollama service at <span className="num text-ink">{o?.url ?? '…'}</span>.
+        AMC uses a language model only through the Ollama service at <span className="num text-ink">{o?.url ?? '…'}</span>.
         Monitoring, alerts, backups and ground reports never depend on it.
-        {o && !o.reachable && ' Ollama is not reachable right now: you can return to the deployment default, but a different model can only be chosen while Ollama runs, so AM can confirm it is installed.'}
+        {o && !o.reachable && ' Ollama is not reachable right now: you can return to the deployment default, but a different model can only be chosen while Ollama runs, so AMC can confirm it is installed.'}
       </p>
       {settings.isError ? <ErrorNote error={settings.error} /> : !chat || !embed || !detection ? <Loading /> : (
         <div className="flex flex-col gap-8">
@@ -304,7 +304,7 @@ function BackupForm() {
         {!actor && <NeedsName />}
       </div>
       <p className="text-xs text-ink-faint">
-        AM never stores the passphrase and cannot recover it. Without it, the backup cannot be opened.
+        AMC never stores the passphrase and cannot recover it. Without it, the backup cannot be opened.
       </p>
       <Problem error={create.error} />
       {create.data && (
@@ -453,7 +453,7 @@ function DataSection({ settings }: { settings: UseQueryResult<Setting[]> }) {
           <div>
             <Subheading>Restoring a backup</Subheading>
             <p className="text-sm text-ink-dim">
-              Restore runs only from the command line, so a browser can never replace the database. Stop the AM backend,
+              Restore runs only from the command line, so a browser can never replace the database. Stop the AMC backend,
               then run from the backend folder:
             </p>
             <pre className="num mt-2 overflow-x-auto rounded-md border border-seam bg-deck px-3 py-2 text-xs text-ink">
@@ -670,7 +670,7 @@ function GroundReportForm() {
       {encrypt && (
         <div className="flex flex-col gap-2 pl-6">
           <PassphraseFields pass={pass} confirm={confirm} onPass={setPass} onConfirm={setConfirm} />
-          <p className="text-xs text-ink-faint">Give the passphrase to the ground team through a separate channel. AM does not store it.</p>
+          <p className="text-xs text-ink-faint">Give the passphrase to the ground team through a separate channel. AMC does not store it.</p>
         </div>
       )}
       <div className="flex flex-wrap items-center gap-3">
@@ -792,7 +792,7 @@ function SyncSection() {
   return (
     <Section title="Synchronization">
       <p className="mb-5 max-w-[80ch] text-sm text-ink-dim">
-        AM never sends anything by itself. A ground report holds only the crew member, days and sections you select,
+        AMC never sends anything by itself. A ground report holds only the crew member, days and sections you select,
         and records who authorized it. A person moves the file over the mission&apos;s approved link and then marks it as
         exported. Every package carries record ids, the DEMO threshold label and a simulated-data flag.
       </p>
@@ -853,7 +853,7 @@ function DiagnosticsSection({ diag }: { diag: UseQueryResult<Diagnostics> }) {
                   {d.backups.stored} kept, retention {d.backups.retention}
                 </span>
               ) : <span className="text-sev-watch">No backup yet</span>],
-              ['AM version', <span className="num">{d.versions.app}</span>],
+              ['AMC version', <span className="num">{d.versions.app}</span>],
               ['Runtime', <span className="num">Python {d.versions.python}, SQLite {d.versions.sqlite}, SQLAlchemy {d.versions.sqlalchemy}, FastAPI {d.versions.fastapi}</span>],
               ['Operating system', d.versions.os],
               ['Thresholds', <span className="text-sev-watch">{d.versions.thresholds_label} ({d.versions.thresholds_version})</span>],

@@ -87,7 +87,8 @@ def send(channel: str, body: PostIn, db: DB, principal: CurrentUser) -> MessageO
     _channel(db, principal, channel)
     try:
         m = ic.post(db, channel, body.body, sender_user_id=principal.user_id, sender_name=principal.display_name,
-                    sender_role="doctor" if principal.is_doctor else "astronaut", urgent=body.urgent)
+                    sender_role="doctor" if principal.is_doctor else "astronaut",
+                    urgent=body.urgent and principal.is_doctor)  # only the flight surgeon marks a call urgent
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     db.commit()

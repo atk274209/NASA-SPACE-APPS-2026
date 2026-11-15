@@ -1,5 +1,5 @@
 // Module P, astronaut side: their quarters (temperature, lighting) and the shared cabin pressure.
-// AM tells them what it changed; one tap undoes it; manual control always wins.
+// AMC tells them what it changed; one tap undoes it; manual control always wins.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { cabinApi, VAR_LABEL, type CabinAction, type Control } from '../api/cabin'
 import { unitLabel } from '../lib/format'
@@ -18,7 +18,7 @@ function ControlTile({ c, astronautId }: { c: Control; astronautId: number }) {
     <div className="grid gap-1 rounded-md border border-seam bg-deck px-3 py-2 text-sm">
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-ink-dim">{VAR_LABEL[c.variable]}</span>
-        <span className="text-xs text-ink-faint" title={c.mode_reason}>{c.mode === 'AUTONOMOUS' ? 'AM control' : c.mode.toLowerCase()}</span>
+        <span className="text-xs text-ink-faint" title={c.mode_reason}>{c.mode === 'AUTONOMOUS' ? 'AMC control' : c.mode.toLowerCase()}</span>
       </div>
       <span className="num text-lg text-ink">{c.reading ?? c.setpoint} {unitLabel(c.unit)}</span>
       {own ? (
@@ -28,7 +28,7 @@ function ControlTile({ c, astronautId }: { c: Control; astronautId: number }) {
           <button aria-label={`Raise ${c.variable}`} className="size-7 rounded border border-seam-strong hover:border-signal disabled:opacity-40"
             disabled={set.isPending || c.setpoint + c.step > c.max} onClick={() => set.mutate(+(c.setpoint + c.step).toFixed(2))}>+</button>
           {c.mode === 'MANUAL' && (
-            <button className="ml-auto text-xs text-signal hover:underline" onClick={() => resume.mutate(undefined)}>Let AM adjust again</button>
+            <button className="ml-auto text-xs text-signal hover:underline" onClick={() => resume.mutate(undefined)}>Let AMC adjust again</button>
           )}
         </div>
       ) : (
@@ -45,7 +45,7 @@ function LastChange({ a, astronautId }: { a: CabinAction; astronautId: number })
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs text-ink-dim">
       <span>
-        AM changed {VAR_LABEL[a.variable]?.toLowerCase()} {a.before} → {a.after}
+        AMC changed {VAR_LABEL[a.variable]?.toLowerCase()} {a.before} → {a.after}
         {a.signal_quote && <> because you said “{a.signal_quote}”</>}.
       </span>
       {!a.reverted && <button className="text-signal hover:underline" onClick={() => undo.mutate(undefined)}>Undo</button>}

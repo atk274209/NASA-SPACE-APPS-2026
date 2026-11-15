@@ -23,6 +23,6 @@ export interface AuthState {
 export const authApi = {
   state: () => request<AuthState>('GET', '/auth/state'),
   login: (username: string, password: string) =>
-    request<User>('POST', '/auth/login', { username, password, device_name: 'AM main app' }),
+    request<User>('POST', '/auth/login', { username, password, device_name: 'AMC main app' }),
   logout: () => request<{ signed_in: boolean }>('POST', '/auth/logout'),
 }

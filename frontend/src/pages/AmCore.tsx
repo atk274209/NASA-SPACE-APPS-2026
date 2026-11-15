@@ -1,4 +1,4 @@
-// AM Core: the station intelligence's sealed log. Crew: no access. Doctor: AM's visible decisions
+// AMC Core: the station intelligence's sealed log. Crew: no access. Doctor: AMC's visible decisions
 // always; the daily reports, behaviour and crew attitude, and the mission log only in an emergency
 // (break the seal with a reason, two hours, the crew is told) or after mission return.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -42,7 +42,7 @@ const LEVEL_COLOR: Record<string, string> = {
 }
 
 function Eye({ open }: { open: boolean }) {
-  // AM's eye: a dim ring while sealed, a bright pulsing core while open
+  // AMC's eye: a dim ring while sealed, a bright pulsing core while open
   return (
     <svg viewBox="0 0 120 120" className="size-28 shrink-0" aria-hidden>
       <circle cx="60" cy="60" r="54" fill="none" stroke="var(--color-seam-strong)" strokeWidth="2" />
@@ -57,12 +57,12 @@ function Eye({ open }: { open: boolean }) {
 function Decisions() {
   const q = useQuery({ queryKey: ['core', 'decisions'], queryFn: core.decisions, refetchInterval: 15_000 })
   if (q.error) return <ErrorNote error={q.error} />
-  if (!q.data?.length) return <p className="text-sm text-ink-dim">No decisions yet. AM decides at each End Day.</p>
+  if (!q.data?.length) return <p className="text-sm text-ink-dim">No decisions yet. AMC decides at each End Day.</p>
   return (
     <ul className="grid gap-1.5 text-sm">
       {q.data.slice(0, 60).map((d) => (
         <li key={d.id} className="rounded bg-deck px-3 py-2" style={{ boxShadow: `inset 3px 0 0 ${LEVEL_COLOR[d.level] ?? LEVEL_COLOR.routine}` }}>
-          <span className="num text-xs text-ink-faint">{d.close_date} · {d.astronaut_code ?? 'crew'} · {d.category} · {d.rule_id} · {d.executed ? 'applied by AM' : 'recommendation'}{!d.visible_to_doctor && ' · sealed'}</span>
+          <span className="num text-xs text-ink-faint">{d.close_date} · {d.astronaut_code ?? 'crew'} · {d.category} · {d.rule_id} · {d.executed ? 'applied by AMC' : 'recommendation'}{!d.visible_to_doctor && ' · sealed'}</span>
           <p className="text-ink">{d.decision}</p>
           <p className="text-xs text-ink-dim">Why: {d.rationale}</p>
         </li>
@@ -82,7 +82,7 @@ function ReportCard({ r }: { r: Report }) {
         {!crew && <span className="text-xs font-medium first-letter:uppercase" style={{ color: LEVEL_COLOR[a.attention] }}>{a.attention}</span>}
         {r.is_simulated && <SimulatedMark />}
         <span className="ml-auto text-xs text-ink-faint">
-          {r.narrative_status === 'llm' ? 'written by AM' : r.narrative_status === 'template' ? 'template (model offline)' : 'AM is writing…'}
+          {r.narrative_status === 'llm' ? 'written by AMC' : r.narrative_status === 'template' ? 'template (model offline)' : 'AMC is writing…'}
         </span>
       </header>
       <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink">{r.narrative}</div>
@@ -148,14 +148,14 @@ export function AmCorePage() {
   const [tab, setTab] = useState<'reports' | 'log' | 'decisions'>('reports')
   const unseal = useMutation({ mutationFn: () => core.unseal(reason), onSuccess: () => qc.invalidateQueries({ queryKey: ['core'] }) })
   if (st.error) return <ErrorNote error={st.error} />
-  if (!st.data) return <p className="text-ink-dim">Connecting to AM Core…</p>
+  if (!st.data) return <p className="text-ink-dim">Connecting to AMC Core…</p>
   const s = st.data
   return (
     <div className="grid gap-8">
       <section className="flex flex-wrap items-center gap-6 rounded-lg border border-seam bg-hull p-5">
         <Eye open={s.open} />
         <div className="grid min-w-0 flex-1 gap-1">
-          <h1 className="text-2xl">AM Core</h1>
+          <h1 className="text-2xl">AMC Core</h1>
           <p className="text-sm text-ink-dim">
             The station intelligence&apos;s own log: daily health, behaviour and crew-attitude reports, and the story of
             the whole mission. The crew cannot open it. Safety information is never held here: alerts and red flags
@@ -183,12 +183,12 @@ export function AmCorePage() {
       </section>
 
       {!s.open ? (
-        <Section title="AM's decisions you can see" aside="attention, doctor notices, mission focus">
+        <Section title="AMC's decisions you can see" aside="attention, doctor notices, mission focus">
           <Decisions />
         </Section>
       ) : (
         <>
-          <nav aria-label="AM Core" className="flex gap-1 border-b border-seam">
+          <nav aria-label="AMC Core" className="flex gap-1 border-b border-seam">
             {([['reports', 'Daily reports'], ['log', 'Mission log'], ['decisions', 'All decisions']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setTab(k)} aria-current={tab === k ? 'page' : undefined}
                 className={`-mb-px border-b-2 px-3 py-2 text-sm ${tab === k ? 'border-signal text-ink' : 'border-transparent text-ink-dim hover:text-ink'}`}>{l}</button>

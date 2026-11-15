@@ -20,7 +20,7 @@ Why this design:
   * The passphrase only ever exists as a function argument here. Nothing in this module
     stores it, logs it, or puts it in an exception message.
 
-The file can be decrypted outside AM with any scrypt + AES-GCM implementation using the
+The file can be decrypted outside AMC with any scrypt + AES-GCM implementation using the
 layout above, or with:  uv run python -m am.admin.crypto <input> <output>
 """
 
@@ -97,7 +97,7 @@ def is_container(blob: bytes) -> bool:
 
 def decrypt_bytes(blob: bytes, passphrase: str) -> bytes:
     if not is_container(blob):
-        raise DecryptionError("not_container", "not an AM encrypted file (AMBK1 header missing or file truncated)")
+        raise DecryptionError("not_container", "not an AMC encrypted file (AMBK1 header missing or file truncated)")
     header = blob[:HEADER_LEN]
     salt = header[len(MAGIC):len(MAGIC) + SALT_LEN]
     nonce = header[len(MAGIC) + SALT_LEN:]
@@ -120,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     line, where it would end up in shell history and process listings.
     """
     parser = argparse.ArgumentParser(prog="python -m am.admin.crypto",
-                                     description="Decrypt an AM encrypted file (AMBK1) to a new file.")
+                                     description="Decrypt an AMC encrypted file (AMBK1) to a new file.")
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--passphrase-stdin", action="store_true",

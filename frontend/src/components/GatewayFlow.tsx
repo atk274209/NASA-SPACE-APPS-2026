@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 // particles riding them; a click sends a shockwave through the particles. Adapted from the
 // 21st.dev "gateway-flow" effect (mengto). The original ran a whole demo page in an iframe with
 // CDN scripts and fonts; this keeps only the canvas effect, so it runs offline and draws with
-// the AM palette. It is decoration only: hidden from assistive technology, never takes a click
+// the AMC palette. It is decoration only: hidden from assistive technology, never takes a click
 // (shockwaves listen on the window), stills itself for reduced motion and pauses in a hidden tab.
 
 export type GatewayFlowProps = {
@@ -14,7 +14,7 @@ export type GatewayFlowProps = {
   density?: number
   /** Line width multiplier, 0.25..4. */
   strokeWidth?: number
-  /** Stream and particle colour as "r, g, b". Defaults to the AM signal colour. */
+  /** Stream and particle colour as "r, g, b". Defaults to the AMC signal colour. */
   rgb?: string
   /** Overall strength, 0.05..1. Keep it low behind text. */
   opacity?: number

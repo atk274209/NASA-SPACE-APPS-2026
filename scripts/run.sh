@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start AM locally: one process, one address (http://localhost:8000), no internet needed.
+# Start AMC locally: one process, one address (http://localhost:8000), no internet needed.
 # ./scripts/run.sh [--demo] [--lan] [port]
 #   --demo: SIMULATED space events and the Test Console API on (demonstrations only)
 #   --lan:  other computers on the same local network may connect (this computer's own
@@ -25,5 +25,5 @@ if [ "$LAN" = 1 ]; then
   echo; echo "Network mode. On the other computer (same Wi-Fi), open one of:"
   for ip in $IPS; do echo "    http://$ip:$PORT"; done; echo
 fi
-echo "AM is starting at http://localhost:$PORT (Ctrl+C to stop)"
+echo "AMC is starting at http://localhost:$PORT (Ctrl+C to stop)"
 cd "$ROOT/backend" && exec uv run uvicorn am.main:app --host "$BIND" --port "$PORT"

@@ -66,9 +66,9 @@ def test_safety_reply_says_the_case_waits_for_the_doctor(client, tmp_path):
 
 # ------------------------------------------------------------------ R02: treatment questions
 @pytest.mark.parametrize("text, expect", [
-    ("What medicine should I take for it?", "AM does not give treatment or self-care advice"),
-    ("Hangi ilacı almalıyım?", "AM tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez"),
-    ("Can I take a painkiller?", "AM does not give treatment or self-care advice"),
+    ("What medicine should I take for it?", "AMC does not give treatment or self-care advice"),
+    ("Hangi ilacı almalıyım?", "AMC tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez"),
+    ("Can I take a painkiller?", "AMC does not give treatment or self-care advice"),
 ])
 def test_treatment_questions_never_reach_the_model(client, crew_member, text, expect):
     fake = FakeOllama([answer("Take two pills.")])
@@ -161,7 +161,7 @@ def test_stated_values_become_proposals_and_notes(client, tmp_path):
     props = me.get("/api/v1/measurement-proposals", params={"astronaut_id": a}).json()
     by = {p["metric_code"]: p for p in props}
     assert by["sleep_duration"]["value"] == 6 and by["sleep_duration"]["context"] == "daily"
-    assert by["heart_rate"]["value"] == 64 and by["heart_rate"]["context"] is None  # not said: AM asks
+    assert by["heart_rate"]["value"] == 64 and by["heart_rate"]["context"] is None  # not said: AMC asks
     assert "nabzım 64" in by["heart_rate"]["quote"]
     # another astronaut can neither read nor confirm them
     assert other.get("/api/v1/measurement-proposals", params={"astronaut_id": a}).status_code == 403

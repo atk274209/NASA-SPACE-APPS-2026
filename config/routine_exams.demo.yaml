@@ -5,8 +5,8 @@
 # can be exercised in a short simulated mission. They are not clinical or NASA intervals. Before
 # any operational use the mission's medical operations team must replace them.
 #
-# AM schedules the exam, reminds the astronaut and the doctor, and stores the results the
-# astronaut ENTERS. AM never fabricates or interprets a result.
+# AMC schedules the exam, reminds the astronaut and the doctor, and stores the results the
+# astronaut ENTERS. AMC never fabricates or interprets a result.
 
 version: "demo-exams-0.1"
 label: "DEMO: placeholder intervals, not a medical protocol"

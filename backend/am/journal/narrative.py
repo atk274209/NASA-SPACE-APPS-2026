@@ -66,7 +66,7 @@ REVIEW_WORDING = re.compile(
     re.IGNORECASE)
 
 PROMPT = """You write one day of a space-mission health journal for the crew medical team.
-The user message holds FACTS: a JSON object with the records AM stored for one astronaut and one
+The user message holds FACTS: a JSON object with the records AMC stored for one astronaut and one
 mission day. The day level, its reasons, alert severities and journal flags in FACTS were computed
 by deterministic DEMO rules before you were called.
 

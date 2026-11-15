@@ -1,4 +1,4 @@
-"""AM command line: setup and demo helpers that run in-process (no server needed).
+"""AMC command line: setup and demo helpers that run in-process (no server needed).
 
     uv run python -m am.cli migrate
     uv run python -m am.cli ingest-knowledge
@@ -207,7 +207,7 @@ def cmd_seed_crew(args) -> int:
         try:
             moved = set_aside_database(db_file, stamp)
         except PermissionError:
-            print("The database file is in use. Stop the AM backend, then run this again.")
+            print("The database file is in use. Stop the AMC backend, then run this again.")
             return 2
         for path in moved:
             print(f"Previous database kept as {path}")
@@ -245,7 +245,7 @@ def cmd_status(_args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="am", description="AM setup and demo helpers")
+    p = argparse.ArgumentParser(prog="am", description="AMC setup and demo helpers")
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("migrate", help="create/upgrade the local database").set_defaults(fn=cmd_migrate)
     sub.add_parser("ingest-knowledge", help="index knowledge/sources").set_defaults(fn=cmd_ingest)

@@ -1,4 +1,4 @@
-# AM one-command setup (Windows PowerShell).
+# AMC one-command setup (Windows PowerShell).
 #   powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 [-Demo] [-PullModels]
 # Installs dependencies, builds the console, prepares the local database and the knowledge
 # base. -Demo adds the FICTIONAL test crew (5 astronauts and a doctor) with easy test passwords
@@ -24,7 +24,7 @@ npm run build; if ($LASTEXITCODE) { throw "frontend build failed" }
 Pop-Location
 
 if ($PullModels) {
-    Need "ollama" "Install Ollama: https://ollama.com/ (optional; AM works without it)"
+    Need "ollama" "Install Ollama: https://ollama.com/ (optional; AMC works without it)"
     Write-Host "Pulling local models (about 5 GB)"
     ollama pull llama3.1:8b
     ollama pull nomic-embed-text
@@ -43,4 +43,4 @@ if ($Demo) {
 }
 uv run python -m am.cli status
 Pop-Location
-Write-Host "Done. Start AM with: powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo"
+Write-Host "Done. Start AMC with: powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo"

@@ -1,6 +1,6 @@
 """Symptom detection in chat messages. Output is only ever a *proposal*.
 
-AM never records a symptom from chat by itself: every detection becomes a pending
+AMC never records a symptom from chat by itself: every detection becomes a pending
 SymptomProposal that the astronaut confirms or dismisses. Detection therefore favours recall,
 but it must not propose what the astronaut explicitly denies ("I don't have a headache",
 "başım ağrımıyor"), so negation is handled deterministically.
@@ -80,7 +80,7 @@ _TR_NEG_AFTER_MA = tuple(s for s in _TR_NEG_SUFFIXES if s.startswith(("ma", "me"
 # Whole words that contain a stem but mean something else.
 _FALSE_FRIENDS = frozenset({"yalnizca"})  # Turkish "only", contains the loneliness stem "yalnız"
 
-# Ways of asking AM what to do about a symptom (ASCII-folded, lower case). In tests with the
+# Ways of asking AMC what to do about a symptom (ASCII-folded, lower case). In tests with the
 # local 7B model, a direct "what should I do?" drew self-care advice whatever the prompt said,
 # so the companion answers these with fixed wording instead (see CompanionService).
 ADVICE_REQUEST_PHRASES = (
@@ -241,7 +241,7 @@ def asks_for_advice(message: str) -> bool:
     return any(p in text for p in ADVICE_REQUEST_PHRASES)
 
 
-# Review finding R02: questions about medication or treatment always get AM's fixed no-advice reply,
+# Review finding R02: questions about medication or treatment always get AMC's fixed no-advice reply,
 # even when no symptom word is in the same message ("What should I take for it?").
 TREATMENT_REQUEST_PHRASES = (
     "what medicine", "what medication", "which medicine", "which medication", "what should i take",

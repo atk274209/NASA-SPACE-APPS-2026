@@ -49,9 +49,9 @@ function Sources({ msg }: { msg: ChatMessage }) {
       {msg.generated_by === 'deterministic' && !opener && (urgent ? (
         <p>Fixed safety answer: symptoms on the DEMO report-promptly list always get these words, not the language model.</p>
       ) : ruleAnswer ? (
-        <p>Fixed answer from AM&apos;s rules: questions about treating a symptom are not sent to the language model.</p>
+        <p>Fixed answer from AMC&apos;s rules: questions about treating a symptom are not sent to the language model.</p>
       ) : (
-        <p className="text-sev-watch">Written by AM&apos;s rule-based summary because the language model is unavailable.</p>
+        <p className="text-sev-watch">Written by AMC&apos;s rule-based summary because the language model is unavailable.</p>
       ))}
       {wording?.flags?.length ? (
         <p className="text-sev-watch">Wording check: this AI answer uses words that need care ({wording.flags.join(', ')}). It is not medical advice.</p>
@@ -90,12 +90,12 @@ function Sources({ msg }: { msg: ChatMessage }) {
       {grounding?.unverified_numbers?.length ? (
         <p className="text-sev-warning">
           Check before relying on this answer: {grounding.unverified_numbers.join(', ')}{' '}
-          {grounding.unverified_numbers.length === 1 ? 'does' : 'do'} not appear in the records AM retrieved.
+          {grounding.unverified_numbers.length === 1 ? 'does' : 'do'} not appear in the records AMC retrieved.
         </p>
       ) : null}
       {msg.model && (
         <p className="text-ink-faint">
-          AM{msg.latency_ms != null && `, ${(msg.latency_ms / 1000).toFixed(1)} s`}
+          AMC{msg.latency_ms != null && `, ${(msg.latency_ms / 1000).toFixed(1)} s`}
         </p>
       )}
     </div>
@@ -113,7 +113,7 @@ function Bubble({ msg }: { msg: ChatMessage }) {
     >
       <div className={`max-w-[min(68ch,85%)] ${mine ? 'rounded-lg rounded-br-sm bg-deck px-3.5 py-2.5' : 'border-l-2 border-signal/60 pl-3.5'}`}>
         <p className="mb-0.5 text-xs text-ink-faint">
-          {mine ? 'You' : 'AM'}, {fmtTime(msg.created_at)}
+          {mine ? 'You' : 'AMC'}, {fmtTime(msg.created_at)}
         </p>
         <div className="whitespace-pre-wrap leading-relaxed text-ink">{msg.content}</div>
         {!mine && <Sources msg={msg} />}
@@ -188,7 +188,7 @@ function ProposalActions({ p, astronautId }: { p: SymptomProposal; astronautId: 
   )
 }
 
-/** Shown under the user's own message: what AM noticed in it, and what was decided. */
+/** Shown under the user's own message: what AMC noticed in it, and what was decided. */
 function NoticedInline({ proposals, astronautId }: { proposals: SymptomProposal[]; astronautId: number }) {
   const pending = proposals.filter((p) => p.status === 'pending')
   const decided = proposals.filter((p) => p.status !== 'pending')
@@ -198,7 +198,7 @@ function NoticedInline({ proposals, astronautId }: { proposals: SymptomProposal[
         {pending.length > 0 && (
           <div className="flex flex-col gap-4 rounded-md border border-sev-watch/40 px-3.5 py-3">
             <p className="text-xs text-sev-watch">
-              AM noticed a possible symptom in this message. Nothing is recorded until you confirm it.
+              AMC noticed a possible symptom in this message. Nothing is recorded until you confirm it.
             </p>
             {pending.map((p) => <ProposalActions key={p.id} p={p} astronautId={astronautId} />)}
           </div>
@@ -220,7 +220,7 @@ function NoticedPanel({ astronautId, onOpenConversation }: { astronautId: number
     <Section title="Possible symptoms noticed" aside={pending.length ? pending.length : undefined}>
       {q.isLoading ? <Loading /> : q.error ? <ErrorNote error={q.error} /> : pending.length === 0 ? (
         <p className="text-sm text-ink-faint">
-          Nothing waiting. If you mention a symptom in chat, AM asks you here before anything is recorded.
+          Nothing waiting. If you mention a symptom in chat, AMC asks you here before anything is recorded.
         </p>
       ) : (
         <ul className="flex flex-col divide-y divide-seam/60">
@@ -401,7 +401,7 @@ function ReportSymptomPanel({ astronautId }: { astronautId: number }) {
           )}
           {submit.error && <ErrorNote error={submit.error} />}
           <p className="text-xs text-ink-faint">
-            Your own rating, not a diagnosis. AM adds logging and reporting prompts; it never suggests treatment.
+            Your own rating, not a diagnosis. AMC adds logging and reporting prompts; it never suggests treatment.
           </p>
         </form>
       )}
@@ -421,7 +421,7 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
     mutationFn: (text: string) => symptomsApi.send(conversationId, text),
     onMutate: () => setDraft(''),
     onSuccess: (turn) => {
-      // show what AM noticed under the message right away, before the refetch lands
+      // show what AMC noticed under the message right away, before the refetch lands
       if (turn.proposals.length) {
         qc.setQueryData<SymptomProposal[]>(['proposals', astronautId], (old = []) => [
           ...turn.proposals,
@@ -459,8 +459,8 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
         {msgs.length === 0 && !pendingText && (
           <li className="py-6">
             <p className="text-ink-dim">
-              Ask about your readings, alerts, baselines or recent check-ins, or tell AM how you feel. If you mention a
-              symptom, AM asks you to confirm it before recording anything.
+              Ask about your readings, alerts, baselines or recent check-ins, or tell AMC how you feel. If you mention a
+              symptom, AMC asks you to confirm it before recording anything.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(suggestions.data ?? []).map((s) => (
@@ -492,7 +492,7 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
             </li>
             <li className="border-l-2 border-signal/30 pl-3.5 text-sm text-ink-dim">
               <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.6 }}>
-                AM is checking the records…
+                AMC is checking the records…
               </motion.span>
             </li>
           </>
@@ -510,7 +510,7 @@ function Chat({ conversationId, astronautId }: { conversationId: number; astrona
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(draft) } }}
-          placeholder="Message AM (Enter to send, Shift+Enter for a new line)"
+          placeholder="Message AMC (Enter to send, Shift+Enter for a new line)"
           className={`${inputCls} flex-1 resize-none`}
         />
         <Button type="submit" disabled={!draft.trim() || send.isPending} className="self-end">Send</Button>
@@ -568,7 +568,7 @@ function CheckinPanel({ astronautId }: { astronautId: number }) {
         <Button type="submit" disabled={submit.isPending || (!Object.keys(ratings).length && !note.trim())}>
           Save check-in
         </Button>
-        {submit.isSuccess && <p role="status" className="text-sm text-sev-normal">Check-in saved. AM will use it today.</p>}
+        {submit.isSuccess && <p role="status" className="text-sm text-sev-normal">Check-in saved. AMC will use it today.</p>}
         {submit.error && <ErrorNote error={submit.error} />}
         <p className="text-xs text-ink-faint">Self-ratings from 1 to 5. They are not a clinical assessment.</p>
       </form>
@@ -583,7 +583,7 @@ function MemoryPanel({ astronautId }: { astronautId: number }) {
   const mission = items.filter((m) => m.layer === 'mission').slice(0, 8)
   const long = items.filter((m) => m.layer === 'long')
   return (
-    <Section title="What AM remembers">
+    <Section title="What AMC remembers">
       {q.isLoading ? <Loading /> : (
         <div className="flex flex-col gap-4 text-sm">
           <div>
@@ -655,7 +655,7 @@ export function CompanionPage() {
       <RoutineExams astronautId={astronaut.id} compact />
       <ComfortStrip astronautId={astronaut.id} />
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-2xl font-semibold">AM companion</h1>
+        <h1 className="mr-auto text-2xl font-semibold">AMC companion</h1>
         {astronaut.is_simulated && <SimulatedMark />}
         <PointsBadge astronautId={astronaut.id} />
         <span className="text-sm text-ink-dim">
@@ -710,7 +710,7 @@ export function CompanionPage() {
         </aside>
       </div>
       <details className="rounded-md border border-seam bg-hull px-4 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-ink">AM&apos;s notes about you</summary>
+        <summary className="cursor-pointer text-sm font-semibold text-ink">AMC&apos;s notes about you</summary>
         <p className="mb-2 mt-1 text-xs text-ink-faint">Only you and the medical officer can read these. Each note shows the words it came from.</p>
         <NotesList astronautId={astronaut.id} />
       </details>

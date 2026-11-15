@@ -17,7 +17,7 @@ export function CareBanner({ astronautId }: { astronautId: number }) {
           <h2 className="font-semibold text-ink">Sent to the doctor: waiting for approval</h2>
           <p className="mt-1 text-sm text-ink">
             What you reported may need attention. It went to the flight surgeon at once and is waiting for their
-            approval. AM does not diagnose or give treatment.
+            approval. AMC does not diagnose or give treatment.
           </p>
           <ul className="mt-2 list-disc pl-5 text-sm text-ink-dim">
             {awaiting.map((i) => <li key={i.id}>“{i.text}” <span className="num text-ink-faint">({fmtDateTime(i.created_at)})</span></li>)}
@@ -30,7 +30,7 @@ export function CareBanner({ astronautId }: { astronautId: number }) {
       )}
       {recentNotices.map((n, i) => (
         <section key={i} className="rounded-md border border-sev-watch/50 bg-sev-watch/10 p-3 text-sm">
-          <span className="font-semibold text-ink">AM Core was opened</span>{' '}
+          <span className="font-semibold text-ink">AMC Core was opened</span>{' '}
           <span className="text-ink-dim">by {n.actor} on {fmtDateTime(n.opened_at)} for an emergency: “{n.reason}”.</span>
         </section>
       ))}

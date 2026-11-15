@@ -2,8 +2,8 @@ import { request } from './client'
 
 /**
  * done: the routine was recorded that day.
- * missed: AM holds other records for that day, but not this one.
- * no_data: AM holds no records at all for that day, so it cannot tell.
+ * missed: AMC holds other records for that day, but not this one.
+ * no_data: AMC holds no records at all for that day, so it cannot tell.
  * pending: today, still open.
  */
 export type StreakDayState = 'done' | 'missed' | 'no_data' | 'pending'
@@ -12,7 +12,7 @@ export interface StreakDay {
   mission_day: number
   day_date: string
   state: StreakDayState
-  /** The day counted only because of records from the AM simulator. */
+  /** The day counted only because of records from the AMC simulator. */
   simulated: boolean
 }
 

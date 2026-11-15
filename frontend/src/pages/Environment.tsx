@@ -32,7 +32,7 @@ function ControlRow({ c }: { c: Control }) {
         {c.mode_reason && <span className="block text-xs text-ink-faint">{c.mode_reason}</span>}
         <div className="mt-1 flex gap-2 text-xs">
           {c.mode !== 'PAUSED' && <button className="text-signal hover:underline" onClick={() => mode.mutate('PAUSED')}>Pause</button>}
-          {c.mode !== 'AUTONOMOUS' && <button className="text-signal hover:underline" onClick={() => mode.mutate('AUTONOMOUS')}>Resume AM</button>}
+          {c.mode !== 'AUTONOMOUS' && <button className="text-signal hover:underline" onClick={() => mode.mutate('AUTONOMOUS')}>Resume AMC</button>}
         </div>
       </td>
       <td className="py-2">

@@ -1,7 +1,7 @@
 """Test crew: five FICTIONAL astronauts and one doctor account (master prompt v1, Module J).
 
 Everything here is invented for testing. The names, profiles and medical histories describe
-no real person. AM derives no threshold from a listed condition; the history exists so that
+no real person. AMC derives no threshold from a listed condition; the history exists so that
 person-specific features (symptom context, the doctor's patient view) can be tested.
 
 Passwords are generated at random and written only to the plain-text TEST_CREDENTIALS.txt file
@@ -88,9 +88,9 @@ DOCTOR_NAME = "Dr. Elif Arman (flight surgeon, FICTIONAL)"
 
 CREDENTIALS_HEADER = """\
 =====================================================================
- AM TEST CREDENTIALS - FOR LOCAL TESTING ONLY
+ AMC TEST CREDENTIALS - FOR LOCAL TESTING ONLY
 =====================================================================
- These accounts belong to the FICTIONAL test crew of the AM prototype.
+ These accounts belong to the FICTIONAL test crew of the AMC prototype.
  - Never reuse these passwords anywhere else.
  - This file is gitignored; do not commit, sync or share it.
  - The database stores only argon2id hashes, never these passwords.

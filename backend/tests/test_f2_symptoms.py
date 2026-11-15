@@ -104,7 +104,7 @@ def test_advice_requests_are_recognised_in_english_and_turkish():
 
 
 def test_quote_is_the_sentence_and_an_exact_substring():
-    msg = "Hi AM. I don't have a headache. But I've been constipated since Tuesday! Anything to log?"
+    msg = "Hi AMC. I don't have a headache. But I've been constipated since Tuesday! Anything to log?"
     found = detect_keywords(msg)
     assert [(d.code, d.quote) for d in found] == [("constipation", "But I've been constipated since Tuesday!")]
     run_on = "word " * 200 + "constipated " + "word " * 200
@@ -183,7 +183,7 @@ def test_manual_report_is_validated_audited_remembered_and_resolvable(client, si
 
 # ------------------------------------------------------------------ chat -> proposal -> missions
 @pytest.mark.parametrize("text, quote", [
-    ("Hi AM. I've been constipated since yesterday and I don't have a headache.",
+    ("Hi AMC. I've been constipated since yesterday and I don't have a headache.",
      "I've been constipated since yesterday and I don't have a headache."),
     ("Merhaba. Dünden beri kabızlık var, başım ağrımıyor.", "Dünden beri kabızlık var, başım ağrımıyor."),
 ])
@@ -356,9 +356,9 @@ def test_companion_sees_active_symptoms_and_uses_read_only_symptom_and_knowledge
 
 @pytest.mark.parametrize("text, codes, intro", [
     ("I can't sleep and my head hurts. What should I do?", ["insomnia", "headache"],
-     "AM does not give treatment or self-care advice"),
+     "AMC does not give treatment or self-care advice"),
     # M6c: the companion answers in the astronaut's language (master prompt Module L)
-    ("Başım ağrıyor, ne yapmalıyım?", ["headache"], "AM tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez"),
+    ("Başım ağrıyor, ne yapmalıyım?", ["headache"], "AMC tedavi, ilaç veya kendi kendine bakım tavsiyesi vermez"),
 ])
 def test_asking_what_to_do_about_a_symptom_gets_a_fixed_answer_not_the_model(client, sim, text, codes, intro):
     fake = FakeOllama([])

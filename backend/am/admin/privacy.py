@@ -1,4 +1,4 @@
-"""What AM stores where, and how data can leave the device.
+"""What AMC stores where, and how data can leave the device.
 
 Built from the running configuration (paths, model service URL) and stored records, so the
 privacy page describes this installation, not an ideal one. Where a setting weakens the
@@ -20,7 +20,7 @@ from am.config import REPO_ROOT, Settings
 from am.db.models_m5 import SyncPackage
 
 LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
-TRANSMISSION = ("AM has no function that uploads or synchronises data to ground. Health data leaves this device only "
+TRANSMISSION = ("AMC has no function that uploads or synchronises data to ground. Health data leaves this device only "
                 "as a ground-report package that a named person authorized, and a person moves that file over the "
                 "mission's approved link. Preparing, downloading and marking a package as exported are each recorded "
                 "in the audit trail.")
@@ -40,7 +40,7 @@ def inventory(session: Session, settings: Settings, engine: Engine) -> dict[str,
         {"key": "database", "where": db_where,
          "what": "Health and mission records: measurements, baselines, alerts, check-ins, symptoms, journal, "
                  "conversations with the companion, settings and the audit trail.",
-         "protection": "Local SQLite file. AM does not encrypt it at rest; protect the device with disk encryption."},
+         "protection": "Local SQLite file. AMC does not encrypt it at rest; protect the device with disk encryption."},
         {"key": "backups", "where": str(backup.backups_dir(settings)),
          "what": "Encrypted database backups.",
          "protection": "AES-256-GCM with a key derived from your passphrase (scrypt). The passphrase is never stored."},

@@ -169,7 +169,7 @@ async function downloadPackageFile(id: number, file: string, actor: string): Pro
       headers: actor.trim() ? { 'X-AM-Actor': encodeURIComponent(actor.trim()) } : undefined,
     })
   } catch {
-    throw new ApiError(0, 'The AM service is not reachable. Start the backend on port 8000.')
+    throw new ApiError(0, 'The AMC service is not reachable. Start the backend on port 8000.')
   }
   if (!res.ok) {
     let detail = res.statusText

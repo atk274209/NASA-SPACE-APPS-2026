@@ -20,7 +20,7 @@ export function ProfilePage() {
       <Section title="Privacy">
         <p className="text-sm text-ink-dim">
           {user.role === 'astronaut'
-            ? 'Your records are visible to you and to the medical officer account only. Everything you write to AM reaches the medical officer\'s feed. AM also keeps its own sealed mission log (health, behaviour, crew): nobody reads it unless the medical officer opens it in an emergency, which you are told about, or after the mission returns.'
+            ? 'Your records are visible to you and to the medical officer account only. Everything you write to AMC reaches the medical officer\'s feed. AMC also keeps its own sealed mission log (health, behaviour, crew): nobody reads it unless the medical officer opens it in an emergency, which you are told about, or after the mission returns.'
             : 'You can read every crew member\'s medical records. Your reads of crew records, acknowledgements and approvals are written to the audit log.'}
         </p>
       </Section>

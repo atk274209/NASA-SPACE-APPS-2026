@@ -1,8 +1,8 @@
 // Crew analytics bento: four live cards (crew water, activity by hour, reported problems by body
 // system, wellbeing and adherence radar). SVG only, no chart library.
-// Adapted for AM from "Analytics Bento" by vasnev.art (credited here, in the source): same
+// Adapted for AMC from "Analytics Bento" by vasnev.art (credited here, in the source): same
 // interactions (count-up, smooth lines, breathing waves, squarified treemap, Fourier radar, shared
-// tooltip, segmented control, staggered entry, reduced-motion support), AM design tokens, and data
+// tooltip, segmented control, staggered entry, reduced-motion support), AMC design tokens, and data
 // from /api/v1/doctor/analytics. Every number comes from stored records.
 import { useQuery } from '@tanstack/react-query'
 import * as React from 'react'

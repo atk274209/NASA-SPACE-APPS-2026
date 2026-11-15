@@ -1,4 +1,4 @@
-"""AM Core panel. Crew: no access. Doctor: decisions marked visible always; the sealed reports and the
+"""AMC Core panel. Crew: no access. Doctor: decisions marked visible always; the sealed reports and the
 mission log only while the core is open (emergency unseal or mission return)."""
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ DB = Annotated[Session, Depends(get_db)]
 def _require_open(db: Session) -> dict[str, Any]:
     st = access.state(db)
     if not st["open"]:
-        raise HTTPException(423, "AM Core is sealed. It opens in an emergency (break the seal with a reason) or "
+        raise HTTPException(423, "AMC Core is sealed. It opens in an emergency (break the seal with a reason) or "
                                  "after mission return.")
     return st
 
@@ -133,7 +133,7 @@ def reports(db: DB, close_date: date | None = None, astronaut_id: int | None = N
 @router.get("/am/core/mission-log", response_model=list[ReportOut])
 @doctor_only
 def mission_log(db: DB):
-    """The whole mission as AM told it: one crew chapter per closed day, oldest first."""
+    """The whole mission as AMC told it: one crew chapter per closed day, oldest first."""
     _require_open(db)
     return _reports(db, db.scalars(select(AmReport).where(AmReport.kind == "crew_day").order_by(AmReport.close_date)))
 
@@ -160,4 +160,4 @@ def summary(db: DB):
     return {"days_logged": len({r.close_date for r in rows}), "crew": per,
             "flags_by_rule_level": dict(flags),
             "decisions": db.scalar(select(func.count()).select_from(AmDecision)) or 0,
-            "label": "Deterministic summary of AM Core's sealed daily reports. Not a clinical assessment."}
+            "label": "Deterministic summary of AMC Core's sealed daily reports. Not a clinical assessment."}

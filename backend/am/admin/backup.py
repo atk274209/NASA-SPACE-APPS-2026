@@ -256,7 +256,7 @@ def verify_backup(session: Session, settings: Settings, backup_id: int, *, passp
         if not check.integrity_ok:
             message = "Decrypted, but the database integrity check reported problems."
         elif check.alembic_revision is None:
-            message = "Decrypted, but this is not an AM database (no schema revision)."
+            message = "Decrypted, but this is not an AMC database (no schema revision)."
         elif not checksum_ok:
             message = "Decrypted and intact, but the file checksum differs from the one recorded."
         else:

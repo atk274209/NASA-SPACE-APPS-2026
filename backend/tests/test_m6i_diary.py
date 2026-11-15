@@ -1,4 +1,4 @@
-"""M6i: private diary. AM talks with the astronaut about the day, colours it, and keeps it private."""
+"""M6i: private diary. AMC talks with the astronaut about the day, colours it, and keeps it private."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ def test_am_opens_the_page_and_keeps_asking_offline(client, crew):
     me, _, _ = crew
     page = _today(me)
     assert page["day"]["is_today"] and page["day"]["level"] == "green"
-    assert [m["role"] for m in page["messages"]] == ["assistant"]  # AM starts with a question
+    assert [m["role"] for m in page["messages"]] == ["assistant"]  # AMC starts with a question
     page = _write(me, page["day"]["id"], "Bugün deneyleri bitirdim, güzel bir gündü.")
     assert page["ai_available"] is False  # no model in tests: deterministic follow-up question
     last = page["messages"][-1]

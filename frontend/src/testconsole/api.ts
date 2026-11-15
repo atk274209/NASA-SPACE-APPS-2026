@@ -18,7 +18,7 @@ async function call<T>(method: string, path: string, body?: unknown, query?: Que
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(0, 'The AM backend is not reachable on port 8000.')
+    throw new ApiError(0, 'The AMC backend is not reachable on port 8000.')
   }
   if (!res.ok) {
     let detail = res.statusText

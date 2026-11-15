@@ -257,7 +257,7 @@ export function OpenEscalations({ astronautId }: { astronautId: number }) {
         <Loading />
       ) : q.data.length === 0 ? (
         <p className="text-sm text-ink-dim">
-          No open escalations. AM raises one when an alert reaches a level that involves the crew medical officer.
+          No open escalations. AMC raises one when an alert reaches a level that involves the crew medical officer.
         </p>
       ) : (
         <>

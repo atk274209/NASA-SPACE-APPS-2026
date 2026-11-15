@@ -1,4 +1,4 @@
-"""AM's notes about what crew members said, and values they stated in conversation (Module L).
+"""AMC's notes about what crew members said, and values they stated in conversation (Module L).
 
 Readable by the astronaut the notes are about and by the doctor (the authorization guard scopes
 every route to the astronaut record it names).

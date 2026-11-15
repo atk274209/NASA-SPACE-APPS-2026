@@ -8,7 +8,7 @@ import { Button, ErrorNote, Field, inputCls, KeyValue, Loading, Section, Simulat
 import { fmtDateTime } from '../lib/format'
 import { useSession } from '../state/session'
 
-/** Today's date in UTC (YYYY-MM-DD): AM counts mission days from the start date in UTC. */
+/** Today's date in UTC (YYYY-MM-DD): AMC counts mission days from the start date in UTC. */
 const utcToday = () => new Date().toISOString().slice(0, 10)
 
 // Inputs with a validation message get a red border while the message is shown.

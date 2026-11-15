@@ -103,7 +103,7 @@ export function HydrationCard({ astronautId }: { astronautId: number }) {
             </motion.button>
           ))}
         </div>
-        <p className="mt-1 text-xs text-ink-faint">AM records what you took; it never suggests a supplement or a dose.</p>
+        <p className="mt-1 text-xs text-ink-faint">AMC records what you took; it never suggests a supplement or a dose.</p>
       </div>
       {(add.error || undo.error || supp.error) && <div className="mt-2"><ErrorNote error={add.error ?? undo.error ?? supp.error} /></div>}
     </section>

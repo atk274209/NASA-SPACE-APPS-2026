@@ -152,7 +152,7 @@ def test_symptom_reports_count_as_checkins(db, crew):
     assert (ci.current, ci.at_risk) == (2, True)
     st = states(ci)
     assert st[8] == st[9] == "done"
-    assert st[7] == "no_data"  # AM holds no record at all for that day, so it cannot say it was missed
+    assert st[7] == "no_data"  # AMC holds no record at all for that day, so it cannot say it was missed
     # reporting a symptom today completes today's check-in
     db.add(SymptomReport(astronaut_id=crew, symptom_code="nausea", severity="severe", source="chat_confirmed",
                          reported_at=at(10, 11)))
@@ -165,7 +165,7 @@ def test_morning_check_needs_a_resting_reading_before_noon(db, ingest, crew):
     heart_rate(ingest, crew, 1, hour=11, minute=59)
     heart_rate(ingest, crew, 2, hour=12)  # noon is no longer morning
     heart_rate(ingest, crew, 3, hour=8, context="exercise")  # not a resting reading
-    heart_rate(ingest, crew, 4, hour=8, bpm=900.0)  # rejected entry: not logged, but AM has data that day
+    heart_rate(ingest, crew, 4, hour=8, bpm=900.0)  # rejected entry: not logged, but AMC has data that day
     heart_rate(ingest, crew, 10, hour=9)  # entered this afternoon (NOW is 15:00) with the time it was taken
     st = states(streak(streak_report(db, crew, now=NOW), "morning_check"))
     assert st[1] == "done"

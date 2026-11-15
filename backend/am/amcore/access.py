@@ -1,4 +1,4 @@
-"""AM Core seal: open only in an emergency (doctor, logged reason, time-limited) or after mission return."""
+"""AMC Core seal: open only in an emergency (doctor, logged reason, time-limited) or after mission return."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""AM companion persona (master prompt Module O): loader, prompt section, opener, one-question check.
+"""AMC companion persona (master prompt Module O): loader, prompt section, opener, one-question check.
 
 The persona file (config/persona/am_companion.v1.yaml) sets style only; the safety rules in
 am.ai.companion.SYSTEM_PROMPT always come first and win.
@@ -32,7 +32,7 @@ class Persona:
             lines += ["", "Support and motivation:"] + [f"- {x}" for x in d["support"]]
         lines += ["", "Examples of the style (not facts about this astronaut):"]
         for ex in d.get("examples", []):
-            lines.append(f'- Astronaut: "{ex["astronaut"]}" / AM: "{ex["am"]}"')
+            lines.append(f'- Astronaut: "{ex["astronaut"]}" / AMC: "{ex["am"]}"')
         return "\n".join(lines)
 
     def opener(self, hour: int, lang: str, seed: int) -> str:

@@ -62,7 +62,7 @@ class Suggestion:
 
 
 def suggestions(session: Session, astronaut_id: int) -> list[Suggestion]:
-    """Questions AM proposes, derived from stored state (no LLM involved)."""
+    """Questions AMC proposes, derived from stored state (no LLM involved)."""
     out: list[Suggestion] = []
     alerts = session.scalars(select(Alert).where(Alert.astronaut_id == astronaut_id,
                                                  Alert.status != AlertStatus.RESOLVED.value)

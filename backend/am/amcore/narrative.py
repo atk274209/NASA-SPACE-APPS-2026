@@ -1,4 +1,4 @@
-"""AM Core narratives: the local model writes each sealed report from its stored facts only.
+"""AMC Core narratives: the local model writes each sealed report from its stored facts only.
 
 Background worker (no database transaction open during the model call). Every number in the text is
 checked against the facts (grounding check) and risky wording is listed (wording check); both are kept
@@ -20,9 +20,9 @@ from am.db.models_amcore import AmReport
 log = logging.getLogger(__name__)
 MAX_ATTEMPTS = 2
 
-PROMPT = """You are AM, the onboard intelligence of a deep-space station. You keep a SEALED daily log that only
+PROMPT = """You are AMC, the onboard intelligence of a deep-space station. You keep a SEALED daily log that only
 the flight surgeon can open in an emergency or after the mission returns.
-Write the report for the FACTS below (JSON) in English, in AM's calm, precise voice.
+Write the report for the FACTS below (JSON) in English, in AMC's calm, precise voice.
 Sections (use exactly these headings, one short paragraph each):
 {sections}
 Rules:
@@ -33,7 +33,7 @@ Rules:
 - If something is missing, say it was not recorded."""
 
 SECTIONS = {
-    "astronaut_day": ["Health", "Behaviour", "Habitat", "AM's attention"],
+    "astronaut_day": ["Health", "Behaviour", "Habitat", "AMC's attention"],
     "crew_day": ["Crew status", "Crew attitude", "Habitat", "Priorities for tomorrow"],
 }
 
@@ -67,7 +67,7 @@ def process_pending(ctx: Any, limit: int = 3) -> int:
         except LLMUnavailable as exc:
             text, checks, err = None, {}, exc.reason
         except Exception as exc:  # a narrative must never break the core
-            log.warning("AM Core narrative failed for report %s", rid, exc_info=True)
+            log.warning("AMC Core narrative failed for report %s", rid, exc_info=True)
             text, checks, err = None, {}, f"{type(exc).__name__}: {exc}"
         with ctx.session_factory() as s:
             r = s.get(AmReport, rid)
@@ -101,7 +101,7 @@ class CoreWorker:
             try:
                 n = process_pending(self.ctx)
             except Exception:
-                log.warning("AM Core worker error", exc_info=True)
+                log.warning("AMC Core worker error", exc_info=True)
                 n = 0
             if n == 0:
                 self._stop.wait(self.interval)

@@ -147,7 +147,7 @@ def test_entry_spec_describes_units_contexts_and_bounds(client):
     rad = by_code["radiation_dose"]
     assert rad["category"] == "radiation" and rad["unit"] == "mSv" and rad["contexts"] == ["daily"]
     assert rad["baseline_enabled"] is False and rad["alert_rule_id"] is None
-    assert "AM does not evaluate exposure limits" in rad["sanity_note"]
+    assert "AMC does not evaluate exposure limits" in rad["sanity_note"]
 
     temp_units = {u["unit"]: u for u in by_code["body_temperature"]["accepted_units"]}
     assert temp_units["degF"]["offset"] == -32 and temp_units["degF"]["factor"] == pytest.approx(5 / 9)
@@ -308,7 +308,7 @@ def test_radiation_cumulative_sums_days_and_states_no_limits(client):
     assert rejected["accepted"] is False
 
     out = client.get("/api/v1/radiation/cumulative", params={"astronaut_id": aid}).json()
-    assert out["note"] == "AM does not evaluate exposure limits."
+    assert out["note"] == "AMC does not evaluate exposure limits."
     assert out["unit"] == "mSv" and out["entries"] == 3 and out["simulated"] is False
     assert [(d["utc_date"], d["entries"]) for d in out["days"]] == [(d1.date().isoformat(), 2),
                                                                      (d2.date().isoformat(), 1)]

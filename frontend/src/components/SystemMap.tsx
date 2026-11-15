@@ -1,13 +1,13 @@
-// AM system map: three live diagrams that replace the wall of status text on the System page.
+// AMC system map: three live diagrams that replace the wall of status text on the System page.
 // Adapted from the 21st.dev "ink-orbit-features" bento (kedhareswer): the flow diagram, the
-// integrations hub and the scrubbable chart, redrawn in the AM palette and fed only with stored
+// integrations hub and the scrubbable chart, redrawn in the AMC palette and fed only with stored
 // records. Nothing here is decorative data:
-//   1. Crew -> AM -> reports: the real crew (colour = their current flag level) and the real
-//      number of sealed AM Core reports; a new sheet slides in only when a real report is written.
-//   2. Local services: database, chat model, embedding model and the AM Core seal, from
+//   1. Crew -> AMC -> reports: the real crew (colour = their current flag level) and the real
+//      number of sealed AMC Core reports; a new sheet slides in only when a real report is written.
+//   2. Local services: database, chat model, embedding model and the AMC Core seal, from
 //      /system/status and /am/core/status; the hub cycles through them, hover to hold one.
-//   3. Written to AM today by hour, from /doctor/analytics. The original drew a "forecast";
-//      AM does not predict, so the chart shows recorded values only.
+//   3. Written to AMC today by hour, from /doctor/analytics. The original drew a "forecast";
+//      AMC does not predict, so the chart shows recorded values only.
 // No dependencies and no external assets: it works offline.
 
 import { useQuery } from '@tanstack/react-query'
@@ -107,7 +107,7 @@ function Frame({ wide, children, title, text }: { wide?: boolean; children: Reac
   )
 }
 
-/** The AM glyph: a ring around a core, as in the navigation. */
+/** The AMC glyph: a ring around a core, as in the navigation. */
 function Mark({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
@@ -144,7 +144,7 @@ function ServiceGlyph({ kind }: { kind: string }) {
   )
 }
 
-/* ------------------------------------------------------ 1: crew -> AM -> reports */
+/* ------------------------------------------------------ 1: crew -> AMC -> reports */
 
 const SEATS = [
   { x: 58, y: 38 }, { x: 104, y: 22 }, { x: 150, y: 40 }, { x: 46, y: 92 }, { x: 146, y: 114 },
@@ -161,10 +161,10 @@ function FlowCard({ crew, core, uid, reduced }: { crew: CrewMember[]; core?: Cor
   const reports = core?.reports ?? 0
   const writing = crew.filter((c) => c.level !== 'none').length
   return (
-    <Frame wide title="Crew → AM → reports"
-      text={<>Everything the crew writes reaches AM; at End Day AM seals a report per astronaut and one for the crew. {core ? <>AM Core holds <b className="num text-ink">{reports}</b> report{reports === 1 ? '' : 's'}{core.last_close_date ? <>, the last for <span className="num">{core.last_close_date}</span></> : ''}.</> : 'Loading AM Core…'}</>}>
+    <Frame wide title="Crew → AMC → reports"
+      text={<>Everything the crew writes reaches AMC; at End Day AMC seals a report per astronaut and one for the crew. {core ? <>AMC Core holds <b className="num text-ink">{reports}</b> report{reports === 1 ? '' : 's'}{core.last_close_date ? <>, the last for <span className="num">{core.last_close_date}</span></> : ''}.</> : 'Loading AMC Core…'}</>}>
       <svg className="sm-diagram" viewBox="0 0 640 178" role="img"
-        aria-label={`${crew.length} crew members feed AM; ${writing} have something flagged; AM Core holds ${reports} reports`}>
+        aria-label={`${crew.length} crew members feed AMC; ${writing} have something flagged; AMC Core holds ${reports} reports`}>
         <defs>
           <radialGradient id={`${uid}glow`} cx="320" cy="110" r="190" gradientUnits="userSpaceOnUse">
             <stop offset="0" stopColor="var(--color-signal)" stopOpacity=".10" />
@@ -215,7 +215,7 @@ function FlowCard({ crew, core, uid, reduced }: { crew: CrewMember[]; core?: Cor
           <rect x="-4" y="-4" width="124" height="52" rx="8" fill="none" stroke="var(--color-signal-dim)" className={reduced ? undefined : 'sm-pulse'} />
           <rect width="116" height="44" rx="6" className="sm-node" />
           <g transform="translate(13,14)" style={{ color: 'var(--color-signal)' }}><Mark /></g>
-          <text x="36" y="20" fontSize="8.5" letterSpacing="1.4" fontWeight="600" fill="var(--color-ink)" fontFamily="var(--font-sans)">AM</text>
+          <text x="36" y="20" fontSize="8.5" letterSpacing="1.4" fontWeight="600" fill="var(--color-ink)" fontFamily="var(--font-sans)">AMC</text>
           <text x="36" y="32" fontSize="7" fill="var(--color-ink-faint)" fontFamily="var(--font-sans)">{core ? (core.open ? 'Open' : 'Sealed') : '…'}</text>
           <path d="M100 18l4 4-4 4" fill="none" stroke="var(--color-ink-dim)" strokeWidth="1.3" />
         </g>
@@ -268,7 +268,7 @@ function ServicesCard({ services, reduced }: { services: { kind: string; name: s
   const shown = on >= 0 ? services[on] : undefined
   return (
     <Frame title="Local services"
-      text={<>All of AM runs on this computer. Monitoring, alerts and End Day need only the database; the language models add conversation and narratives.</>}>
+      text={<>All of AMC runs on this computer. Monitoring, alerts and End Day need only the database; the language models add conversation and narratives.</>}>
       <svg className="sm-diagram" viewBox="0 0 300 150" role="group" aria-label={`Local services: ${up} of ${services.length} available`}>
         {TILES.map((_, i) => <path key={i} d={path(i)} className={`sm-flow${on === i ? ' sm-flow-on' : ''}`} />)}
         {!reduced && on >= 0 && services[on]?.ok && (
@@ -301,7 +301,7 @@ function ServicesCard({ services, reduced }: { services: { kind: string; name: s
   )
 }
 
-/* ------------------------------------------------------- 3: written to AM today */
+/* ------------------------------------------------------- 3: written to AMC today */
 
 function ActivityCard({ values, uid }: { values: number[] | undefined; uid: string }) {
   const [ref, inView] = useInView(0.3)
@@ -320,10 +320,10 @@ function ActivityCard({ values, uid }: { values: number[] | undefined; uid: stri
   }
   return (
     <div ref={ref} data-in={inView} className="contents">
-      <Frame title="Written to AM today"
-        text={<>Companion messages and notes from the whole crew, by hour (UTC). <b className="num text-ink">{total}</b> so far. Recorded values only: AM does not forecast.</>}>
+      <Frame title="Written to AMC today"
+        text={<>Companion messages and notes from the whole crew, by hour (UTC). <b className="num text-ink">{total}</b> so far. Recorded values only: AMC does not forecast.</>}>
         <svg className="sm-diagram cursor-crosshair" viewBox={`0 0 ${W} ${H + 6}`} onPointerMove={onMove} onPointerLeave={() => setHover(-1)}
-          role="img" aria-label={`Written to AM today: ${total} entries, busiest at ${String(peak).padStart(2, '0')}:00`}>
+          role="img" aria-label={`Written to AMC today: ${total} entries, busiest at ${String(peak).padStart(2, '0')}:00`}>
           <defs>
             <linearGradient id={`${uid}area`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="var(--color-signal)" stopOpacity=".22" />
@@ -373,11 +373,11 @@ export function SystemMap() {
     { kind: 'database', name: 'Database', ok: status.data ? status.data.database === 'ok' : null, detail: status.data?.database === 'ok' ? 'Online' : String(status.data?.database ?? '…') },
     { kind: 'chat', name: 'Chat model', ok: model(o?.configured_chat_model), detail: modelDetail(o?.configured_chat_model) },
     { kind: 'embed', name: 'Search model', ok: model(o?.configured_embed_model), detail: modelDetail(o?.configured_embed_model) },
-    { kind: 'seal', name: 'AM Core', ok: core.data ? true : null, detail: core.data ? (core.data.open ? 'Seal open' : 'Sealed') : '…' },
+    { kind: 'seal', name: 'AMC Core', ok: core.data ? true : null, detail: core.data ? (core.data.open ? 'Seal open' : 'Sealed') : '…' },
   ]
 
   return (
-    <section aria-label="AM system map" className="sm-root">
+    <section aria-label="AMC system map" className="sm-root">
       <style>{SM_CSS}</style>
       <div className="sm-bento">
         <FlowCard crew={crew.data ?? []} core={core.data} uid={uid} reduced={reduced} />

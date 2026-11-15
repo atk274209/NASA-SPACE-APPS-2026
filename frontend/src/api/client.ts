@@ -69,7 +69,7 @@ export async function request<T>(method: string, path: string, body?: unknown, q
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(0, 'The AM service is not reachable. Start the backend on port 8000.')
+    throw new ApiError(0, 'The AMC service is not reachable. Start the backend on port 8000.')
   }
   if (!res.ok) {
     let detail = res.statusText
@@ -110,7 +110,7 @@ export const api = {
   aiStatus: () => request<AIStatus>('GET', '/ai/status'),
   conversations: (astronaut_id: number) =>
     request<Conversation[]>('GET', '/companion/conversations', undefined, { astronaut_id }),
-  // opener: AM starts the check-in with a short greeting (persona, Module O)
+  // opener: AMC starts the check-in with a short greeting (persona, Module O)
   createConversation: (astronaut_id: number, opener = true) =>
     request<Conversation>('POST', '/companion/conversations', { astronaut_id, opener }),
   messages: (conversationId: number) => request<ChatMessage[]>('GET', `/companion/conversations/${conversationId}/messages`),

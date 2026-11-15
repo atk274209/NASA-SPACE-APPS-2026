@@ -7,7 +7,7 @@ or page needed to enforce authorization.
 ## Threat model and goals
 
 **Setting:** several crew computers on a closed habitat LAN. There is no internet. One
-computer runs the AM hub, and the others use a browser.
+computer runs the AMC hub, and the others use a browser.
 
 **Assets:** the crew's health records, conversations, alerts and journals.
 

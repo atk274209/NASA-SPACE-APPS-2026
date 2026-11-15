@@ -349,8 +349,8 @@ def search_knowledge(env: ToolEnv, args: dict[str, Any]) -> ToolResult:
                         "text": h.chunk.text[:KNOWLEDGE_TEXT_CHARS]})
         refs.append({"type": "knowledge", "id": h.chunk.id, "doc_slug": doc.slug, "title": doc.title, "url": url})
     data = {"query": query,
-            "note": ("Excerpts from AM's curated public sources about spaceflight health in general, not about "
-                     "this astronaut. kind 'passage' is a verbatim quote; 'finding' and 'limitation' are AM's own "
+            "note": ("Excerpts from AMC's curated public sources about spaceflight health in general, not about "
+                     "this astronaut. kind 'passage' is a verbatim quote; 'finding' and 'limitation' are AMC's own "
                      "summaries. Name the source title when you use one."),
             "results": results}
     if not results:
@@ -399,7 +399,7 @@ TOOLS: list[Tool] = [
          "(mild, moderate, severe). These are not diagnoses. Active symptoms only unless status is 'all'.",
          {"type": "object", "properties": {"status": {"type": "string", "enum": ["active", "all"]}}},
          symptom_reports),
-    Tool("search_knowledge", "Search AM's curated knowledge base of public spaceflight-health sources (mostly NASA "
+    Tool("search_knowledge", "Search AMC's curated knowledge base of public spaceflight-health sources (mostly NASA "
          "Human Research Program pages). Returns short excerpts with source titles. Use it for general background "
          "questions; it says nothing about this astronaut's own data.",
          {"type": "object", "properties": {"query": {"type": "string", "description": "a few keywords"}},

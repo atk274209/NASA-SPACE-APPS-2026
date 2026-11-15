@@ -55,7 +55,7 @@ from am.guidance.schemas import (
 from am.symptoms import catalog
 
 # Indicator-to-system mapping (M5 spec, F7). Symptoms map through catalog.Symptom.body_system.
-# Eyes and digestion have no measured indicator in AM, so only symptom reports inform them.
+# Eyes and digestion have no measured indicator in AMC, so only symptom reports inform them.
 SYSTEM_METRICS: dict[str, tuple[str, ...]] = {
     "neuro_behavioral": ("sleep_duration",),
     "eyes": (),
@@ -157,7 +157,7 @@ def _last_report_by_symptom(session: Session, astronaut_id: int) -> dict[str, da
 def _coverage(code: str, names: dict[str, str]) -> str:
     metrics = SYSTEM_METRICS[code]
     if not metrics:
-        return "Symptom reports only. AM has no measured indicator for this system."
+        return "Symptom reports only. AMC has no measured indicator for this system."
     extra = " and check-in self-ratings" if code == SELF_REPORT_SYSTEM else ""
     return f"Indicators: {', '.join(metric_name(names, m) for m in metrics)}. Also symptom reports{extra}."
 

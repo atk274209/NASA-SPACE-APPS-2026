@@ -3,7 +3,7 @@
 am.settings_store owns storage, defaults and the audit entry. This module adds what an
 operator needs to change a setting safely: a description, a type, bounds, and for model
 settings a check against the models the local Ollama service actually has installed.
-A model AM cannot confirm is never saved, so the companion cannot silently switch to a
+A model AMC cannot confirm is never saved, so the companion cannot silently switch to a
 model that does not exist.
 """
 
@@ -38,7 +38,7 @@ class SettingSpec:
 SPECS: dict[str, SettingSpec] = {s.key: s for s in [
     SettingSpec("chat_model", "model",
                 "Local Ollama model for the companion, journal narratives and research hypotheses. Empty means "
-                "the deployment default (AM_CHAT_MODEL). AM only accepts a model that is installed."),
+                "the deployment default (AM_CHAT_MODEL). AMC only accepts a model that is installed."),
     SettingSpec("embed_model", "model",
                 "Local Ollama embedding model for knowledge-base search. After changing it, re-index the knowledge "
                 "base; until then search uses the offline keyword method. Empty means the deployment default "
@@ -121,7 +121,7 @@ def _check_model(value: Any, llm: OllamaClient) -> str | None:
     status = llm.status(name)
     if not status["reachable"]:
         raise ModelServiceOffline(
-            "The local model service (Ollama) is not reachable, so AM cannot confirm that "
+            "The local model service (Ollama) is not reachable, so AMC cannot confirm that "
             f"'{name}' is installed. Start Ollama and try again; the current model stays in use.")
     if not status["model_installed"]:
         installed = ", ".join(status.get("installed_models") or []) or "none"

@@ -1,6 +1,6 @@
 """Adaptive daily missions (rule-based, deterministic).
 
-Tasks are monitoring, logging and protocol-adherence prompts. AM never prescribes
+Tasks are monitoring, logging and protocol-adherence prompts. AMC never prescribes
 medication, changes treatment, or sets exercise/nutrition targets: those come from the
 mission's approved protocols, referenced here by placeholder IDs marked DEMO until real
 protocols are configured.
@@ -52,7 +52,7 @@ T = {t.code: t for t in [
              "Rate mood, stress, fatigue, sleep quality and motivation in the companion.",
              "AM-DEMO-BH-01", "checkin"),
     Template("exercise_session", "exercise", "Complete today's scheduled exercise session",
-             "Follow the exercise prescription in your mission protocol; AM does not change it.",
+             "Follow the exercise prescription in your mission protocol; AMC does not change it.",
              "AM-DEMO-EX-01", "measurement:exercise_duration:daily"),
     Template("hydration_log", "nutrition", "Log water intake",
              "Record today's total water intake.", "AM-DEMO-NUT-01", "measurement:water_intake:daily"),

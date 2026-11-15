@@ -1,7 +1,7 @@
-"""Intercom: voice-loop style text channels between the crew, the flight surgeon and AM (2026-11-15).
+"""Intercom: voice-loop style text channels between the crew, the flight surgeon and AMC (2026-11-15).
 
 Channels:
-  crew      everyone on the mission (all astronauts and the doctor); AM posts announcements here
+  crew      everyone on the mission (all astronauts and the doctor); AMC posts announcements here
   ast-<id>  a private loop between one astronaut and the doctor
 
 Intercom messages are conversation between people. They are not health records and never enter

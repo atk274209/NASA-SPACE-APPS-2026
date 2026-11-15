@@ -311,7 +311,7 @@ function EntryForm({
             )}
             {outOfRange && (
               <span role="alert" className="text-sev-watch">
-                Outside the accepted range. AM will store this entry as rejected. Check the value and the unit.
+                Outside the accepted range. AMC will store this entry as rejected. Check the value and the unit.
               </span>
             )}
             {otherUnit && value !== null && (
@@ -442,14 +442,14 @@ function AssessmentBlock({ r, metric }: { r: ManualEntryResult; metric: EntryMet
       return (
         <p className="text-sm text-ink-dim">
           Logged only: this indicator has no baseline and no alert rule.
-          {metric.code === RADIATION && ' AM keeps a running total and does not evaluate exposure limits.'}
+          {metric.code === RADIATION && ' AMC keeps a running total and does not evaluate exposure limits.'}
         </p>
       )
     }
     return (
       <div className="flex flex-col gap-1 text-sm">
         <p className="text-ink-dim">
-          Not compared yet: there is no personal baseline for this context. AM forms one from your good-quality
+          Not compared yet: there is no personal baseline for this context. AMC forms one from your good-quality
           readings and never compares a reading with a different context.
         </p>
         {a.reasons.map((x) => <p key={x} className="text-xs text-ink-faint">{x}</p>)}

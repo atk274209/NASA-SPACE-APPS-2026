@@ -1,8 +1,8 @@
 """SIMULATED space events for live demonstrations. See am.db.models_demo for the idea.
 
-Each event kind changes one real input of AM (a cabin sensor reading, a sensor fault, wearable
-readings, a symptom report) and then records, in plain words, what AM's own subsystems did in
-response. Nothing in the reaction is scripted: if AM does not react, the event says so.
+Each event kind changes one real input of AMC (a cabin sensor reading, a sensor fault, wearable
+readings, a symptom report) and then records, in plain words, what AMC's own subsystems did in
+response. Nothing in the reaction is scripted: if AMC does not react, the event says so.
 Cabin faults clear themselves when the event ends; health records stay, as they would.
 """
 
@@ -73,7 +73,7 @@ def _cabin_event(s: Session, ev: SpaceEvent, control, *, drift: float | None = N
     else:
         ev.reactions = ev.reactions + ["The cabin monitor read the sensors and found nothing outside its limits."]
     if mode_before == "AUTONOMOUS" and control.mode == "PAUSED":
-        ev.reactions = ev.reactions + [f"AM paused its own {control.variable} control and handed it to the crew "
+        ev.reactions = ev.reactions + [f"AMC paused its own {control.variable} control and handed it to the crew "
                                        "until the reading is trustworthy again."]
 
 
@@ -88,7 +88,7 @@ def _clear_cabin(s: Session, ev: SpaceEvent) -> None:
     cab._log(s, c, "FAULT", "P-DEMO-EVENT", ACTOR, reason=f"SIMULATED demo event ended: {ev.title}")
     if ev.detail.get("mode_before") == "AUTONOMOUS" and c.mode == "PAUSED":
         cab.set_mode(s, c, "AUTONOMOUS", actor=ACTOR, reason="SIMULATED demo event ended; reading back in limits")
-        ev.reactions = ev.reactions + [f"Readings back in limits: AM resumed {c.variable} control."]
+        ev.reactions = ev.reactions + [f"Readings back in limits: AMC resumed {c.variable} control."]
     cab.sense(s)
 
 
@@ -122,12 +122,12 @@ def _solar(s, ctx, rng, ev):
         "SIMULATED: a burst of solar energetic particles reaches the station. Radiation dose is not "
         "simulated in this prototype.")
     ev.reactions = ["All crew were shown the notice to follow the mission's radiation shelter procedure (DEMO).",
-                    "AM keeps monitoring every crew member as usual; no health value was invented."]
+                    "AMC keeps monitoring every crew member as usual; no health value was invented."]
 
 
 def _ground_link(s, ctx, rng, ev):
     ev.severity, ev.summary = "info", "SIMULATED: the link with mission control on Earth is lost for a while."
-    ev.reactions = ["AM keeps working on board: monitoring, alerts, the doctor's feed and the diary need no "
+    ev.reactions = ["AMC keeps working on board: monitoring, alerts, the doctor's feed and the diary need no "
                     "connection to Earth.",
                     "Nothing waits for the ground: records are stored locally and sync when the link returns."]
 
@@ -153,7 +153,7 @@ def _pressure(s, ctx, rng, ev):
     ev.summary = "SIMULATED: cabin pressure drifts down slowly, as after a small leak (micrometeoroid suspected)."
     lim = load_envelope().variables["pressure"]
     _cabin_event(s, ev, c, drift=round(lim.auto_min - 0.4 - c.setpoint, 2))  # below the autonomous band
-    ev.reactions = ev.reactions + ["Pressure is cabin-wide and safety-critical: AM never corrects it outside its "
+    ev.reactions = ev.reactions + ["Pressure is cabin-wide and safety-critical: AMC never corrects it outside its "
                                    "narrow band on its own; a person decides."]
 
 
@@ -179,7 +179,7 @@ def _wearable(preset: str, summary: str):
         except NoWindow:
             ev.reactions = ["The mission day has just started: no readings to add yet."]
             return
-        ev.reactions = [f"AM received {res.readings} SIMULATED wearable readings from the last hours."]
+        ev.reactions = [f"AMC received {res.readings} SIMULATED wearable readings from the last hours."]
         _health_reaction(s, ev, res.alert_ids)
     return run
 
@@ -239,7 +239,7 @@ def trigger(s: Session, ctx: Any, code: str | None = None, *, actor: str = ACTOR
     s.add(ev)
     s.flush()
     kind.run(s, ctx, rng, ev)
-    # AM speaks on the intercom: crew-wide events on the crew loop; anything about one person only on
+    # AMC speaks on the intercom: crew-wide events on the crew loop; anything about one person only on
     # that person's private loop with the flight surgeon, never in front of the whole crew.
     from am.intercom import service as intercom
 
@@ -247,7 +247,7 @@ def trigger(s: Session, ctx: Any, code: str | None = None, *, actor: str = ACTOR
     if ev.reactions:
         text += f" {ev.reactions[0]}"
     channel = intercom.private_id(ev.astronaut_id) if ev.astronaut_id else intercom.CREW
-    intercom.post(s, channel, f"[SIMULATED] {text}", sender_user_id=None, sender_name="AM", sender_role="am",
+    intercom.post(s, channel, f"[SIMULATED] {text}", sender_user_id=None, sender_name="AMC", sender_role="am",
                   urgent=ev.severity in ("warning", "critical"))
     audit(s, actor=actor, action="demo.event", entity="space_event", entity_id=ev.id,
           payload={"kind": kind.code, "astronaut_id": ev.astronaut_id})

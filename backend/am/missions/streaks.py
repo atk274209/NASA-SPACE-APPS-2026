@@ -79,7 +79,7 @@ class StreakDay:
     mission_day: int
     day_date: date
     state: DayState
-    simulated: bool  # the day counted only because of records from the AM simulator
+    simulated: bool  # the day counted only because of records from the AMC simulator
 
 
 @dataclass
@@ -132,9 +132,9 @@ def summarize(kind: StreakType, done: dict[int, bool], data_days: set[int], *, t
     """Turn the days a routine was recorded into runs, a calendar and milestones.
 
     `done` maps a mission day to True when only simulated records made it count.
-    `data_days` are the days AM holds any relevant record for. A day with records but
+    `data_days` are the days AMC holds any relevant record for. A day with records but
     without this routine is 'missed'; a day with no records at all is 'no_data', because
-    AM cannot tell whether the routine happened (for example, data that never synced).
+    AMC cannot tell whether the routine happened (for example, data that never synced).
     Today is 'pending' until it is done: an unfinished day is never shown as missed, and
     a reading taken earlier today can still be entered later with its own time.
     """
@@ -251,7 +251,7 @@ def _mission_task_days(s: Session, scope: _Scope) -> tuple[dict[int, bool], set[
     The spec counts a day when every priority-1 task is done. Many days have no
     priority-1 task, and an empty requirement must not count as completion, so on those
     days the highest priority level present (routine tasks) is required instead. Skipped
-    tasks are not done. Tasks come from AM's planner, never from the simulator, so they
+    tasks are not done. Tasks come from AMC's planner, never from the simulator, so they
     are never marked simulated.
     """
     rows = s.execute(select(DailyTask.mission_day, DailyTask.priority, DailyTask.status).where(
@@ -286,7 +286,7 @@ def streak_report(s: Session, astronaut_id: int, now: datetime | None = None) ->
     rest, daily = MeasurementContext.REST.value, MeasurementContext.DAILY.value
     checkins = _checkin_days(s, scope)
     task_done, task_days = _mission_task_days(s, scope)
-    # Days AM holds any record for this astronaut; a day outside this set is 'no data'.
+    # Days AMC holds any record for this astronaut; a day outside this set is 'no data'.
     activity = set(_measurement_days(s, scope, include_rejected=True)) | set(checkins) | task_days
     evidence: dict[str, tuple[dict[int, bool], set[int]]] = {
         "checkin": (checkins, activity),

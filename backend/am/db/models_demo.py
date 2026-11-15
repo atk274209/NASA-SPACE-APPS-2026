@@ -1,9 +1,9 @@
 """SIMULATED space events for demonstrations (jury presentation, 2026-11-15).
 
-While AM runs in test mode, a demo director starts a random event shortly after start-up and
+While AMC runs in test mode, a demo director starts a random event shortly after start-up and
 then every few minutes: a solar particle event, a cabin fault, a crew member's readings rising,
-a symptom report. Each event acts on AM's real subsystems (sensors, wearable feed, symptom
-reports), so what the audience sees is AM's actual, unscripted reaction. Every event and every
+a symptom report. Each event acts on AMC's real subsystems (sensors, wearable feed, symptom
+reports), so what the audience sees is AMC's actual, unscripted reaction. Every event and every
 record it creates is marked SIMULATED.
 """
 
@@ -19,7 +19,7 @@ from am.db.base import Base, utcnow
 
 
 class SpaceEvent(Base):
-    """status: active | resolved. reactions: what AM did, in plain words, as it happened."""
+    """status: active | resolved. reactions: what AMC did, in plain words, as it happened."""
 
     __tablename__ = "space_event"
 

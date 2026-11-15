@@ -190,7 +190,7 @@ def step_journal(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDa
 
 
 def step_am_core(s: Session, ctx: Any, run: DayCloseRun, crew: list[CrewMemberDay]) -> dict[str, Any]:
-    """AM Core: sealed daily reports and AM's own (non-medical) decisions for the closed date."""
+    """AMC Core: sealed daily reports and AMC's own (non-medical) decisions for the closed date."""
     from am.amcore.engine import run_cycle
 
     return run_cycle(s, run.close_date, crew)

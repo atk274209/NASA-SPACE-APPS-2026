@@ -108,7 +108,7 @@ function AlertDetailView({ id }: { id: number }) {
       />
 
       <div>
-        <h3 className="mb-1 text-sm font-medium text-ink-dim">How AM reached this result</h3>
+        <h3 className="mb-1 text-sm font-medium text-ink-dim">How AMC reached this result</h3>
         <ul className="list-disc space-y-1 pl-5 text-sm text-ink">
           {a.explanation.split('; ').map((line, i) => <li key={i}>{line}</li>)}
         </ul>

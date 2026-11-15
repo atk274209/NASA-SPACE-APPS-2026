@@ -68,7 +68,7 @@ export interface NewSymptomReport {
   onset_at?: string | null
 }
 
-/** A chat turn plus the symptoms AM noticed in the user's message (pending until confirmed). */
+/** A chat turn plus the symptoms AMC noticed in the user's message (pending until confirmed). */
 export type TurnWithProposals = Turn & { proposals: SymptomProposal[] }
 
 export const symptomsApi = {

@@ -2,7 +2,7 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 
-// AM Test Console: a separate application on its own origin (port 5174), independent of the
+// AMC Test Console: a separate application on its own origin (port 5174), independent of the
 // main app on 5173. It talks to the same backend (FastAPI on :8000), which must run with
 // AM_TEST_MODE=1 for /api/test/* to exist.
 //

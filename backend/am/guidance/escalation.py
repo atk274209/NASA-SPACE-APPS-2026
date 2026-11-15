@@ -65,7 +65,7 @@ FALLBACK_LABEL = "DEMO — NOT CLINICALLY VALIDATED"
 MATRIX_UNAVAILABLE = "Escalation matrix unavailable: use the mission's medical contact procedure."
 
 DISCLAIMER = (
-    "AM is a research prototype, not a medical device. This guidance is DEMO content that points to the "
+    "AMC is a research prototype, not a medical device. This guidance is DEMO content that points to the "
     "mission's own medical procedures. It does not diagnose and does not recommend treatment."
 )
 NOTHING_OPEN_NOTE = (
@@ -196,7 +196,7 @@ def symptom_level(report: SymptomReport, matrix: EscalationMatrix) -> tuple[Seve
     if rated is None:
         # Ratings are validated when a report is created; an unknown one gets the most cautious level.
         rated = max(matrix.symptoms.by_severity.values(), key=rank)
-        reasons.append(f"The rating '{report.severity}' is not recognised, so AM uses the most cautious level.")
+        reasons.append(f"The rating '{report.severity}' is not recognised, so AMC uses the most cautious level.")
     else:
         reasons.append(f"{label} was rated {report.severity} by the astronaut.")
     levels = [rated]

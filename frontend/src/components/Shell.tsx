@@ -21,7 +21,7 @@ const ASTRONAUT_NAV = [
 const DOCTOR_NAV = [
   { to: '/', label: 'Crew', icon: 'M9 11a4 4 0 100-8 4 4 0 000 8zm-7 10v-1a6 6 0 0112 0v1m3-10a3 3 0 100-6m4 16v-1a5 5 0 00-3-4.6' },
   { to: '/intercom', label: 'Intercom', icon: 'M4 15V9a2 2 0 012-2h3l4-3v16l-4-3H6a2 2 0 01-2-2zm13-6a4 4 0 010 6m2-9a8 8 0 010 12' },
-  { to: '/am', label: 'AM Core', icon: 'M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 100 8 4 4 0 000-8zm0 3v2' },
+  { to: '/am', label: 'AMC Core', icon: 'M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 100 8 4 4 0 000-8zm0 3v2' },
   { to: '/environment', label: 'Environment', icon: 'M12 3v10m0 0a4 4 0 104 4M8 7h2m-2 3h2M3 21h18' },
   { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
   { to: '/settings', label: 'Settings', icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4' },
@@ -72,7 +72,7 @@ function ServiceLights() {
   const llmState = !llm?.reachable ? 'offline' : llm.models?.length ? 'ready' : 'no model'
   return (
     <div className="flex shrink-0 items-center gap-4 text-sm text-ink-dim">
-      <span className="inline-flex items-center gap-1.5" title="Local AM service and database">
+      <span className="inline-flex items-center gap-1.5" title="Local AMC service and database">
         <span className="size-2 rounded-full" style={{ background: backendOk ? 'var(--color-sev-normal)' : 'var(--color-sev-critical)' }} />
         <span className="hidden sm:inline">Core {backendOk ? 'online' : 'unreachable'}</span>
       </span>
@@ -107,7 +107,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <nav aria-label="Primary" className="sticky top-0 flex h-screen w-14 shrink-0 flex-col border-r border-seam bg-hull md:w-48">
         <div className="flex h-14 items-center gap-2 border-b border-seam px-4">
           <AmMark className="size-6 shrink-0" />
-          <span className="hidden text-lg font-bold md:inline" style={{ fontStretch: '125%' }}>AM</span>
+          <span className="hidden text-lg font-bold md:inline" style={{ fontStretch: '125%' }}>AMC</span>
         </div>
         <ul className="flex flex-col gap-0.5 p-2">
           {nav.map((n) => (

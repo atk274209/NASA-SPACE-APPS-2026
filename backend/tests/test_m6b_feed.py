@@ -92,7 +92,7 @@ def test_astronaut_writing_reaches_the_doctor_feed_at_once(client, crew):
     assert "Göğsümde" in msg["text"]
     assert by_type["symptom_report"]["level"] == "yellow"
     assert by_type["checkin_note"]["level"] == "yellow"
-    # only the astronaut's own words: AM's replies never appear in the feed
+    # only the astronaut's own words: AMC's replies never appear in the feed
     assert all(f["source_type"] != "message" or f["source_id"] != msg["source_id"] + 1 for f in feed)
     # polling for new entries only
     top = max(f["id"] for f in feed)

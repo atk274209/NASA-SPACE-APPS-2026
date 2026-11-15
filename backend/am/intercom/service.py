@@ -1,4 +1,4 @@
-"""Intercom channels: who may use which, posting, reading, unread counts, and AM's announcements."""
+"""Intercom channels: who may use which, posting, reading, unread counts, and AMC's announcements."""
 
 from __future__ import annotations
 
@@ -90,5 +90,5 @@ def last_message(s: Session, channel: str) -> IntercomMessage | None:
 
 
 def announce(s: Session, body: str, *, urgent: bool = False) -> IntercomMessage:
-    """AM speaks on the crew loop (for example when a simulated space event starts)."""
-    return post(s, CREW, body, sender_user_id=None, sender_name="AM", sender_role="am", urgent=urgent)
+    """AMC speaks on the crew loop (for example when a simulated space event starts)."""
+    return post(s, CREW, body, sender_user_id=None, sender_name="AMC", sender_role="am", urgent=urgent)

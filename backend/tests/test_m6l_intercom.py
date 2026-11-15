@@ -1,4 +1,4 @@
-"""M6l: intercom loops between the crew, the flight surgeon and AM."""
+"""M6l: intercom loops between the crew, the flight surgeon and AMC."""
 
 from __future__ import annotations
 
@@ -69,3 +69,9 @@ def test_personal_events_go_to_the_private_loop_not_the_crew(client, crew):
 def test_empty_message_is_refused(client, crew):
     a1, *_ = crew
     assert a1.post("/api/v1/intercom/channels/crew/messages", json={"body": "   "}).status_code == 422
+
+
+def test_only_the_doctor_can_mark_a_message_urgent(client, crew):
+    a1, id1, *_ = crew
+    m = a1.post(f"/api/v1/intercom/channels/ast-{id1}/messages", json={"body": "Help", "urgent": True}).json()
+    assert m["urgent"] is False

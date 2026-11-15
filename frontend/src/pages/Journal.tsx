@@ -175,7 +175,7 @@ function Provenance({ e }: { e: JournalDay }) {
     <div className="mt-3 space-y-1 text-xs">
       <p className="text-ink-faint">
         {e.narrative_generated_by === 'llm'
-          ? `Drafted by AM from this day's records only (${sources}). A model draft, not a medical assessment.`
+          ? `Drafted by AMC from this day's records only (${sources}). A model draft, not a medical assessment.`
           : `Rule-based template from this day's records (${sources}). No language model was used because ${
             FALLBACK_REASON[g.fallback_reason ?? ''] ?? 'the model was unavailable'}.`}
         {e.narrative_generated_at && ` Written ${fmtDateTime(e.narrative_generated_at)}.`}
@@ -223,7 +223,7 @@ function Narrative({ e, busy }: { e: JournalDay; busy: boolean }) {
       {write.error && <ErrorNote error={write.error} />}
       {!e.narrative ? (
         <p className="text-sm text-ink-dim">
-          No summary yet. AM drafts one from this day&apos;s records only: mission continuity, health status, psychological
+          No summary yet. AMC drafts one from this day&apos;s records only: mission continuity, health status, psychological
           status and notes for the medical team. Without the language model it writes a rule-based template instead.
         </p>
       ) : (
@@ -292,7 +292,7 @@ const CLAMP = 280
 function TimelineItem({ m }: { m: DayMessage }) {
   const [open, setOpen] = useState(false)
   const long = m.content.length > CLAMP
-  const who = m.role === 'user' ? 'Astronaut' : m.generated_by === 'deterministic' ? 'AM, rule-based' : 'AM'
+  const who = m.role === 'user' ? 'Astronaut' : m.generated_by === 'deterministic' ? 'AMC, rule-based' : 'AMC'
   const device = m.role === 'user' ? m.device_name ?? (m.client_host ? `host ${m.client_host}` : 'device not recorded') : null
   const title = m.conversation_title.length > 40 ? `${m.conversation_title.slice(0, 40)}…` : m.conversation_title
   return (
@@ -443,7 +443,7 @@ function AiLine() {
   const ai = useQuery({ queryKey: ['ai-status'], queryFn: api.aiStatus, refetchInterval: 20_000, retry: 0 })
   if (ai.isLoading) return <span className="text-sm text-ink-dim">Checking model…</span>
   if (ai.data?.reachable && ai.data.model_installed) {
-    return <span className="text-sm text-ink-dim">Summaries by AM</span>
+    return <span className="text-sm text-ink-dim">Summaries by AMC</span>
   }
   return (
     <span className="text-sm text-sev-watch">

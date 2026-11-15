@@ -1,6 +1,6 @@
-"""Restore AM's database from an encrypted backup. Command line only, by design.
+"""Restore AMC's database from an encrypted backup. Command line only, by design.
 
-Stop the AM backend first. With --confirm the script:
+Stop the AMC backend first. With --confirm the script:
   1. decrypts the backup in memory and runs PRAGMA integrity_check on it,
   2. copies the current database with SQLite's backup API to <data dir>/pre-restore/,
   3. folds the current write-ahead log into the database file and replaces the file
@@ -42,14 +42,14 @@ class RestoreError(RuntimeError):
 
 
 def _parse(argv: list[str] | None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Restore the AM database from an encrypted backup (.ambk).")
+    p = argparse.ArgumentParser(description="Restore the AMC database from an encrypted backup (.ambk).")
     p.add_argument("backup", type=Path, help="the encrypted backup file")
     p.add_argument("--actor", required=True, help="your name, recorded in the audit log")
     p.add_argument("--reason", required=True, help="why the database is being restored")
     p.add_argument("--confirm", action="store_true", help="actually restore (without it nothing changes)")
     p.add_argument("--passphrase-stdin", action="store_true",
                    help="read the passphrase from the first line of standard input instead of the terminal")
-    p.add_argument("--data-dir", type=Path, help="data folder (default: AM_DATA_DIR or the AM default)")
+    p.add_argument("--data-dir", type=Path, help="data folder (default: AM_DATA_DIR or the AMC default)")
     p.add_argument("--database-url", help="database URL (default: AM_DATABASE_URL or the file in the data folder)")
     return p.parse_args(argv)
 
@@ -92,7 +92,7 @@ def _fold_wal(db: Path) -> None:
     finally:
         conn.close()
     if busy:
-        raise RestoreError("the database is in use; stop the AM backend and try again")
+        raise RestoreError("the database is in use; stop the AMC backend and try again")
 
 
 def _replace(db: Path, plain: bytes) -> None:
@@ -107,7 +107,7 @@ def _replace(db: Path, plain: bytes) -> None:
         os.replace(tmp, db)
     except OSError as exc:
         tmp.unlink(missing_ok=True)
-        raise RestoreError(f"could not replace the database file ({exc.__class__.__name__}); stop the AM backend "
+        raise RestoreError(f"could not replace the database file ({exc.__class__.__name__}); stop the AMC backend "
                            "and try again") from exc
 
 
@@ -154,7 +154,7 @@ def restore(args: argparse.Namespace) -> int:
     if not check.integrity_ok:
         raise RestoreError(f"the backup failed the integrity check: {'; '.join(check.integrity[:3])}")
     if check.alembic_revision is None:
-        raise RestoreError("the backup is not an AM database (no schema revision)")
+        raise RestoreError("the backup is not an AMC database (no schema revision)")
 
     pre = None
     if target.exists():
@@ -173,7 +173,7 @@ def restore(args: argparse.Namespace) -> int:
     except Exception as exc:  # noqa: BLE001 - the restore itself succeeded; say so instead of failing
         print(f"Warning: the restore succeeded but its audit entry could not be written ({exc.__class__.__name__}).",
               file=sys.stderr)
-    print("Start the AM backend; it applies any newer database migrations at startup.")
+    print("Start the AMC backend; it applies any newer database migrations at startup.")
     return 0
 
 

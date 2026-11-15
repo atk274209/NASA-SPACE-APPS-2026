@@ -50,7 +50,7 @@ class AstronautProfile(Base):
 
     medical_history: list of {"condition", "status", "since", "note"}; status is
     active | resolved | monitoring. Every value is invented for testing; none describes a real
-    person. Conditions are free text: AM does not derive any threshold from them.
+    person. Conditions are free text: AMC does not derive any threshold from them.
     """
 
     __tablename__ = "astronaut_profile"

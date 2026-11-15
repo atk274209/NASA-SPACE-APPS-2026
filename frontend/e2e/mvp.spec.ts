@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test'
 // every safety path, the doctor feed and cabin control must work without it.
 
 // Every page must load without console errors, and the app must never contact a host other than
-// the AM server itself (offline-first: fonts and scripts are bundled).
+// the AMC server itself (offline-first: fonts and scripts are bundled).
 const problems: string[] = []
 test.beforeEach(async ({ page, baseURL }) => {
   problems.length = 0
@@ -55,7 +55,7 @@ test('sign-in refuses a wrong password and each role gets its own simple menu', 
 
   await signIn(page, 'doctor')
   const doctorNav = page.getByRole('navigation', { name: 'Primary' }).getByRole('link')
-  await expect(doctorNav).toHaveText(['Crew', 'Intercom', 'AM Core', 'Environment', 'Alerts', 'Settings'])
+  await expect(doctorNav).toHaveText(['Crew', 'Intercom', 'AMC Core', 'Environment', 'Alerts', 'Settings'])
 })
 
 test('an urgent symptom reaches the doctor at once and waits for approval', async ({ page }) => {
@@ -91,7 +91,7 @@ test('a comfort complaint adjusts the quarters and the doctor sees why', async (
   await signIn(page, 'ast003')
   await say(page, "I'm cold tonight")
   await expect(page.getByText(/It felt cold, so I raised your quarters from 22 to 23/).first()).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByText(/AM changed temperature 22 → 23/)).toBeVisible()
+  await expect(page.getByText(/AMC changed temperature 22 → 23/)).toBeVisible()
 
   await signIn(page, 'doctor')
   await page.getByRole('link', { name: 'Environment' }).click()
@@ -109,11 +109,11 @@ test('water is logged with one tap and the crew board ranks adherence', async ({
   await expect(page.getByText('earns nothing extra', { exact: false })).toBeVisible()
 })
 
-test('AM Core is sealed, shows visible decisions, and opens only with a reason', async ({ page }) => {
+test('AMC Core is sealed, shows visible decisions, and opens only with a reason', async ({ page }) => {
   await signIn(page, 'doctor')
   const run = await page.request.post('/api/test/end-day', { data: {} })
   expect(run.ok()).toBeTruthy()
-  await page.getByRole('link', { name: 'AM Core' }).click()
+  await page.getByRole('link', { name: 'AMC Core' }).click()
   await expect(page.getByText('SEALED', { exact: true })).toBeVisible()
   await expect(page.getByText(/Attention for .* tomorrow/).first()).toBeVisible()
   const breakSeal = page.getByRole('button', { name: 'Break the seal for 2 hours' })
@@ -124,7 +124,7 @@ test('AM Core is sealed, shows visible decisions, and opens only with a reason',
   await expect(page.getByRole('heading', { name: 'Crew report' })).toBeVisible()
 
   await signIn(page, 'ast005')
-  await expect(page.getByText('AM Core was opened')).toBeVisible()
+  await expect(page.getByText('AMC Core was opened')).toBeVisible()
 })
 
 test('crew analytics bento shows live cards from stored records', async ({ page }) => {
@@ -134,7 +134,7 @@ test('crew analytics bento shows live cards from stored records', async ({ page 
   const water = page.getByRole('region', { name: 'Crew water today' })
   await expect(water).toBeVisible()
   await expect(water.getByText(/500 mL/).first()).toBeVisible()
-  await expect(page.getByRole('region', { name: 'Written to AM today' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Written to AMC today' })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Reported problems by body system' })).toBeVisible()
   const radar = page.getByRole('region', { name: /Wellbeing and adherence/ })
   await radar.getByRole('tab', { name: 'AST-004' }).click()
@@ -167,19 +167,19 @@ test('the private diary talks about the day and stays away from the doctor', asy
   expect(sealed.status()).toBe(423)
 })
 
-test('a simulated space event shows what happened and how AM reacted', async ({ page }) => {
+test('a simulated space event shows what happened and how AMC reacted', async ({ page }) => {
   await signIn(page, 'doctor')
   const ev = await page.request.post('/api/v1/demo/events', { data: { kind: 'quarters_heat' } })
   expect(ev.ok()).toBeTruthy()
   const card = page.getByRole('status', { name: /Simulated event: Quarters overheating/ })
   await expect(card).toBeVisible({ timeout: 15_000 })
   await expect(card.getByText(/raised a (warning|critical) alert/)).toBeVisible()
-  await expect(card.getByText(/AM paused its own temperature control/)).toBeVisible()
+  await expect(card.getByText(/AMC paused its own temperature control/)).toBeVisible()
   await card.getByRole('button', { name: 'Dismiss' }).click()
   await expect(card).toHaveCount(0)
 })
 
-test('AM shares out the day by energy and morale', async ({ page }) => {
+test('AMC shares out the day by energy and morale', async ({ page }) => {
   await signIn(page, 'doctor')
   await page.request.post('/api/test/checkins', { data: { astronaut_id: 4, ratings: { mood: 1, motivation: 1, stress: 5, fatigue: 5, sleep_quality: 1 } } })
   await page.request.post('/api/v1/duties/today/replan')

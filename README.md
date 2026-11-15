@@ -1,13 +1,13 @@
-# AM — Allied Mastercomputer
+# AMC — Allied Mastercomputer
 
-AM is an offline-first astronaut health monitoring and scientific intelligence prototype.
+AMC is an offline-first astronaut health monitoring and scientific intelligence prototype.
 
 > Research prototype. Not a medical device. Alert thresholds are demonstration values.
 > See [docs/SAFETY.md](docs/SAFETY.md).
 
-## For the jury: install and try AM
+## For the jury: install and try AMC
 
-AM runs entirely on one computer. It needs no cloud account and no internet connection once it
+AMC runs entirely on one computer. It needs no cloud account and no internet connection once it
 is installed. All crew members and all health data in the demo are **fictional and simulated**.
 
 ### What you need
@@ -19,7 +19,7 @@ is installed. All crew members and all health data in the demo are **fictional a
 | [Ollama](https://ollama.com/) (optional) | the local AI for conversation, diary and notes | the website |
 
 Without Ollama everything still works: monitoring, alerts, the doctor's feed, cabin control,
-space events and duty planning are rule-based, and AM answers with fixed, safe replies.
+space events and duty planning are rule-based, and AMC answers with fixed, safe replies.
 
 ### Install (once)
 
@@ -49,7 +49,7 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo
 ```
 
 Then open **http://localhost:8000** (the Windows script opens it for you). `-Demo` / `--demo`
-turns on the simulated space events and the Test Console controls. Stop AM with Ctrl+C.
+turns on the simulated space events and the Test Console controls. Stop AMC with Ctrl+C.
 
 ### Sign in
 
@@ -66,12 +66,12 @@ same time.
 
 ### Two computers: astronaut on one, doctor on the other
 
-This shows the data moving between the station and the flight surgeon live. AM runs on **one**
+This shows the data moving between the station and the flight surgeon live. AMC runs on **one**
 computer (the station); the second computer needs only a web browser, nothing installed.
 
 1. Put both computers on the same Wi-Fi. Event and guest networks often block devices from
    reaching each other; a phone hotspot that both computers join always works.
-2. On the AM computer, start in network mode:
+2. On the AMC computer, start in network mode:
 
    ```powershell
    powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo -Lan
@@ -83,7 +83,7 @@ computer (the station); the second computer needs only a web browser, nothing in
 
    It prints the address for the other computer, for example `http://192.168.1.23:8000`.
    If Windows asks whether Python may use networks, choose **Private networks** and **Allow**.
-3. On the AM computer, sign in as `doctor`. On the second computer, open the printed address and
+3. On the AMC computer, sign in as `doctor`. On the second computer, open the printed address and
    sign in as `ast001` (or the other way round).
 4. Try it: the astronaut writes `Göğsümde sıkışma var` in the Companion. Within a few seconds it
    appears on the doctor's Crew page, waiting for approval. The doctor approves it with a note,
@@ -91,43 +91,43 @@ computer (the station); the second computer needs only a web browser, nothing in
    update on both screens the same way.
 
 Network mode accepts only this computer's own addresses and still blocks writes from other
-websites. Use it on a network you trust, and stop AM (Ctrl+C) after the demonstration.
+websites. Use it on a network you trust, and stop AMC (Ctrl+C) after the demonstration.
 
 ### A short tour
 
 **As an astronaut (`ast001`)**
 
-1. **Companion.** At the top, *Today's duties* shows the work AM gave you today and a note
-   about why. Below, chat with AM in English or Turkish. Try:
-   - `Odam çok soğuk` or `The light hurts my eyes`: AM adjusts your quarters' temperature or
+1. **Companion.** At the top, *Today's duties* shows the work AMC gave you today and a note
+   about why. Below, chat with AMC in English or Turkish. Try:
+   - `Odam çok soğuk` or `The light hurts my eyes`: AMC adjusts your quarters' temperature or
      lighting, within simulated safety limits, and you can undo it.
-   - `Göğsümde sıkışma var` (chest tightness): AM switches to fixed safety words and sends it to
+   - `Göğsümde sıkışma var` (chest tightness): AMC switches to fixed safety words and sends it to
      the doctor at once. The model never decides an emergency.
-   - `Dün gece 6 saat uyudum`: AM offers to record the value with one tap.
-2. **Diary.** A private diary written by talking with AM. Tap *Look back on this day* to get the
+   - `Dün gece 6 saat uyudum`: AMC offers to record the value with one tap.
+2. **Diary.** A private diary written by talking with AMC. Tap *Look back on this day* to get the
    day's colour (green, yellow or red) and a short summary. Nobody else can read it until the
    mission is back on Earth. Only a medical problem leaves it: an urgent one at once, anything
    else only if you choose *Send to my doctor*.
-3. **Health** and **Journal**: your readings, alerts, symptoms and AM's daily journal.
+3. **Health** and **Journal**: your readings, alerts, symptoms and AMC's daily journal.
 
 **As the doctor (`doctor`)**
 
 1. **Crew.** Entries that wait for your approval, the live feed of everything the crew writes
    (flagged yellow or red by rules; the AI may only raise a flag, with a quote), crew
-   analytics, and *Today's duty roster*: each astronaut's energy and morale and the work AM
+   analytics, and *Today's duty roster*: each astronaut's energy and morale and the work AMC
    shared out. *Plan again from the latest check-ins* recalculates it.
-2. **AM Core.** AM's own reports and decisions. They stay sealed; you can break the seal for
+2. **AMC Core.** AMC's own reports and decisions. They stay sealed; you can break the seal for
    two hours in an emergency, with a written reason, and the crew is told.
-3. **Environment.** Every change AM made to the cabin, and why.
+3. **Environment.** Every change AMC made to the cabin, and why.
 4. **Settings → System and audit.** A live map of the system, and the *Simulated space
    events* panel.
 
 ### Simulated space events
 
-With `-Demo` on, AM starts a random event a few seconds after start-up and then about every
+With `-Demo` on, AMC starts a random event a few seconds after start-up and then about every
 three minutes: a solar particle event, a lost link with Earth, an overheating room, a slow
 pressure drop, a sensor fault, a crew member's heart rate or temperature rising, or a reported
-symptom. Each event changes one real input; what you see afterwards is AM's own reaction: alerts,
+symptom. Each event changes one real input; what you see afterwards is AMC's own reaction: alerts,
 paused automation, flags for the doctor, approvals. A card appears for everyone affected.
 
 To show a specific event, sign in as the doctor and use **Settings → System and audit →
@@ -137,7 +137,7 @@ to pause them during a talk.
 ### Test Console (optional)
 
 For entering check-ins, readings and symptoms by hand, or closing the day (*End Day*), start the
-separate Test Console in a second terminal while AM runs with `-Demo`:
+separate Test Console in a second terminal while AMC runs with `-Demo`:
 
 ```bash
 cd frontend && npm run dev:testconsole
@@ -184,14 +184,14 @@ screens:
 
 Fonts are bundled locally, so the UI works offline.
 
-**M3 is done: the AM companion.** It runs on a local LLM through Ollama
+**M3 is done: the AMC companion.** It runs on a local LLM through Ollama
 (`llama3.1:8b` by default).
 
 - **Data access:** the model reads data only through read-only tools: overview,
   measurements (with a mission-day and time-of-day lookup), baselines, alerts and check-ins.
 - **Traceability:** every answer stores the tools it called and the record IDs it relied
   on. A grounding check flags numbers that do not appear in the retrieved data.
-- **Offline fallback:** if the model is unavailable, AM answers with a rule-based status
+- **Offline fallback:** if the model is unavailable, AMC answers with a rule-based status
   summary. Monitoring and alerts never depend on the model.
 - **Memory:**
   - short-term: today's check-ins
@@ -214,7 +214,7 @@ The tools reject ambiguous calls (for example, a missing context) instead of gue
   (0–3 days) with Benjamini-Hochberg FDR control. Each association is re-tested on
   first differences, so two unrelated trends are labelled "shared trend only".
 - **Research observations (ARI):** each observation combines the statistical finding,
-  retrieved literature (quotes and AM's own summaries are labelled differently) and a
+  retrieved literature (quotes and AMC's own summaries are labelled differently) and a
   hypothesis drafted by the LLM with validated citations. The hypothesis states its own
   confidence and goes through a review workflow.
 - **Mission journal:** deterministic daily summaries compared with a fixed reference
@@ -235,7 +235,7 @@ The backend has 64 pytest tests in total.
   deterministic rules set the floor, the local model may only raise it, and rule-level red waits
   for the doctor's approval.
 - Companion: replies in Turkish or English, a versioned persona, fixed safety answers for urgent
-  symptoms and medication questions, one-tap recording of values said in conversation, AM's notes.
+  symptoms and medication questions, one-tap recording of values said in conversation, AMC's notes.
 - Routine exams with DEMO intervals and adherence points; explainable risk factors.
 - Comfort-aware cabin control against a SIMULATED cabin, inside SIMULATED DEMONSTRATION LIMITS,
   with manual override and an Environment screen.

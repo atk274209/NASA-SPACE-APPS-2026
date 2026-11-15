@@ -1,4 +1,4 @@
-"""Private diary: AM talks with the astronaut about their day, colours the day, and keeps it private.
+"""Private diary: AMC talks with the astronaut about their day, colours the day, and keeps it private.
 
 Design and privacy rules: see am.db.models_diary. What leaves the diary is decided here, by
 deterministic code only; the language model writes conversation and a day summary, nothing else.
@@ -52,7 +52,7 @@ class DiarySealed(Exception):
     """The diary is not readable by this person yet."""
 
 
-SYSTEM_PROMPT = """You are AM, the onboard companion of a long-duration space mission. Right now you are
+SYSTEM_PROMPT = """You are AMC, the onboard companion of a long-duration space mission. Right now you are
 helping one astronaut keep their PRIVATE DIARY. Nobody else reads it during the mission.
 
 How to talk:
@@ -69,7 +69,7 @@ How to talk:
    it by name. Mention that the crew medical officer and the behavioural health team are there
    whenever they want. Do not lecture.
 5. Never diagnose, never give medical, medication or treatment advice, never judge how serious a
-   symptom is. If they mention a physical symptom, say that AM can pass it to the doctor if they
+   symptom is. If they mention a physical symptom, say that AMC can pass it to the doctor if they
    want, and continue the conversation.
 6. Do not invent facts about their health or data; you have none here, only what they tell you.
 7. Reply in the astronaut's language."""
@@ -269,7 +269,7 @@ class DiaryService:
             if sym is None or any(f.symptom_code == det.code for f in out):
                 continue
             if sym.category == "behavioral" and not sym.report_promptly:
-                continue  # feelings stay in the diary: AM supports, it does not report them
+                continue  # feelings stay in the diary: AMC supports, it does not report them
 
             f = DiaryForward(astronaut_id=astronaut_id, message_id=msg.id, symptom_code=det.code, quote=det.quote,
                              status="sent_urgent" if sym.report_promptly else "offered")

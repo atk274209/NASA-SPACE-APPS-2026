@@ -1,10 +1,10 @@
 """Private diary (user design, 2026-11-15).
 
-Each astronaut keeps a daily diary by talking with AM: AM asks about the day and how they feel,
+Each astronaut keeps a daily diary by talking with AMC: AMC asks about the day and how they feel,
 listens, and supports them. The diary belongs to the astronaut alone:
 
   * Only its author reads it during the mission. Nobody else can, the doctor included, until the
-    mission has returned to Earth (the same mission-return mark that opens AM Core). After that,
+    mission has returned to Earth (the same mission-return mark that opens AMC Core). After that,
     a doctor may read it, and every read is audited.
   * Diary messages never enter the doctor's live feed. Only a medical matter leaves the diary:
       - a symptom on the DEMO report-promptly list (chest pain, self-harm thoughts, ...) is sent at

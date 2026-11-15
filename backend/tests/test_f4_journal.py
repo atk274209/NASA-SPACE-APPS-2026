@@ -260,7 +260,7 @@ def _seed_day4(client, aid: int) -> dict[str, int]:
     morning = _chat(client, aid, "Morning", [
         {"role": "user", "content": "I feel a bit queasy today.", "created_at": at(8), "device_name": "Galley tablet"},
         {"role": "tool", "content": '{"tool": "payload"}', "created_at": at(8, 1)},
-        {"role": "assistant", "content": "Noted. AM private reply text.", "created_at": at(8, 1),
+        {"role": "assistant", "content": "Noted. AMC private reply text.", "created_at": at(8, 1),
          "generated_by": "llm", "model": "llama3.1:8b"},
     ])
     evening = _chat(client, aid, "Evening", [
@@ -306,7 +306,7 @@ def test_llm_narrative_is_grounded_labelled_and_built_from_that_day_only(client,
     assert facts["physical_symptoms_reported"][0]["symptom"] == "Nausea"
     assert facts["physical_symptoms_reported"][0]["astronaut_note"] == "After the meal."
     assert facts["behavioural_symptoms_reported"] == []
-    assert "AM private reply text" not in user and "tool" not in json.dumps(facts["chat_messages_from_astronaut"])
+    assert "AMC private reply text" not in user and "tool" not in json.dumps(facts["chat_messages_from_astronaut"])
     assert "Message from the next day." not in user
 
 

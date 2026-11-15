@@ -1,9 +1,9 @@
-"""AM Core daily cycle: facts -> deterministic assessment -> AM's own decisions -> sealed reports.
+"""AMC Core daily cycle: facts -> deterministic assessment -> AMC's own decisions -> sealed reports.
 
 Runs in End Day for the closed date. Everything here is deterministic; the local model only writes the
 narrative of a report later, from the stored facts (am.amcore.narrative). Behavioural indicators come
-from the astronaut's own self-ratings and what they said to AM; they are observations, not clinical
-assessments. AM Core never decides medical or emergency status: those stay with the rules, the live
+from the astronaut's own self-ratings and what they said to AMC; they are observations, not clinical
+assessments. AMC Core never decides medical or emergency status: those stay with the rules, the live
 feed and the doctor.
 
 Rule ids:
@@ -11,7 +11,7 @@ Rule ids:
   A-ATTN-WATCH     a yellow report, an open WATCH alert, one declining self-rating, an overdue exam
   A-TREND          a self-rating's 3-day mean moved by >= TREND_DELTA from the 3 days before (DEMO rule)
   A-DOCTOR         notice for the doctor: priority attention, or check-ins missed two days running
-  A-CHECKIN        check-in plan for tomorrow (AM opens the conversation)
+  A-CHECKIN        check-in plan for tomorrow (AMC opens the conversation)
   A-SLEEP          sleep self-rating declining: keep sleep logging prompts first
   A-CREW-COHESION  conflict or isolation mentioned by two or more crew members
 """
@@ -169,11 +169,11 @@ def assess(facts: dict[str, Any], checked_in_yesterday: bool) -> dict[str, Any]:
                        for k, v in b["trend"].items()]
     if b["behavioural_topics"]:
         behaviour_lines.append("topics raised: " + ", ".join(t.replace("_", " ") for t in b["behavioural_topics"]))
-    behaviour_lines.append(f"talked to AM {b['messages_to_am']} time(s); checked in: {'yes' if b['checked_in'] else 'no'}")
+    behaviour_lines.append(f"talked to AMC {b['messages_to_am']} time(s); checked in: {'yes' if b['checked_in'] else 'no'}")
     return {"attention": level, "reasons": priority + watch, "declining": declining,
             "missed_checkins_two_days": not b["checked_in"] and not checked_in_yesterday,
             "behaviour": behaviour_lines,
-            "label": "AM's observations from stored records and self-ratings. Not a diagnosis; behavioural lines "
+            "label": "AMC's observations from stored records and self-ratings. Not a diagnosis; behavioural lines "
                      "are self-report trends (DEMO rule), not clinical assessments."}
 
 
@@ -263,7 +263,7 @@ def run_cycle(s: Session, d: date, crew: list[Any]) -> dict[str, Any]:
         members.append(facts)
         assessments[a.id] = assessment
     cfacts = crew_report_facts(members, assessments)
-    crew_assessment = {"label": "AM's crew-level observations. Not a clinical or psychological assessment."}
+    crew_assessment = {"label": "AMC's crew-level observations. Not a clinical or psychological assessment."}
     raised_by = sum(any(t in COHESION for t in m["behaviour"]["behavioural_topics"]) for m in members)
     cfacts["cohesion_raised_by"] = raised_by
     if raised_by >= 2:

@@ -1,4 +1,4 @@
-// AM Test Console (TEST ONLY). Live test entries, End Day and scenario fixtures.
+// AMC Test Console (TEST ONLY). Live test entries, End Day and scenario fixtures.
 // Every record written here is SIMULATED test data, tagged MANUAL_TEST_ENTRY or SIMULATED_GENERATOR.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent, type ReactNode } from 'react'
@@ -13,7 +13,7 @@ const STEP_LABELS: Record<string, string> = {
   anomaly_persistence: 'Anomaly and persistence check',
   correlation: 'Historical correlation',
   journal: 'Daily journal',
-  am_core: 'AM Core: sealed reports and decisions',
+  am_core: 'AMC Core: sealed reports and decisions',
   advance_clock: 'Advance mission clock',
   missions: "Plan next day's missions",
   streaks: 'Update streaks',
@@ -32,7 +32,7 @@ function TestBanner() {
       role="note"
       className="sticky top-0 z-20 border-b-2 border-sev-watch bg-[repeating-linear-gradient(135deg,#3a2f0b_0_12px,#2a2208_12px_24px)] px-4 py-2 text-center text-sm font-semibold tracking-wide text-sev-watch"
     >
-      TEST CONSOLE · SIMULATED TEST DATA ONLY · NOT THE AM MAIN APP
+      TEST CONSOLE · SIMULATED TEST DATA ONLY · NOT THE AMC MAIN APP
     </div>
   )
 }
@@ -356,10 +356,10 @@ function MissionReturn() {
   const m = useMutation({ mutationFn: tc.missionReturn })
   return (
     <div className="mt-6 rounded-md border border-seam p-3 text-sm">
-      <p className="text-ink-dim">Mission return (doctor account): AM Core opens for good so the full mission log can be read.</p>
+      <p className="text-ink-dim">Mission return (doctor account): AMC Core opens for good so the full mission log can be read.</p>
       <button className="mt-2 h-8 rounded border border-seam-strong px-3 hover:border-signal" disabled={m.isPending} onClick={() => m.mutate()}>Mark mission returned</button>
       {m.error && <div className="mt-2"><ErrorNote error={m.error} /></div>}
-      {m.data && <p className="mt-2 text-sev-normal">Mission returned: AM Core is open.</p>}
+      {m.data && <p className="mt-2 text-sev-normal">Mission returned: AMC Core is open.</p>}
     </div>
   )
 }
@@ -444,7 +444,7 @@ function CabinPanel({ user }: { user: User }) {
   return (
     <Section title="Cabin simulator" aside="SIMULATED cabin">
       <p className="mb-3 text-sm text-ink-dim">
-        Inject sensor or actuator faults and drift readings. AM pauses autonomy for that variable and raises an
+        Inject sensor or actuator faults and drift readings. AMC pauses autonomy for that variable and raises an
         environment alert when a reading leaves the envelope or a fault occurs. Cabin pressure is doctor-only.
       </p>
       {q.error && <ErrorNote error={q.error} />}
@@ -467,7 +467,7 @@ function Console({ user }: { user: User }) {
     <div className="mx-auto grid max-w-5xl gap-6 px-4 py-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">AM Test Console</h1>
+          <h1 className="text-xl font-semibold">AMC Test Console</h1>
           <p className="text-sm text-ink-dim">
             {user.display_name} · {user.role}
             {me && <> · mission day <span className="num text-ink">{me.mission_day}</span></>}

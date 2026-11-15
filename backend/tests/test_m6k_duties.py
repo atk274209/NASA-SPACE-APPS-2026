@@ -1,4 +1,4 @@
-"""M6k: AM shares out the day's duties by each astronaut's energy and morale."""
+"""M6k: AMC shares out the day's duties by each astronaut's energy and morale."""
 
 from __future__ import annotations
 

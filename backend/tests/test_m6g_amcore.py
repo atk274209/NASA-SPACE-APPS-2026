@@ -1,4 +1,4 @@
-"""M6g: AM Core: sealed daily reports, AM's own decisions, emergency unseal and mission return."""
+"""M6g: AMC Core: sealed daily reports, AMC's own decisions, emergency unseal and mission return."""
 
 from __future__ import annotations
 

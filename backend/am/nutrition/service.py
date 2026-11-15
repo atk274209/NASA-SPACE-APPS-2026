@@ -25,7 +25,7 @@ from am.db.models_m6b import HydrationLog, SupplementLog
 from am.research.series import current_mission_day, day_bounds, mission_start
 
 CONFIG_PATH = REPO_ROOT / "config" / "nutrition.demo.yaml"
-SOURCE_NAME = "AM hydration log (daily total)"
+SOURCE_NAME = "AMC hydration log (daily total)"
 LEADERBOARD_DAYS = 7
 
 

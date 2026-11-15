@@ -36,7 +36,7 @@ def resolve_in_data_dir(settings: Settings, relative: str) -> Path:
 
     Paths are stored relative so the records stay valid when the data folder moves (for
     example after a restore on another machine). Anything that would resolve outside the
-    data folder is refused, so a tampered record cannot point AM at other files.
+    data folder is refused, so a tampered record cannot point AMC at other files.
     """
     root = settings.data_dir.resolve()
     path = (root / relative).resolve()

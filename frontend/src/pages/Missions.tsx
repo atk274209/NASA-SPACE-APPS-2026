@@ -126,7 +126,7 @@ export function MissionsPage() {
       ))}
       <p className="text-xs text-ink-faint">
         Tasks adapt to your recent data, check-ins and the symptoms you report; resolving a symptom removes its open
-        tasks. AM does not prescribe medication or change exercise or nutrition targets. {titleCase(d.protocol_note)}.
+        tasks. AMC does not prescribe medication or change exercise or nutrition targets. {titleCase(d.protocol_note)}.
       </p>
     </div>
   )

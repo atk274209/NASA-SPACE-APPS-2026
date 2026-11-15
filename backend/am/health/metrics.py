@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from am.db.enums import MeasurementContext as C
 from am.db.models import MetricDefinition
 
-SANITY_NOTE = "AM engineering sanity bound for error rejection; NOT a clinical reference range."
+SANITY_NOTE = "AMC engineering sanity bound for error rejection; NOT a clinical reference range."
 
 PHYSIO = [C.REST.value, C.EXERCISE.value, C.SLEEP.value, C.OTHER.value]
 GLUCOSE_CONTEXTS = [C.FASTING.value, C.POSTPRANDIAL.value, C.OTHER.value]
@@ -31,7 +31,7 @@ CATEGORY_LABELS = {
 }
 
 # What each measurement context means, so a reading is filed under the right baseline.
-# Descriptions are deliberately qualitative: AM does not define clinical fasting windows.
+# Descriptions are deliberately qualitative: AMC does not define clinical fasting windows.
 CONTEXT_LABELS: dict[str, tuple[str, str]] = {
     C.REST.value: ("Resting", "At rest, for example seated or lying quietly."),
     C.EXERCISE.value: ("Exercise", "During or right after exercise."),
@@ -103,7 +103,7 @@ METRICS: list[MetricSpec] = [
     # misplaced decimal point. It is not an exposure limit.
     MetricSpec("radiation_dose", "radiation", "Radiation dose", "mSv", [C.DAILY.value], 0, 10000,
                baseline_enabled=False,
-               bound_note="Not an exposure limit; AM does not evaluate exposure limits."),
+               bound_note="Not an exposure limit; AMC does not evaluate exposure limits."),
 ]
 
 _BY_CODE = {m.code: m for m in METRICS}

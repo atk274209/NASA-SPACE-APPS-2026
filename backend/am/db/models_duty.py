@@ -1,4 +1,4 @@
-"""Daily duty roster: AM shares out the station's work by each astronaut's energy and morale
+"""Daily duty roster: AMC shares out the station's work by each astronaut's energy and morale
 (user design, 2026-11-15).
 
 Inputs are what the crew already shares with the medical team: check-in ratings (mood, stress,
@@ -31,7 +31,7 @@ class DutyPlan(Base):
 
 
 class DutyReadiness(Base):
-    """energy / morale: 0-100, or None when there is nothing to go on. note: AM's words to the astronaut."""
+    """energy / morale: 0-100, or None when there is nothing to go on. note: AMC's words to the astronaut."""
 
     __tablename__ = "duty_readiness"
     __table_args__ = (UniqueConstraint("plan_id", "astronaut_id", name="uq_duty_readiness"),)

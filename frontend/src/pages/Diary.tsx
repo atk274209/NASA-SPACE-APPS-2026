@@ -1,4 +1,4 @@
-// The astronaut's private diary: a daily conversation with AM, a colour for each day, and the
+// The astronaut's private diary: a daily conversation with AMC, a colour for each day, and the
 // earlier pages to read back. Nobody else reads it during the mission; only a medical matter
 // leaves it (an urgent one at once, anything else only if the astronaut chooses to send it).
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -146,7 +146,7 @@ function Conversation({ page }: { page: DiaryPage }) {
             {(byMessage.get(m.id) ?? []).map((f) => <div key={f.id} className="mt-2 max-w-[60ch]"><Forward f={f} dayId={page.day.id} /></div>)}
           </li>
         ))}
-        {write.isPending && <li className="justify-self-start pl-4 text-sm text-ink-faint">AM is listening…</li>}
+        {write.isPending && <li className="justify-self-start pl-4 text-sm text-ink-faint">AMC is listening…</li>}
       </ol>
       <div ref={end} />
       {page.day.is_today ? (
@@ -190,8 +190,8 @@ export function DiaryPage() {
       <header className="grid gap-2">
         <h1 className="text-[1.75rem]">Diary</h1>
         <p className="max-w-[68ch] text-ink-dim">
-          Talk with AM about your day. Only you can read this diary until the mission is back on Earth.
-          If you write about a medical problem, AM tells you before anything leaves it.
+          Talk with AMC about your day. Only you can read this diary until the mission is back on Earth.
+          If you write about a medical problem, AMC tells you before anything leaves it.
         </p>
       </header>
       <div className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">

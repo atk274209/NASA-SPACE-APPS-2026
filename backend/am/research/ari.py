@@ -1,4 +1,4 @@
-"""AM Research Intelligence (ARI): structured observations from findings + literature.
+"""AMC Research Intelligence (ARI): structured observations from findings + literature.
 
 Composition of an observation:
   observation         deterministic text from the statistical finding (+ caveat)
@@ -104,7 +104,7 @@ def build_observation(session: Session, finding_id: int, *, llm: OllamaClient | 
         cite = f"({d.organization or d.title}, {d.published_date or 'n.d.'}; {h.chunk.source_url or d.url})"
         if h.chunk.kind == "passage":  # verbatim public-domain text
             return f'[{h.chunk.id}] Quote: "{h.chunk.text}" {cite}'
-        label = "Stated limitation" if h.chunk.kind == "limitation" else "Summary (AM paraphrase, not a quote)"
+        label = "Stated limitation" if h.chunk.kind == "limitation" else "Summary (AMC paraphrase, not a quote)"
         return f"[{h.chunk.id}] {label}: {h.chunk.text} {cite}"
 
     context_lines = [_line(h) for h in hits]

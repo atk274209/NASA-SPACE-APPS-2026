@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# AM one-command setup (macOS/Linux/Git Bash).  ./scripts/setup.sh [--demo] [--pull-models]
+# AMC one-command setup (macOS/Linux/Git Bash).  ./scripts/setup.sh [--demo] [--pull-models]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DEMO=0; PULL=0
@@ -19,4 +19,4 @@ echo "4/5 Knowledge base"; uv run python -m am.cli ingest-knowledge
 if [ "$DEMO" = 1 ]; then echo "5/5 Test crew (FICTIONAL, easy test passwords)"; uv run python -m am.cli seed-crew --simple-passwords --reset-passwords
 else echo "5/5 Skipped demo crew (add --demo to create it)"; fi
 uv run python -m am.cli status
-echo "Done. Start AM with: ./scripts/run.sh --demo"
+echo "Done. Start AMC with: ./scripts/run.sh --demo"

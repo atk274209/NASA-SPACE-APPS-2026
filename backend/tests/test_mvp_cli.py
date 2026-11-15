@@ -39,7 +39,7 @@ def test_seed_demo_creates_labelled_simulated_crew(settings, monkeypatch):
 def test_built_console_is_served_with_spa_fallback(tmp_path):
     dist = tmp_path / "dist"
     (dist / "assets").mkdir(parents=True)
-    (dist / "index.html").write_text("<!doctype html><title>AM</title>", encoding="utf-8")
+    (dist / "index.html").write_text("<!doctype html><title>AMC</title>", encoding="utf-8")
     (dist / "assets" / "app.js").write_text("console.log(1)", encoding="utf-8")
     (dist / "favicon.svg").write_text("<svg/>", encoding="utf-8")
     (tmp_path / "secret.txt").write_text("nope", encoding="utf-8")

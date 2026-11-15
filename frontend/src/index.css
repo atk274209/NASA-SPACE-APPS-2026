@@ -3,7 +3,7 @@
 @import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
 
-/* AM design tokens, taken from the cabin it serves:
+/* AMC design tokens, taken from the cabin it serves:
    graphite panels (the station's anodised walls), Nomex white for text (crew-suit fabric),
    and one cool accent, Earthlight blue, for focus and the current place. Green, amber, orange
    and red belong to health severity and are never used for anything else.

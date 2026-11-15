@@ -132,7 +132,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.ctx.engine.dispose()
 
     app = FastAPI(
-        title="AM — Allied Mastercomputer API",
+        title="AMC — Allied Mastercomputer API",
         version="0.1.0",
         description="Offline-first astronaut health monitoring. Alert thresholds are DEMO values, "
                     "not clinically validated.",

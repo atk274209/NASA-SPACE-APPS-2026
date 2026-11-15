@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AM \u2014 Allied Mastercomputer API",
+    "title": "AMC \u2014 Allied Mastercomputer API",
     "description": "Offline-first astronaut health monitoring. Alert thresholds are DEMO values, not clinically validated.",
     "version": "0.1.0"
   },
@@ -2250,7 +2250,7 @@
           "crew"
         ],
         "summary": "Radiation Cumulative",
-        "description": "Daily and running sums of logged dosimeter doses.\n\nArithmetic only: AM records what the dosimeter reported and adds it up. It does not\ncompare doses with any exposure limit.",
+        "description": "Daily and running sums of logged dosimeter doses.\n\nArithmetic only: AMC records what the dosimeter reported and adds it up. It does not\ncompare doses with any exposure limit.",
         "operationId": "radiation_cumulative_api_v1_radiation_cumulative_get",
         "parameters": [
           {

@@ -20,7 +20,7 @@ class SymptomReport(Base):
     source:   manual | checkin | chat_confirmed | chat_auto | simulated
     severity: mild | moderate | severe (self-rated) | unrated (noted from chat, not rated yet)
     status:   active | resolved | retracted (noted in error; kept for the audit trail)
-    A chat_auto report is written by AM from an exact quote of the astronaut's message
+    A chat_auto report is written by AMC from an exact quote of the astronaut's message
     (see SymptomProposal); the astronaut can rate it or retract it. The language model never
     sets severity and never writes a report without a verified quote.
     """
@@ -45,11 +45,11 @@ class SymptomReport(Base):
 
 
 class SymptomProposal(Base):
-    """A symptom AM noticed in a chat message: the detection record (message, exact quote, detector).
+    """A symptom AMC noticed in a chat message: the detection record (message, exact quote, detector).
 
     `quote` must be an exact substring of the source message (verified deterministically).
     detector: keyword | llm
-    status:   pending (waiting for the astronaut) | confirmed | dismissed | auto_noted (AM recorded
+    status:   pending (waiting for the astronaut) | confirmed | dismissed | auto_noted (AMC recorded
               a chat_auto report from it) | retracted (the astronaut said the note was wrong)
     """
 
@@ -78,7 +78,7 @@ class AppSetting(Base):
 class SyncPackage(Base):
     """Outbox entry: an explicitly authorized export prepared for transmission to ground.
 
-    AM never transmits by itself; it prepares a file and records who authorized what.
+    AMC never transmits by itself; it prepares a file and records who authorized what.
     status: prepared | exported | cancelled (ground reports); stored | pruned (backups)
     """
 
