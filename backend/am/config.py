@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     ai_triage_worker: bool = True
     # Background writer of AM Core report narratives (am.amcore.narrative).
     am_core_worker: bool = True
+    # SIMULATED demo space events (jury demonstrations): only in test mode (AM_TEST_MODE=1).
+    demo_events: bool = True
+    demo_event_interval_s: float = 180.0
 
     @property
     def resolved_database_url(self) -> str:

@@ -42,6 +42,7 @@ export default defineConfig({
       AM_TEST_ACCOUNTS_FILE: path.join(dataDir, 'TEST_CREDENTIALS.txt'), // never the developer's own file
       AM_PASSWORD_HASH_PROFILE: 'fast',
       AM_TEST_MODE: '1',
+      AM_DEMO_EVENTS: '0', // random demo events would change what the tests see; tests trigger them explicitly
     },
   },
 })

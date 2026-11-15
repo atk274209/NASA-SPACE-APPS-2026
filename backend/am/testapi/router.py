@@ -304,8 +304,7 @@ def list_runs(db: DB, principal: CurrentUser, limit: int = 20):
 
 
 # ------------------------------------------------------------------ simulated wearable feed (Module N)
-WEARABLE_SOURCE = "simulated wearable (smart shirt)"
-WEARABLE_PRESETS = ("nominal", "elevated_heart_rate", "fever")
+from am.simulation.wearable import WEARABLE_PRESETS, WEARABLE_SOURCE  # noqa: E402,F401
 
 
 class WearableIn(BaseModel):
@@ -329,44 +328,19 @@ def wearable_feed(body: WearableIn, db: DB, ctx: CTX):
 
     Values are arbitrary demonstration draws (see am.simulation.generator), not physiological norms.
     """
-    import numpy as np
+    from am.simulation.wearable import NoWindow, simulate_wearable
 
-    from datetime import timedelta
-
-    if body.preset not in WEARABLE_PRESETS:
-        raise HTTPException(422, f"preset must be one of {list(WEARABLE_PRESETS)}")
-    end = utcnow()
-    start = end - timedelta(hours=body.hours)
-    lock = day_lock_through(db)
-    if lock is not None and start < lock:
-        start = lock
-    if start >= end:
-        raise HTTPException(409, "The mission day has just started; there is no time window to fill yet.")
-    rng = np.random.default_rng(int(end.timestamp()) % 100000 + body.astronaut_id)
-    hr_shift = 25.0 if body.preset == "elevated_heart_rate" else 12.0 if body.preset == "fever" else 0.0
-    temp_shift = 1.2 if body.preset == "fever" else 0.0
-    svc = IngestService(db, ctx.thresholds, ctx.policy)
-    readings, alerts = 0, set()
-    t = start + timedelta(minutes=10)
     try:
-        while t <= end:
-            for metric, unit, mean, sd, dec in (("heart_rate", "bpm", 68 + hr_shift, 2.5, 0),
-                                                ("spo2", "%", 97.5, 0.5, 1),
-                                                ("body_temperature", "degC", 36.7 + temp_shift, 0.1, 2)):
-                if metric != "heart_rate" and t.minute >= 20:  # SpO2 and temperature a few times per hour
-                    continue
-                value = round(float(rng.normal(mean, sd)), dec) if dec else float(round(rng.normal(mean, sd)))
-                res = svc.ingest(MeasurementInput(astronaut_id=body.astronaut_id, metric_code=metric, value=value,
-                                                  unit=unit, context="rest", recorded_at=t, source_name=WEARABLE_SOURCE,
-                                                  source_kind=SourceKind.SIMULATED, confidence=0.9))
-                readings += 1
-                if res.alert_id:
-                    alerts.add(res.alert_id)
-            t += timedelta(minutes=10)
+        res = simulate_wearable(db, ctx.thresholds, ctx.policy, body.astronaut_id, body.preset, body.hours)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NoWindow as exc:
+        raise HTTPException(409, str(exc)) from exc
     except LookupError as exc:
         db.rollback()
         raise HTTPException(404, str(exc)) from exc
     db.commit()
+    readings, alerts, start, end = res.readings, res.alert_ids, res.start, res.end
     return WearableOut(astronaut_id=body.astronaut_id, readings=readings, alerts_touched=sorted(alerts),
                        window_start=start, window_end=end)
 

@@ -15,6 +15,8 @@ import am.db.models_m6b  # noqa: F401
 import am.db.models_cabin  # noqa: F401
 import am.db.models_amcore  # noqa: F401
 import am.db.models_diary  # noqa: F401
+import am.db.models_demo  # noqa: F401
+import am.db.models_duty  # noqa: F401
 from am.config import get_settings
 from am.db.base import Base
 

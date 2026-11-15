@@ -24,6 +24,8 @@ from am.api.v1 import (
     exams,
     cabin,
     diary,
+    demo,
+    duties,
     nutrition,
     amcore,
     guidance,
@@ -111,7 +113,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             from am.amcore.narrative import CoreWorker
 
             core = CoreWorker(app.state.ctx).start()
+        demo = None
+        if settings.test_mode and settings.demo_events:
+            from am.demo.events import DemoDirector
+
+            demo = DemoDirector(app.state.ctx, settings.demo_event_interval_s).start()
+        app.state.demo = demo
         yield
+        if demo is not None:
+            demo.stop()
         if core is not None:
             core.stop()
         if triage is not None:
@@ -134,7 +144,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Every API route passes through `authorize` (am.auth.guard): sign-in is required and a
     # crew member can only reach their own records unless a route is explicitly marked otherwise.
     for module in (auth, core, monitoring, companion, research, crew, symptoms, streaks, journal_ext, admin,
-                   guidance, notes, crewlog, testbench, doctor, exams, cabin, nutrition, amcore, diary):
+                   guidance, notes, crewlog, testbench, doctor, exams, cabin, nutrition, amcore, diary, demo, duties):
         app.include_router(module.router, prefix="/api/v1", dependencies=[Depends(authorize)])
     if settings.test_mode:
         # Test Console controls (/api/test/*): only with AM_TEST_MODE=1, same guard as /api/v1.

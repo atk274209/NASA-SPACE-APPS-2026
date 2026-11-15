@@ -247,3 +247,5 @@ from am.db import models_m6b  # noqa: E402,F401  (register the doctor feed and i
 from am.db import models_cabin  # noqa: E402,F401  (register Module P cabin control tables)
 from am.db import models_amcore  # noqa: E402,F401  (register AM Core reports and decisions)
 from am.db import models_diary  # noqa: E402,F401  (register the private diary)
+from am.db import models_demo  # noqa: E402,F401  (register SIMULATED demo space events)
+from am.db import models_duty  # noqa: E402,F401  (register the daily duty roster)

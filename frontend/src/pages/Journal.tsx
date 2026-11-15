@@ -175,7 +175,7 @@ function Provenance({ e }: { e: JournalDay }) {
     <div className="mt-3 space-y-1 text-xs">
       <p className="text-ink-faint">
         {e.narrative_generated_by === 'llm'
-          ? `Drafted by ${e.narrative_model} from this day's records only (${sources}). A model draft, not a medical assessment.`
+          ? `Drafted by AM from this day's records only (${sources}). A model draft, not a medical assessment.`
           : `Rule-based template from this day's records (${sources}). No language model was used because ${
             FALLBACK_REASON[g.fallback_reason ?? ''] ?? 'the model was unavailable'}.`}
         {e.narrative_generated_at && ` Written ${fmtDateTime(e.narrative_generated_at)}.`}
@@ -443,11 +443,11 @@ function AiLine() {
   const ai = useQuery({ queryKey: ['ai-status'], queryFn: api.aiStatus, refetchInterval: 20_000, retry: 0 })
   if (ai.isLoading) return <span className="text-sm text-ink-dim">Checking model…</span>
   if (ai.data?.reachable && ai.data.model_installed) {
-    return <span className="text-sm text-ink-dim">Summaries by <span className="num text-ink">{ai.data.model}</span></span>
+    return <span className="text-sm text-ink-dim">Summaries by AM</span>
   }
   return (
     <span className="text-sm text-sev-watch">
-      {ai.data?.reachable ? `Model ${ai.data.model} not installed` : 'Language model offline'}: summaries use the rule-based template
+      {ai.data?.reachable ? 'Local AI not set up' : 'Language model offline'}: summaries use the rule-based template
     </span>
   )
 }

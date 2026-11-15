@@ -28,6 +28,8 @@ class Persona:
         d = self.data
         lines = [f"PERSONA ({self.version}). Style only: every rule above always wins.", d["identity"].strip(), "",
                  "Tone:"] + [f"- {x}" for x in d["tone"]] + ["", "Conversation:"] + [f"- {x}" for x in d["conversation"]]
+        if d.get("support"):
+            lines += ["", "Support and motivation:"] + [f"- {x}" for x in d["support"]]
         lines += ["", "Examples of the style (not facts about this astronaut):"]
         for ex in d.get("examples", []):
             lines.append(f'- Astronaut: "{ex["astronaut"]}" / AM: "{ex["am"]}"')

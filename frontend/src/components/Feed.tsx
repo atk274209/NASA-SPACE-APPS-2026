@@ -39,7 +39,7 @@ function AiBox({ f }: { f: FeedItem }) {
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium text-ink-dim">AI suggestion</span>
         <LevelDot level={f.ai_level} />
-        <span className="text-xs text-ink-faint">local model {f.ai_model ?? ''} · not a diagnosis · can only raise the flag</span>
+        <span className="text-xs text-ink-faint">Local AI. Not a diagnosis; it can only raise the flag.</span>
       </div>
       {f.ai_reason && <p className="mt-1 text-ink-dim">{f.ai_reason}</p>}
       {f.ai_quote && <p className="mt-1 text-ink">“{f.ai_quote}”</p>}

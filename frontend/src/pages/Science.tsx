@@ -115,7 +115,7 @@ function ObservationView({ o }: { o: Observation }) {
         <dd className="whitespace-pre-wrap">
           {o.hypothesis}
           <span className="mt-1 block text-xs text-ink-faint">
-            {o.generated_by === 'llm' ? `Drafted by ${o.model}; citations limited to the excerpts above.` : 'Template text; no language model used.'}
+            {o.generated_by === 'llm' ? `Drafted by AM; citations limited to the excerpts above.` : 'Template text; no language model used.'}
             {g.invalid_citations_removed?.length ? ` Removed citations to excerpts that were not provided: ${g.invalid_citations_removed.join(', ')}.` : ''}
           </span>
           {g.unverified_numbers?.length ? <span className="block text-xs text-sev-warning">Numbers not found in the inputs: {g.unverified_numbers.join(', ')}</span> : null}

@@ -34,7 +34,7 @@ screens:
 Fonts are bundled locally, so the UI works offline.
 
 **M3 is done: the AM companion.** It runs on a local LLM through Ollama
-(`qwen2.5:7b-instruct` by default).
+(`llama3.1:8b` by default).
 
 - **Data access:** the model reads data only through read-only tools: overview,
   measurements (with a mission-day and time-of-day lookup), baselines, alerts and check-ins.
@@ -105,7 +105,7 @@ knowledge/ source-traceable scientific documents (knowledge/sources/*.json + _in
 Install Ollama, then pull the chat model and the embedding model:
 
 ```bash
-ollama pull qwen2.5:7b-instruct
+ollama pull llama3.1:8b
 ```
 
 ```bash

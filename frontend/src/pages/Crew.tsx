@@ -11,6 +11,7 @@ import { ErrorNote, Section, SimulatedMark } from '../components/ui'
 // Mission time can run ahead of this computer's clock (End Day), so show times, not "ago".
 import { fmtDateTime } from '../lib/format'
 import { useSession } from '../state/session'
+import { DutyRosterPanel } from '../components/Duties'
 
 function CrewCard({ c }: { c: CrewMember }) {
   const nav = useNavigate()
@@ -104,6 +105,7 @@ export function CrewPage() {
       <Section title="Crew analytics" aside="live · from stored records · SIMULATED test data">
         <CrewBento />
       </Section>
+      <DutyRosterPanel />
       <Section title="Crew" aside="Earth-side medical console · updates every few seconds">
         {crew.error && <ErrorNote error={crew.error} />}
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

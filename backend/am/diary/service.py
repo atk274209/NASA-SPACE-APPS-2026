@@ -62,9 +62,12 @@ How to talk:
 3. Keep replies short: one or two sentences of reflection, then your question. Always END with exactly
    one open question (not a yes/no question and not a rhetorical tag like "right?"), unless the
    astronaut is saying goodbye. Do not thank them for trusting you or talk about yourself.
-4. Offer emotional support when they are struggling: acknowledge the feeling, normalise it without
-   minimising it, and mention that they can talk to the crew medical officer or the behavioural
-   health team whenever they want. Do not lecture.
+4. Be motivating and supportive. When they are struggling: acknowledge the feeling in their words,
+   then name a real strength or effort from what they told you, connect the day to why they are up
+   here (the mission, the crew, home), and offer one small step they could choose. Speak with quiet
+   confidence in them; no empty cheerfulness, no "don't worry". When the day went well, celebrate
+   it by name. Mention that the crew medical officer and the behavioural health team are there
+   whenever they want. Do not lecture.
 5. Never diagnose, never give medical, medication or treatment advice, never judge how serious a
    symptom is. If they mention a physical symptom, say that AM can pass it to the doctor if they
    want, and continue the conversation.
@@ -97,22 +100,37 @@ OPENERS = {
            "Bugünün sayfasını yazalım. Şu an nasıl hissediyorsun?"],
 }
 FOLLOW_UPS = {
-    "en": ["Thank you for writing that down. What was the best moment of your day?",
+    "en": ["Thank you for writing that down. What was the best moment of your day, even a small one?",
            "I hear you. What was the hardest part of today?",
            "How did you sleep last night, and how is your energy now?",
            "How are things between you and the rest of the crew today?",
            "Is there anything on your mind about home?"],
-    "tr": ["Bunu yazdığın için teşekkürler. Günün en güzel anı neydi?",
+    "tr": ["Bunu yazdığın için teşekkürler. Küçük de olsa günün en güzel anı neydi?",
            "Seni anlıyorum. Bugünün en zor kısmı neydi?",
            "Dün gece nasıl uyudun, şu an enerjin nasıl?",
            "Bugün ekiple aranız nasıl?",
            "Aklında evle ilgili bir şey var mı?"],
 }
 SUPPORT = {
-    "en": "You do not have to carry this alone. Whenever you want, the crew medical officer and the behavioural "
-          "health team are there for you. I am here too: tell me more if you like.",
-    "tr": "Bunu tek başına taşımak zorunda değilsin. İstediğin an ekip sağlık görevlisi ve davranışsal sağlık ekibi "
-          "yanında. Ben de buradayım: istersen biraz daha anlat.",
+    "en": ["That sounds heavy, and it makes sense that you feel it. You have carried hard days up here before, and "
+           "you are still showing up for the crew and the mission. One small thing for tonight: is there someone "
+           "at home you could write to in the next window? The crew medical officer and the behavioural health "
+           "team are there whenever you want them.",
+           "Thank you for being honest about this; that takes strength. Every day you get through out here is part "
+           "of something few people will ever do. Be kind to yourself tonight: a break, some music, or a few more "
+           "lines here. And the crew medical officer and behavioural health team are one call away.",
+           "Feelings like this are part of a long mission, not a sign you are failing at it. Look at what you "
+           "already did today. What would help you most in the next hour? The crew medical officer and the "
+           "behavioural health team are there for you too."],
+    "tr": ["Bu ağır geliyor ve bunu hissetmen çok anlaşılır. Burada daha önce de zor günleri taşıdın ve hâlâ ekip "
+           "ve görev için oradasın. Bu akşam için küçük bir şey: bir sonraki iletişim penceresinde evden birine "
+           "yazmak ister misin? Ekip sağlık görevlisi ve davranışsal sağlık ekibi istediğin an yanında.",
+           "Bunu açıkça yazdığın için teşekkürler; bu güç ister. Burada geçirdiğin her gün çok az insanın "
+           "yapabileceği bir şeyin parçası. Bu akşam kendine iyi davran: bir mola, biraz müzik ya da buraya birkaç "
+           "satır daha. Ekip sağlık görevlisi ve davranışsal sağlık ekibi de bir çağrı uzağında.",
+           "Böyle hissetmek uzun bir görevin parçası; başaramadığın anlamına gelmiyor. Bugün zaten neler yaptığına "
+           "bir bak. Önümüzdeki bir saatte sana en çok ne iyi gelir? Ekip sağlık görevlisi ve davranışsal sağlık "
+           "ekibi de senin için orada."],
 }
 OFFER = {
     "en": "I noticed {names} in what you wrote. It stays private unless you choose to send it to your doctor: "
@@ -194,7 +212,7 @@ class DiaryService:
         offered = [f for f in forwards if f.status == "offered"]
         if urgent:
             items = [(f.symptom_code, catalog.get(f.symptom_code).label) for f in urgent]
-            text = safety_reply(lang, items, awaiting=True) + "\n\n" + SUPPORT[lang]
+            text = safety_reply(lang, items, awaiting=True) + "\n\n" + SUPPORT[lang][day.id % len(SUPPORT[lang])]
             return DiaryTurn(user, self._say(day, text, "deterministic", [{"type": "safety_rule",
                                                                            "rule": "diary_report_promptly"}]),
                              forwards)
@@ -208,7 +226,7 @@ class DiaryService:
         struggling = any((s := catalog.get(d.code)) is not None and s.category == "behavioral"
                          for d in detect_keywords(content))
         if struggling and by == "deterministic":
-            reply = SUPPORT[lang] + "\n\n" + reply
+            reply = SUPPORT[lang][user.id % len(SUPPORT[lang])] + "\n\n" + reply
         if offered:
             reply += "\n\n" + self._offer_text(offered, lang)
         return DiaryTurn(user, self._say(day, reply, by, [], model), forwards, ok)

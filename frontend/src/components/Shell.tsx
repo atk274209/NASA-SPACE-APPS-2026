@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import { doctorApi } from '../api/doctor'
 import { useAuth } from '../state/auth'
 import { useSession } from '../state/session'
+import { SpaceEventToasts } from './SpaceEvents'
 import { AmMark, SimulatedMark } from './ui'
 
 // Simple role-based navigation: 3 items for an astronaut, doctor items for the medical officer.
@@ -129,6 +130,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <UserMenu />
         </header>
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 md:px-6">{children}</main>
+        <SpaceEventToasts />
       </div>
     </div>
   )

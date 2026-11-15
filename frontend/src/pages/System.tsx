@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { SpaceEventsPanel } from '../components/SpaceEvents'
 import { SystemMap } from '../components/SystemMap'
 import { useState, type FormEvent } from 'react'
 import { api } from '../api/client'
@@ -303,6 +304,7 @@ export function SystemPage() {
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">System</h1>
       <SystemMap />
+      <SpaceEventsPanel />
       <div className="grid gap-8 lg:grid-cols-2">
         <Section title="Service details">
           {status.isError ? <ErrorNote error={status.error} /> : !status.data ? <Loading /> : (
@@ -314,8 +316,6 @@ export function SystemPage() {
                     ['Database', status.data.database === 'ok' ? <span className="text-sev-normal">Online</span> : status.data.database],
                     ['Data folder', <span className="num break-all text-sm">{status.data.data_dir}</span>],
                     ['Language model service', o?.reachable ? <span className="text-sev-normal">Reachable at {o.url}</span> : <span className="text-ink-dim">Not running. Monitoring and alerts do not need it.</span>],
-                    ['Installed models', o?.reachable ? (o.models.length ? o.models.join(', ') : <span className="text-sev-watch">None installed yet</span>) : '–'],
-                    ['Configured chat model', <span className="num">{o?.configured_chat_model}</span>],
                     ['Baseline policy', <span className="num">{status.data.baseline_policy_version}</span>],
                   ]}
                 />

@@ -82,7 +82,7 @@ function ReportCard({ r }: { r: Report }) {
         {!crew && <span className="text-xs font-medium first-letter:uppercase" style={{ color: LEVEL_COLOR[a.attention] }}>{a.attention}</span>}
         {r.is_simulated && <SimulatedMark />}
         <span className="ml-auto text-xs text-ink-faint">
-          {r.narrative_status === 'llm' ? `written by AM (${r.narrative_model})` : r.narrative_status === 'template' ? 'template (model offline)' : 'AM is writing…'}
+          {r.narrative_status === 'llm' ? 'written by AM' : r.narrative_status === 'template' ? 'template (model offline)' : 'AM is writing…'}
         </span>
       </header>
       <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink">{r.narrative}</div>

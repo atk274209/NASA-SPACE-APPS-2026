@@ -20,6 +20,7 @@ import { NotesList, ValueProposals } from '../components/Capture'
 import { PointsBadge, RoutineExams } from '../components/Exams'
 import { ComfortStrip } from '../components/ComfortStrip'
 import { HydrationCard, HydrationLeaderboard, StreakChips } from '../components/Hydration'
+import { TodayDuties } from '../components/Duties'
 
 type Ref = { type: string; id?: number; unverified_numbers?: number[]; doc_slug?: string; title?: string; url?: string }
 
@@ -94,8 +95,7 @@ function Sources({ msg }: { msg: ChatMessage }) {
       ) : null}
       {msg.model && (
         <p className="text-ink-faint">
-          {msg.model}
-          {msg.latency_ms != null && `, ${(msg.latency_ms / 1000).toFixed(1)} s`}
+          AM{msg.latency_ms != null && `, ${(msg.latency_ms / 1000).toFixed(1)} s`}
         </p>
       )}
     </div>
@@ -647,6 +647,7 @@ export function CompanionPage() {
       <CareBanner astronautId={astronaut.id} />
       <ValueProposals astronautId={astronaut.id} />
       <StreakChips astronautId={astronaut.id} />
+      <TodayDuties />
       <div className="grid gap-3 lg:grid-cols-2">
         <HydrationCard astronautId={astronaut.id} />
         <HydrationLeaderboard />
@@ -659,9 +660,9 @@ export function CompanionPage() {
         <PointsBadge astronautId={astronaut.id} />
         <span className="text-sm text-ink-dim">
           {ai.isLoading ? 'Checking model…' : aiReady
-            ? <>Local model <span className="num text-ink">{ai.data!.model}</span></>
+            ? 'Local AI ready'
             : <span className="text-sev-watch">
-                {ai.data?.reachable ? `Model ${ai.data.model} not installed` : 'Language model offline'}: answers fall back to rule-based summaries
+                {ai.data?.reachable ? 'Local AI not set up' : 'Language model offline'}: answers fall back to rule-based summaries
               </span>}
         </span>
       </div>

@@ -368,7 +368,7 @@ export function SystemMap() {
   const model = (m?: string) =>
     !status.data ? null : !o?.reachable ? false : installed(m)
   const modelDetail = (m?: string) =>
-    !o?.reachable ? 'Model service not running' : installed(m) ? `${m} ready` : `${m} not installed`
+    !o?.reachable ? 'Model service not running' : installed(m) ? 'Ready' : 'Not set up'
   const services = [
     { kind: 'database', name: 'Database', ok: status.data ? status.data.database === 'ok' : null, detail: status.data?.database === 'ok' ? 'Online' : String(status.data?.database ?? '…') },
     { kind: 'chat', name: 'Chat model', ok: model(o?.configured_chat_model), detail: modelDetail(o?.configured_chat_model) },
