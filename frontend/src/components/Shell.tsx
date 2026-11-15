@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import { doctorApi } from '../api/doctor'
 import { useAuth } from '../state/auth'
 import { useSession } from '../state/session'
+import { useIntercomUnread } from '../pages/Intercom'
 import { SpaceEventToasts } from './SpaceEvents'
 import { AmMark, SimulatedMark } from './ui'
 
@@ -12,12 +13,14 @@ import { AmMark, SimulatedMark } from './ui'
 // Every earlier page is still reachable: grouped as tabs inside Health and Settings.
 const ASTRONAUT_NAV = [
   { to: '/', label: 'Companion', icon: 'M4 5h16v11H9l-5 4V5zm4 5h8m-8 3h5' },
+  { to: '/intercom', label: 'Intercom', icon: 'M4 15V9a2 2 0 012-2h3l4-3v16l-4-3H6a2 2 0 01-2-2zm13-6a4 4 0 010 6m2-9a8 8 0 010 12' },
   { to: '/diary', label: 'Diary', icon: 'M7 3h10a2 2 0 012 2v16l-7-4-7 4V5a2 2 0 012-2z' },
   { to: '/health', label: 'Health', icon: 'M4 19V9m6 10V5m6 14v-7m4 7H2' },
   { to: '/journal', label: 'Journal', icon: 'M6 3h11a2 2 0 012 2v16H8a2 2 0 01-2-2V3zm0 16a2 2 0 012-2h11M10 7h6M10 11h6' },
 ]
 const DOCTOR_NAV = [
   { to: '/', label: 'Crew', icon: 'M9 11a4 4 0 100-8 4 4 0 000 8zm-7 10v-1a6 6 0 0112 0v1m3-10a3 3 0 100-6m4 16v-1a5 5 0 00-3-4.6' },
+  { to: '/intercom', label: 'Intercom', icon: 'M4 15V9a2 2 0 012-2h3l4-3v16l-4-3H6a2 2 0 01-2-2zm13-6a4 4 0 010 6m2-9a8 8 0 010 12' },
   { to: '/am', label: 'AM Core', icon: 'M12 3a9 9 0 100 18 9 9 0 000-18zm0 5a4 4 0 100 8 4 4 0 000-8zm0 3v2' },
   { to: '/environment', label: 'Environment', icon: 'M12 3v10m0 0a4 4 0 104 4M8 7h2m-2 3h2M3 21h18' },
   { to: '/alerts', label: 'Alerts', icon: 'M12 3l9 16H3L12 3zm0 6v4m0 3v.5' },
@@ -31,6 +34,12 @@ function Icon({ d }: { d: string }) {
       <path d={d} />
     </svg>
   )
+}
+
+function IntercomBadge() {
+  const n = useIntercomUnread()
+  if (!n) return null
+  return <span className="num ml-auto rounded-sm bg-signal/20 px-1.5 text-xs text-signal" title="Unread intercom messages">{n}</span>
 }
 
 function UnseenRedCount() {
@@ -115,6 +124,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <Icon d={n.icon} />
                 <span className="hidden md:inline">{n.label}</span>
                 {n.to === '/alerts' && <span className="hidden md:contents"><OpenAlertCount /></span>}
+                {n.to === '/intercom' && <span className="hidden md:contents"><IntercomBadge /></span>}
                 {isDoctor && n.to === '/' && <span className="hidden md:contents"><UnseenRedCount /></span>}
               </NavLink>
             </li>

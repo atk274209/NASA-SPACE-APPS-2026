@@ -26,6 +26,7 @@ from am.api.v1 import (
     diary,
     demo,
     duties,
+    intercom,
     nutrition,
     amcore,
     guidance,
@@ -144,7 +145,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Every API route passes through `authorize` (am.auth.guard): sign-in is required and a
     # crew member can only reach their own records unless a route is explicitly marked otherwise.
     for module in (auth, core, monitoring, companion, research, crew, symptoms, streaks, journal_ext, admin,
-                   guidance, notes, crewlog, testbench, doctor, exams, cabin, nutrition, amcore, diary, demo, duties):
+                   guidance, notes, crewlog, testbench, doctor, exams, cabin, nutrition, amcore, diary, demo, duties, intercom):
         app.include_router(module.router, prefix="/api/v1", dependencies=[Depends(authorize)])
     if settings.test_mode:
         # Test Console controls (/api/test/*): only with AM_TEST_MODE=1, same guard as /api/v1.

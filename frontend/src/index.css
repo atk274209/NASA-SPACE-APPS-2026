@@ -107,3 +107,124 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ crew quarters (CabinStage) */
+.cabin-stage {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: calc(var(--cabin-h) + 40px);
+  perspective: 1000px;
+  perspective-origin: 50% 20%;
+}
+.cabin-scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-13deg);
+}
+.cabin-shell {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: var(--cabin-h);
+  transform-style: preserve-3d;
+}
+.cabin-panel {
+  position: absolute;
+  top: 0;
+  height: var(--cabin-h);
+  backface-visibility: visible;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--color-deck) 30%, transparent) 0%,
+      color-mix(in oklab, var(--color-hull) 6%, transparent) 45%,
+      color-mix(in oklab, var(--color-deck) 30%, transparent) 100%);
+  border-left: 1px solid color-mix(in oklab, var(--color-seam-strong) 80%, transparent);
+  box-shadow: inset 0 18px 0 -16px var(--color-seam-strong), inset 0 -18px 0 -16px var(--color-seam-strong);
+}
+/* a porthole: Earth seen from the quarters */
+.cabin-panel-window::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 46px;
+  height: 46px;
+  margin-left: -23px;
+  border-radius: 50%;
+  border: 3px solid var(--color-seam-strong);
+  background: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--color-signal) 70%, white) 0 6%,
+    var(--color-signal-dim) 40%, #0b1016 72%);
+}
+/* soft wall light strips */
+.cabin-panel-light::before {
+  content: '';
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 8%;
+  height: 34%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--color-signal) 18%, transparent), transparent);
+}
+.cabin-floor,
+.cabin-ceiling {
+  position: absolute;
+  width: calc(var(--cabin-r) * 2);
+  height: calc(var(--cabin-r) * 2);
+  left: calc(var(--cabin-r) * -1);
+  top: calc(var(--cabin-h) / 2 - var(--cabin-r));
+  border-radius: 50%;
+}
+.cabin-floor {
+  transform: translateY(calc(var(--cabin-h) / 2)) rotateX(90deg);
+  background:
+    repeating-radial-gradient(circle, transparent 0 22px, color-mix(in oklab, var(--color-seam-strong) 70%, transparent) 22px 23px),
+    radial-gradient(circle, color-mix(in oklab, var(--color-deck) 90%, transparent), var(--color-hull));
+  border: 2px solid var(--color-seam-strong);
+}
+.cabin-ceiling {
+  transform: translateY(calc(var(--cabin-h) / -2)) rotateX(90deg);
+  background: radial-gradient(circle, transparent 0 52%, color-mix(in oklab, var(--color-signal) 45%, transparent) 54% 57%,
+    transparent 59%), color-mix(in oklab, var(--color-hull) 70%, transparent);
+  border: 2px solid var(--color-seam-strong);
+}
+.cabin-shadow {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--cabin-h) - 34px);
+  width: 120px;
+  height: 22px;
+  margin-left: -60px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent);
+  transform: translateZ(0);
+}
+.cabin-body {
+  position: absolute;
+  left: 50%;
+  top: 34px;
+  width: 170px;
+  margin-left: -85px;
+  transform-style: preserve-3d;
+  animation: cabin-turn 26s linear infinite;
+}
+.cabin-stage:hover .cabin-body,
+.cabin-stage:focus-within .cabin-body {
+  animation-play-state: paused;
+}
+.cabin-label {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-ink-faint);
+}
+@keyframes cabin-turn {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cabin-body { animation: none; }
+}

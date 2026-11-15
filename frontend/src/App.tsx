@@ -9,6 +9,7 @@ import { CrewPage } from './pages/Crew'
 import { DiaryPage } from './pages/Diary'
 import { EnvironmentPage } from './pages/Environment'
 import { HealthHub } from './pages/HealthHub'
+import { IntercomPage } from './pages/Intercom'
 import { JournalPage } from './pages/Journal'
 import { PatientPage } from './pages/Patient'
 import { ProfilePage } from './pages/Profile'
@@ -25,6 +26,7 @@ function AstronautRoutes() {
   return (
     <Routes>
       <Route path="/" element={<CompanionPage />} />
+      <Route path="/intercom" element={<IntercomPage />} />
       <Route path="/diary" element={<DiaryPage />} />
       <Route path="/health" element={<HealthHub />} />
       <Route path="/journal" element={<JournalPage />} />
@@ -39,6 +41,7 @@ function DoctorRoutes() {
     <Routes>
       <Route path="/" element={<CrewPage />} />
       <Route path="/patient/:id" element={<PatientPage />} />
+      <Route path="/intercom" element={<IntercomPage />} />
       <Route path="/am" element={<AmCorePage />} />
       <Route path="/environment" element={<EnvironmentPage />} />
       <Route path="/alerts" element={<AlertsPage />} />

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { Component, lazy, Suspense, useCallback, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   guidanceApi,
@@ -13,6 +13,12 @@ import {
 import { contextLabel, fmtAgo, fmtDateTime, fmtNum, severityColor, unitLabel } from '../lib/format'
 import { GuidancePanel, SymptomGuidance } from './Guidance'
 import { ErrorNote, Loading, SeverityTag, SimulatedMark } from './ui'
+import { CabinStage } from './CabinStage'
+import { webglAvailable } from './body3dSupport'
+
+// three.js is only downloaded when the 3D body map is shown.
+const Body3D = lazy(() => import('./Body3D'))
+const VIEW_KEY = 'am.bodymap.view'
 
 /* Body status colours reuse the severity tokens: red = critical, yellow = warning. */
 const STATUS_COLOR: Record<BodyStatus, string> = {
@@ -205,7 +211,7 @@ function Figure({
 
   const figure = (
     <svg viewBox="0 0 200 410" role="radiogroup" aria-label="Body map. Use the arrow keys to move between body systems."
-      className="h-auto w-full max-w-[220px] select-none">
+      className="h-auto w-full select-none">
       {/* Immune system and skin: the body outline. A wide transparent stroke makes it easy to hit. */}
       {region('immune_skin', (st, isSelected) => {
         const outline = {
@@ -286,7 +292,7 @@ function Figure({
 
   return (
     <div className="flex w-full flex-col items-center gap-1">
-      {figure}
+      <CabinStage>{figure}</CabinStage>
       {/* Names the region under the pointer; keyboard and screen-reader users get it from aria-label. */}
       <p aria-hidden className="h-4 text-center text-xs text-ink-dim">{hovered ?? ''}</p>
     </div>
@@ -534,6 +540,67 @@ function SystemDetail({ s, bm, levels }: { s: BodySystem; bm: BodyMapData; level
   )
 }
 
+/** If the 3D view cannot load (a missing chunk) or throws while drawing, show the flat map instead of a blank app. */
+class Body3DBoundary extends Component<{ fallback: ReactNode; onError: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  componentDidCatch() {
+    this.props.onError()
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children
+  }
+}
+
+function readView(): '3d' | 'flat' {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'flat' ? 'flat' : '3d'
+  } catch {
+    return '3d'
+  }
+}
+
+/** The figure: 3D in the crew quarters when the browser can draw it, else (or by choice) the flat map. */
+function BodyView({ systems, selected, onSelect, levels }: {
+  systems: BodySystem[]
+  selected: BodySystem
+  onSelect: (code: string) => void
+  levels: Levels
+}) {
+  const [can3d, setCan3d] = useState(webglAvailable)
+  const [view, setView] = useState<'3d' | 'flat'>(readView)
+  const pick = (v: '3d' | 'flat') => {
+    setView(v)
+    try { localStorage.setItem(VIEW_KEY, v) } catch { /* private mode */ }
+  }
+  const failed = useCallback(() => setCan3d(false), [])
+  const flat = <Figure systems={systems} selected={selected.code} onSelect={onSelect} levels={levels} />
+  return (
+    <>
+      {can3d && (
+        <div role="group" aria-label="Body map view" className="inline-flex rounded-md border border-seam-strong p-0.5 text-xs">
+          {(['3d', 'flat'] as const).map((v) => (
+            <button key={v} type="button" aria-pressed={view === v} onClick={() => pick(v)}
+              className={`rounded px-2.5 py-1 ${view === v ? 'bg-deck text-ink' : 'text-ink-dim hover:text-ink'}`}>
+              {v === '3d' ? '3D view' : 'Flat view'}
+            </button>
+          ))}
+        </div>
+      )}
+      {can3d && view === '3d' ? (
+        <Body3DBoundary fallback={flat} onError={failed}>
+          <Suspense fallback={flat}>
+            <Body3D systems={systems} selected={selected.code} onSelect={onSelect}
+              selectedText={describe(selected, levels)} onFail={failed} />
+          </Suspense>
+        </Body3DBoundary>
+      ) : flat}
+    </>
+  )
+}
+
 function mostSevere(systems: BodySystem[]): BodySystem {
   return systems.reduce((best, s) => (STATUS_RANK[s.status] > STATUS_RANK[best.status] ? s : best), systems[0])
 }
@@ -560,9 +627,9 @@ export function BodyMap({ astronautId }: { astronautId: number }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)]">
-        <div className="flex flex-col items-center gap-4">
-          <Figure systems={bm.systems} selected={selected.code} onSelect={setPicked} levels={levels} />
+      <div className="grid gap-6 sm:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="flex flex-col items-center gap-3">
+          <BodyView systems={bm.systems} selected={selected} onSelect={setPicked} levels={levels} />
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <SystemList systems={bm.systems} selected={selected.code} onSelect={setPicked} levels={levels} />

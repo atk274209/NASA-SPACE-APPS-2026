@@ -239,6 +239,16 @@ def trigger(s: Session, ctx: Any, code: str | None = None, *, actor: str = ACTOR
     s.add(ev)
     s.flush()
     kind.run(s, ctx, rng, ev)
+    # AM speaks on the intercom: crew-wide events on the crew loop; anything about one person only on
+    # that person's private loop with the flight surgeon, never in front of the whole crew.
+    from am.intercom import service as intercom
+
+    text = f"{kind.title}. {ev.summary.removeprefix('SIMULATED: ')}"
+    if ev.reactions:
+        text += f" {ev.reactions[0]}"
+    channel = intercom.private_id(ev.astronaut_id) if ev.astronaut_id else intercom.CREW
+    intercom.post(s, channel, f"[SIMULATED] {text}", sender_user_id=None, sender_name="AM", sender_role="am",
+                  urgent=ev.severity in ("warning", "critical"))
     audit(s, actor=actor, action="demo.event", entity="space_event", entity_id=ev.id,
           payload={"kind": kind.code, "astronaut_id": ev.astronaut_id})
     s.flush()

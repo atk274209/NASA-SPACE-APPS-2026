@@ -64,6 +64,35 @@ at the repository root.
 Use two browser windows (one normal, one private) to watch the astronaut and the doctor at the
 same time.
 
+### Two computers: astronaut on one, doctor on the other
+
+This shows the data moving between the station and the flight surgeon live. AM runs on **one**
+computer (the station); the second computer needs only a web browser, nothing installed.
+
+1. Put both computers on the same Wi-Fi. Event and guest networks often block devices from
+   reaching each other; a phone hotspot that both computers join always works.
+2. On the AM computer, start in network mode:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo -Lan
+   ```
+
+   ```bash
+   ./scripts/run.sh --demo --lan
+   ```
+
+   It prints the address for the other computer, for example `http://192.168.1.23:8000`.
+   If Windows asks whether Python may use networks, choose **Private networks** and **Allow**.
+3. On the AM computer, sign in as `doctor`. On the second computer, open the printed address and
+   sign in as `ast001` (or the other way round).
+4. Try it: the astronaut writes `Göğsümde sıkışma var` in the Companion. Within a few seconds it
+   appears on the doctor's Crew page, waiting for approval. The doctor approves it with a note,
+   and the note appears on the astronaut's screen. Space events, alerts and the duty roster
+   update on both screens the same way.
+
+Network mode accepts only this computer's own addresses and still blocks writes from other
+websites. Use it on a network you trust, and stop AM (Ctrl+C) after the demonstration.
+
 ### A short tour
 
 **As an astronaut (`ast001`)**

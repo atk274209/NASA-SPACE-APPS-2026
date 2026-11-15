@@ -51,11 +51,11 @@ test('sign-in refuses a wrong password and each role gets its own simple menu', 
 
   await signIn(page, 'ast001')
   const astronautNav = page.getByRole('navigation', { name: 'Primary' }).getByRole('link')
-  await expect(astronautNav).toHaveText(['Companion', 'Diary', 'Health', 'Journal'])
+  await expect(astronautNav).toHaveText(['Companion', 'Intercom', 'Diary', 'Health', 'Journal'])
 
   await signIn(page, 'doctor')
   const doctorNav = page.getByRole('navigation', { name: 'Primary' }).getByRole('link')
-  await expect(doctorNav).toHaveText(['Crew', 'AM Core', 'Environment', 'Alerts', 'Settings'])
+  await expect(doctorNav).toHaveText(['Crew', 'Intercom', 'AM Core', 'Environment', 'Alerts', 'Settings'])
 })
 
 test('an urgent symptom reaches the doctor at once and waits for approval', async ({ page }) => {
@@ -191,4 +191,38 @@ test('AM shares out the day by energy and morale', async ({ page }) => {
   await expect(card.getByText('Private call home')).toBeVisible()
   await card.getByRole('checkbox').first().click()
   await expect(card.getByText(/1 of \d+ done/)).toBeVisible()
+})
+
+test('the body map stands in the crew quarters in 3D, with the flat map one tap away', async ({ page }) => {
+  await signIn(page, 'ast001')
+  await page.getByRole('link', { name: 'Health' }).click()
+  const toggle = page.getByRole('group', { name: 'Body map view' })
+  if (await toggle.count()) {
+    await expect(page.getByRole('img', { name: /Body map in 3D inside the crew quarters/ })).toBeVisible({ timeout: 20_000 })
+    await toggle.getByRole('button', { name: 'Flat view' }).click()
+    await expect(page.getByRole('radiogroup', { name: /Body map/ })).toBeVisible()
+    await toggle.getByRole('button', { name: '3D view' }).click()
+    await expect(page.getByRole('img', { name: /Body map in 3D/ })).toBeVisible()
+  } else {
+    // no WebGL in this browser: the flat map is shown instead
+    await expect(page.getByRole('radiogroup', { name: /Body map/ })).toBeVisible()
+  }
+  await page.getByRole('button', { name: /Heart and circulation/ }).click()
+  await expect(page.getByRole('heading', { name: /Heart and circulation/ }).first()).toBeVisible()
+})
+
+test('the flight surgeon and an astronaut talk on their private intercom loop', async ({ page }) => {
+  await signIn(page, 'doctor')
+  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Intercom' }).click()
+  await page.getByRole('navigation', { name: 'Intercom loops' }).getByRole('button', { name: /Samuel Idowu/ }).click()
+  await page.getByLabel('Message on this loop').fill('Please call me after the EVA prep.')
+  await page.getByRole('button', { name: 'Send' }).click()
+  await expect(page.getByText('Please call me after the EVA prep.')).toBeVisible()
+
+  await signIn(page, 'ast004')
+  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Intercom' }).click()
+  await expect(page.getByText('Please call me after the EVA prep.')).toBeVisible()
+  await page.getByLabel('Message on this loop').fill('Copy, calling at 15:00.')
+  await page.getByLabel('Message on this loop').press('Enter')
+  await expect(page.getByText('Copy, calling at 15:00.')).toBeVisible()
 })

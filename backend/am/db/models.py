@@ -249,3 +249,4 @@ from am.db import models_amcore  # noqa: E402,F401  (register AM Core reports an
 from am.db import models_diary  # noqa: E402,F401  (register the private diary)
 from am.db import models_demo  # noqa: E402,F401  (register SIMULATED demo space events)
 from am.db import models_duty  # noqa: E402,F401  (register the daily duty roster)
+from am.db import models_intercom  # noqa: E402,F401  (register intercom channels)
