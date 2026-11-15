@@ -1,6 +1,6 @@
 // Crew analytics bento: four live cards (crew water, activity by hour, reported problems by body
 // system, wellbeing and adherence radar). SVG only, no chart library.
-// Adapted for AM from "Analytics Bento" by vasnev.art (credit badge kept below the grid): same
+// Adapted for AM from "Analytics Bento" by vasnev.art (credited here, in the source): same
 // interactions (count-up, smooth lines, breathing waves, squarified treemap, Fourier radar, shared
 // tooltip, segmented control, staggered entry, reduced-motion support), AM design tokens, and data
 // from /api/v1/doctor/analytics. Every number comes from stored records.
@@ -503,48 +503,9 @@ function Radar({ values, axis, who, color, tip }: { values: number[]; axis: stri
   )
 }
 
-/* ---------------- vasnev.art badge (credit for the original component) ---------------- */
-
-const V_ON = new Set(['0,0', '4,0', '1,1', '3,1', '2,2'])
-function VasnevBadge({ className = '' }: { className?: string }) {
-  return (
-    <a href="https://vasnev.art" target="_blank" rel="noopener noreferrer" aria-label="Chart design by vasnev.art" className={`vb-badge ${className}`}>
-      <span className="vb-mark" aria-hidden="true">
-        {Array.from({ length: 15 }, (_, i) => {
-          const x = i % 5, y = Math.floor(i / 5)
-          return <i key={i} className={V_ON.has(`${x},${y}`) ? 'on' : undefined} style={{ ['--x' as string]: x }} />
-        })}
-      </span>
-      <span><span className="vb-by">charts by</span> vasnev.art</span>
-      <svg className="vb-arr" viewBox="0 0 12 12" aria-hidden="true">
-        <path d="M3.5 8.5l5-5M4.5 3.5h4v4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <style>{`
-.vb-badge{--vb-bg:var(--color-hull);--vb-line:var(--color-seam);--vb-fg:var(--color-ink);--vb-mut:var(--color-ink-dim);--vb-off:var(--color-seam-strong);--vb-on:var(--color-signal);
-  display:inline-flex;align-items:center;gap:9px;height:34px;padding:0 12px 0 11px;border-radius:17px;background:var(--vb-bg);border:1px solid var(--vb-line);
-  color:var(--vb-fg);text-decoration:none;font:500 13px/1 var(--font-sans);letter-spacing:-.02em;
-  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 8px 24px -12px rgba(0,0,0,.6);transition:border-color .25s,transform .25s cubic-bezier(.2,.9,.25,1)}
-.vb-badge:hover{border-color:color-mix(in oklab,var(--vb-on) 45%,transparent)}
-.vb-badge:active{transform:scale(.97)}
-.vb-badge:focus-visible{outline:2px solid var(--vb-on);outline-offset:2px}
-.vb-mark{display:grid;grid-template-columns:repeat(5,3px);grid-template-rows:repeat(3,3px);gap:2px}
-.vb-mark i{width:3px;height:3px;border-radius:50%;background:var(--vb-off);transition:background .3s}
-.vb-mark i.on{background:var(--vb-on)}
-.vb-badge:hover .vb-mark i.on{animation:vb-wave .9s cubic-bezier(.3,1.4,.4,1) calc(var(--x)*60ms) 1}
-.vb-badge:hover .vb-mark i:not(.on){background:color-mix(in oklab,var(--vb-on) 22%,transparent)}
-@keyframes vb-wave{0%,100%{transform:none}40%{transform:translateY(-2px) scale(1.35)}}
-.vb-by{color:var(--vb-mut)}
-.vb-arr{height:12px;width:0;margin-left:-9px;opacity:0;color:var(--vb-mut);transform:translate(-4px,4px);transition:width .3s cubic-bezier(.2,.9,.25,1),opacity .25s,transform .3s cubic-bezier(.2,.9,.25,1),margin .3s}
-.vb-badge:hover .vb-arr{width:12px;margin-left:0;opacity:1;transform:none;color:var(--vb-fg)}
-@media (prefers-reduced-motion: reduce){.vb-badge:hover .vb-mark i.on{animation:none}}
-`}</style>
-    </a>
-  )
-}
-
 /* ---------------- the bento ---------------- */
 
-export function CrewBento({ credit = true }: { credit?: boolean }) {
+export function CrewBento() {
   const q = useQuery({ queryKey: ['doctor', 'analytics'], queryFn: () => request<Analytics>('GET', '/doctor/analytics'), refetchInterval: 30_000 })
   const tip = React.useRef(null as TipApi | null) as TipRef
   const [period, setPeriod] = React.useState(0)
@@ -677,11 +638,6 @@ export function CrewBento({ credit = true }: { credit?: boolean }) {
         </Card>
       </div>
 
-      {credit && (
-        <div className="mt-5 flex justify-end">
-          <VasnevBadge />
-        </div>
-      )}
       <Tooltip api={tip} />
     </div>
   )
