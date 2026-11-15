@@ -5,6 +5,128 @@ AM is an offline-first astronaut health monitoring and scientific intelligence p
 > Research prototype. Not a medical device. Alert thresholds are demonstration values.
 > See [docs/SAFETY.md](docs/SAFETY.md).
 
+## For the jury: install and try AM
+
+AM runs entirely on one computer. It needs no cloud account and no internet connection once it
+is installed. All crew members and all health data in the demo are **fictional and simulated**.
+
+### What you need
+
+| Tool | Why | Get it |
+|---|---|---|
+| [uv](https://docs.astral.sh/uv/) | runs the Python backend | `winget install astral-sh.uv` or the website |
+| [Node.js 20+](https://nodejs.org/) | builds the web console | the website |
+| [Ollama](https://ollama.com/) (optional) | the local AI for conversation, diary and notes | the website |
+
+Without Ollama everything still works: monitoring, alerts, the doctor's feed, cabin control,
+space events and duty planning are rule-based, and AM answers with fixed, safe replies.
+
+### Install (once)
+
+Windows PowerShell, from the repository folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 -Demo -PullModels
+```
+
+macOS, Linux or Git Bash:
+
+```bash
+./scripts/setup.sh --demo --pull-models
+```
+
+This installs the dependencies, builds the console, creates the local database, and adds the
+fictional test crew. Leave out `-PullModels` / `--pull-models` to skip the AI models (about 5 GB).
+
+### Start
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo
+```
+
+```bash
+./scripts/run.sh --demo
+```
+
+Then open **http://localhost:8000** (the Windows script opens it for you). `-Demo` / `--demo`
+turns on the simulated space events and the Test Console controls. Stop AM with Ctrl+C.
+
+### Sign in
+
+Passwords are the username followed by `-test`. The full list is in `TEST_CREDENTIALS.txt`
+at the repository root.
+
+| Username | Password | Who |
+|---|---|---|
+| `doctor` | `doctor-test` | the flight surgeon on Earth |
+| `ast001` … `ast005` | `ast001-test` … `ast005-test` | the five astronauts |
+
+Use two browser windows (one normal, one private) to watch the astronaut and the doctor at the
+same time.
+
+### A short tour
+
+**As an astronaut (`ast001`)**
+
+1. **Companion.** At the top, *Today's duties* shows the work AM gave you today and a note
+   about why. Below, chat with AM in English or Turkish. Try:
+   - `Odam çok soğuk` or `The light hurts my eyes`: AM adjusts your quarters' temperature or
+     lighting, within simulated safety limits, and you can undo it.
+   - `Göğsümde sıkışma var` (chest tightness): AM switches to fixed safety words and sends it to
+     the doctor at once. The model never decides an emergency.
+   - `Dün gece 6 saat uyudum`: AM offers to record the value with one tap.
+2. **Diary.** A private diary written by talking with AM. Tap *Look back on this day* to get the
+   day's colour (green, yellow or red) and a short summary. Nobody else can read it until the
+   mission is back on Earth. Only a medical problem leaves it: an urgent one at once, anything
+   else only if you choose *Send to my doctor*.
+3. **Health** and **Journal**: your readings, alerts, symptoms and AM's daily journal.
+
+**As the doctor (`doctor`)**
+
+1. **Crew.** Entries that wait for your approval, the live feed of everything the crew writes
+   (flagged yellow or red by rules; the AI may only raise a flag, with a quote), crew
+   analytics, and *Today's duty roster*: each astronaut's energy and morale and the work AM
+   shared out. *Plan again from the latest check-ins* recalculates it.
+2. **AM Core.** AM's own reports and decisions. They stay sealed; you can break the seal for
+   two hours in an emergency, with a written reason, and the crew is told.
+3. **Environment.** Every change AM made to the cabin, and why.
+4. **Settings → System and audit.** A live map of the system, and the *Simulated space
+   events* panel.
+
+### Simulated space events
+
+With `-Demo` on, AM starts a random event a few seconds after start-up and then about every
+three minutes: a solar particle event, a lost link with Earth, an overheating room, a slow
+pressure drop, a sensor fault, a crew member's heart rate or temperature rising, or a reported
+symptom. Each event changes one real input; what you see afterwards is AM's own reaction: alerts,
+paused automation, flags for the doctor, approvals. A card appears for everyone affected.
+
+To show a specific event, sign in as the doctor and use **Settings → System and audit →
+Simulated space events**: *Start a random event*, or pick one by name. Untick *Automatic events*
+to pause them during a talk.
+
+### Test Console (optional)
+
+For entering check-ins, readings and symptoms by hand, or closing the day (*End Day*), start the
+separate Test Console in a second terminal while AM runs with `-Demo`:
+
+```bash
+cd frontend && npm run dev:testconsole
+```
+
+Then open http://localhost:5174 and sign in with the same accounts.
+
+### If something goes wrong
+
+- **The page says the AI is offline:** Ollama is not running or the models are not pulled. Start
+  Ollama and run `ollama pull llama3.1:8b`. Everything else keeps working without it.
+- **Wrong username or password:** reset the test passwords with
+  `cd backend && uv run python -m am.cli seed-crew --simple-passwords --reset-passwords`.
+- **Port 8000 is busy:** start with `scripts\run.ps1 -Demo -Port 8010` (or
+  `./scripts/run.sh --demo 8010`) and open that port.
+- **Start again from a clean database:** `cd backend && uv run python -m am.cli seed-crew
+  --simple-passwords --fresh-db` (the old database file is renamed, not deleted).
+
 ## Status
 
 **M1 is done: the core pipeline from measurement to alert.** Implemented:

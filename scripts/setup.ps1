@@ -1,8 +1,9 @@
 # AM one-command setup (Windows PowerShell).
 #   powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 [-Demo] [-PullModels]
 # Installs dependencies, builds the console, prepares the local database and the knowledge
-# base. -Demo adds the SIMULATED demo crew. -PullModels downloads the local AI models
-# (about 5 GB) with Ollama.
+# base. -Demo adds the FICTIONAL test crew (5 astronauts and a doctor) with easy test passwords
+# ("<username>-test", written to TEST_CREDENTIALS.txt). -PullModels downloads the local AI
+# models (about 5 GB) with Ollama.
 param([switch]$Demo, [switch]$PullModels)
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -25,7 +26,7 @@ Pop-Location
 if ($PullModels) {
     Need "ollama" "Install Ollama: https://ollama.com/ (optional; AM works without it)"
     Write-Host "Pulling local models (about 5 GB)"
-    ollama pull qwen2.5:7b-instruct
+    ollama pull llama3.1:8b
     ollama pull nomic-embed-text
 }
 
@@ -35,11 +36,11 @@ uv run python -m am.cli migrate; if ($LASTEXITCODE) { throw "migration failed" }
 Write-Host "4/5 Knowledge base"
 uv run python -m am.cli ingest-knowledge
 if ($Demo) {
-    Write-Host "5/5 Demo crew (SIMULATED data)"
-    uv run python -m am.cli seed-demo; if ($LASTEXITCODE) { throw "demo seed failed" }
+    Write-Host "5/5 Test crew (FICTIONAL, easy test passwords)"
+    uv run python -m am.cli seed-crew --simple-passwords --reset-passwords; if ($LASTEXITCODE) { throw "crew seed failed" }
 } else {
     Write-Host "5/5 Skipped demo crew (add -Demo to create it)"
 }
 uv run python -m am.cli status
 Pop-Location
-Write-Host "Done. Start AM with: powershell -ExecutionPolicy Bypass -File scripts\run.ps1"
+Write-Host "Done. Start AM with: powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -Demo"
